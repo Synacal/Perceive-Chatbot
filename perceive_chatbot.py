@@ -1,6 +1,10 @@
 import os
 import streamlit as st
 from openai import AzureOpenAI
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize AzureOpenAI client
 client = AzureOpenAI(
