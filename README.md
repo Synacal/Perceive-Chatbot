@@ -31,9 +31,20 @@ Before setting up the Perceive-Chatbot project, ensure you have the following pr
 
 3. **Create `.env` File**
 
-   Create a file named `.env` in the root directory of the project. This file will store environment variables required for the application. Ensure to add necessary configuration details in this file.
+   Create a file named `.env` in the root directory of the project. This file will store the environment variables required for the application. Ensure to add the necessary configuration details in this file.
 
-4. **Install Dependencies**
+   Here's a sample `.env` file structure:
+   
+   ```
+   # .env file
+   
+   # Azure OpenAI API Key
+   OPENAI_API_KEY=your_openai_api_key_here
+   
+   ```
+
+
+5. **Install Dependencies**
 
    Install the required Python dependencies using `pip`. Run the following commands:
 
@@ -42,7 +53,7 @@ Before setting up the Perceive-Chatbot project, ensure you have the following pr
    pip install python-dotenv
    ```
 
-5. **Run the Application**
+6. **Run the Application**
 
    To start the Perceive-Chatbot application, execute the following command:
 
