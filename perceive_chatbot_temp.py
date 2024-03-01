@@ -3,6 +3,7 @@ import os
 from openai import AzureOpenAI
 
 
+
 client = AzureOpenAI(
   azure_endpoint = "https://chatbotmedipredict.openai.azure.com/", 
   api_key=os.getenv("AZURE_OPENAI_KEY"),  
@@ -51,13 +52,13 @@ def main():
                     "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
                     "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content"]
 
-    j =  0 
-    for i in questions:
-        print(i)
+
+    for idx, question in enumerate(questions):
+        print(question)
 
         while True:
             user_input = input("You: ")
-            message_text = [{"role": "system", "content": system_prompt[j]},{"role": "user", "content": user_input}]
+            message_text = [{"role": "system", "content": system_prompt[idx]},{"role": "user", "content": user_input}]
             generated_content = generate_completion(client, message_text)
 
             if generated_content== "YES":
@@ -70,7 +71,6 @@ def main():
                 print("system error\n")
                 #return
         
-        j += 1
 
 if __name__ == "__main__":
     main()
