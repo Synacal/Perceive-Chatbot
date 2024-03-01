@@ -15,7 +15,6 @@ Here's a sample `.env` file structure:
 # Azure OpenAI API Key
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Other environment variables
 ```
 
 Replace `your_openai_api_key_here` with your actual Azure OpenAI API key.
