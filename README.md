@@ -39,7 +39,7 @@ Before setting up the Perceive-Chatbot project, ensure you have the following pr
    # .env file
    
    # Azure OpenAI API Key
-   OPENAI_API_KEY=your_openai_api_key_here
+   AZURE_OPENAI_KEY=your_openai_api_key_here
    
    ```
 
