@@ -26,63 +26,51 @@ def generate_completion(client, message_text, model="gpt-35-turbo", temperature=
     print(content)
     return content
 
-
-
-
-
-
-
 def main():
-    questions=["1. What is the full name of the company developing the AI-based Predictive Analytics for Healthcare?","2. Please provide a concise description of the AI-based Predictive Analytics for Healthcare technology.","3.	Can you tell me more about the specific patents or prior art you may have encountered during your research? What similarities or differences did you find?"]
+    questions=["1. What is the full name of the company developing the AI-based Predictive Analytics for Healthcare?",
+               "2. Please provide a concise description of the AI-based Predictive Analytics for Healthcare technology.",
+               "3. Describe the technical aspects and unique features of the AI-based Predictive Analytics for Healthcare.",
+               "4. Can you tell me more about the specific patents or prior art you may have encountered during your research? What similarities or differences did you find?",
+               "5. How does the AI-based Predictive Analytics for Healthcare meet the criteria of novelty in its field? ",
+               "6. Can you explain why the features of the AI-based Predictive Analytics for Healthcare are considered non-obvious to someone skilled in the field? ",
+               "7. How is the AI-based Predictive Analytics for Healthcare applicable to industrial needs in its domain? ",
+               "8. What is your strategy for patent filing, including geographies and patent offices?",
+               "9. How have you ensured enablement in the patent application for the AI-based Predictive Analytics for Healthcare? ",
+               "10. How have you ensured the definiteness of claims in your patent application for the AI-based Predictive Analytics for Healthcare? ",
+               "11. Can you provide the exact claims that will be present in the patent application for your AI-based Predictive Analytics solution?"]
+    
+    system_prompt =["you should check User Prompt that completed or not. User Prompt should include these points.\" The organization behind AI-based predictive analytics for healthcare is MediPredict Solutions. At MediPredict Solutions, we are dedicated to transforming healthcare through the power of artificial intelligence. Our flagship AI-based predictive The analytics platform is designed to revolutionize patient care by providing early warnings, personalized treatment insights and a deeper understanding of disease progression. Our mission is to provide healthcare with cutting-edge tools to more accurately predict health outcomes and improve the overall quality of care. Empowering Service Professionals.\" It is complete only if all the information included above is entered in the user prompt. it is compulsory Otherwise it is incomplete. Check the completed or incomplete user query. Return only \"NO\" word if not completed and \"YES\" word if completed. if you cant understand the user prompt, so return only \"NO\" word. ",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content"
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content",
+                    "get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content"]
 
+    j =  0 
     for i in questions:
-        
         print(i)
 
-        if i == "1. What is the full name of the company developing the AI-based Predictive Analytics for Healthcare?":
-            while True:
-                user_input = input("You: ")
-                message_text = [{"role": "system", "content": " you should check User Prompt that completed or not. User Prompt should include these points.\" The organization behind AI-based predictive analytics for healthcare is MediPredict Solutions. At MediPredict Solutions, we are dedicated to transforming healthcare through the power of artificial intelligence. Our flagship AI-based predictive The analytics platform is designed to revolutionize patient care by providing early warnings, personalized treatment insights and a deeper understanding of disease progression. Our mission is to provide healthcare with cutting-edge tools to more accurately predict health outcomes and improve the overall quality of care. Empowering Service Professionals.\" It is complete only if all the information included above is entered in the user prompt. it is compulsory Otherwise it is incomplete. Check the completed or incomplete user query. Return only \"NO\" word if not completed and \"YES\" word if completed. if you cant understand the user prompt, so return only \"NO\" word. "},{"role": "user", "content": user_input}]
-                generated_content = generate_completion(client, message_text)
+        while True:
+            user_input = input("You: ")
+            message_text = [{"role": "system", "content": system_prompt[j]},{"role": "user", "content": user_input}]
+            generated_content = generate_completion(client, message_text)
 
-                if generated_content== "YES":
-                    print("Answer is completed! Answer the next question.\n")
-                    break
-                elif generated_content=="NO":
-                    print("Answer is uncompleted! Answer again.\n")
-                    continue
-                else:
-                    print("system error\n")
-        elif i=="2. Please provide a concise description of the AI-based Predictive Analytics for Healthcare technology.":
-            while True:
-                user_input = input("You: ")
-                message_text = [{"role": "system", "content": " get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content"},{"role": "user", "content": user_input}]
-                generated_content = generate_completion(client, message_text)
-
-                if generated_content== "YES":
-                    print("Answer is completed! Answer the next question.\n")
-                    break
-                elif generated_content=="NO":
-                    print("Answer is uncompleted! Answer again.")
-                    continue
-                else:
-                    print("system error")
-        elif i=="3.	Can you tell me more about the specific patents or prior art you may have encountered during your research? What similarities or differences did you find?":
-            while True:
-                user_input = input("You: ")
-                message_text = [{"role": "system", "content": " get the user prompt and check what it has What are the various uses of Python? and it should include mentions of its applications in web development (server-side), software development, mathematics, and system scripting. please check the user prompt that is completed or uncompleted. firstly tell that completed or uncompleted. if uncompleted give full correct content"},{"role": "user", "content": user_input}]
-                generated_content = generate_completion(client, message_text)
-
-                if generated_content== "YES":
-                    print("Answer is completed! Answer the next question.\n")
-                    break
-                elif generated_content=="NO":
-                    print("Answer is uncompleted! Answer again.\n")
-                    continue
-                else:
-                    print("system error")
-
+            if generated_content== "YES":
+                print("Answer is completed! Answer the next question.\n")
+                break
+            elif generated_content=="NO":
+                print("Answer is uncompleted! Answer again.\n")
+                continue
+            else:
+                print("system error\n")
+                #return
         
+        j += 1
 
 if __name__ == "__main__":
     main()
