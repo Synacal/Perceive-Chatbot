@@ -1,45 +1,64 @@
-**Setting Up Perceive-Chatbot**
+## Perceive-Chatbot Setup Guide
 
-To set up the Perceive-Chatbot, follow these steps:
+This document outlines the steps required to set up and run the Perceive-Chatbot project. The Perceive-Chatbot is a Python-based chatbot application that integrates Azure and OpenAI services.
 
-### Step 1: Clone the Repository
-Clone the Perceive-Chatbot repository from the source.
+### Prerequisites
 
-### Step 2: Add .env File
-Create a .env file in the root directory of the project. This file will contain environment variables such as API keys. Ensure that you do not expose this file to the public.
+Before setting up the Perceive-Chatbot project, ensure you have the following prerequisites installed:
 
-Here's a sample `.env` file structure:
-```
-# .env file
+- Python (version 3.6 or higher)
+- `pip` package manager
 
-# Azure OpenAI API Key
-OPENAI_API_KEY=your_openai_api_key_here
+### Installation Steps
 
-```
+1. **Clone the Repository**
 
-Replace `your_openai_api_key_here` with your actual Azure OpenAI API key.
+   Clone the Perceive-Chatbot repository from GitHub using the following command:
 
-### Step 3: Install Dependencies
-Install the required Python dependencies using pip. Run the following commands in your terminal or command prompt:
+   ```
+   git clone <repository_url>
+   ```
 
-```bash
-pip install AzureOpenAI
-pip install python-dotenv
-pip install streamlit
-```
+   Replace `<repository_url>` with the URL of the Perceive-Chatbot repository.
 
-### Step 4: Run the Application
-After installing the dependencies, you can run the Perceive-Chatbot using Streamlit. Execute the following command in your terminal:
+2. **Navigate to the Project Directory**
 
-```bash
-streamlit run perceive_chatbot.py
-```
+   Move to the directory containing the Perceive-Chatbot project:
 
-This command will start the Streamlit server and launch the Perceive-Chatbot application in your default web browser.
+   ```
+   cd Perceive-Chatbot
+   ```
 
-### Additional Notes:
-- Make sure you have Python installed on your system.
-- Ensure that you have an active internet connection to download the dependencies and access the Azure OpenAI API.
-- For any issues or errors during the setup process, refer to the documentation or seek assistance from the community or project maintainers.
+3. **Create `.env` File**
 
-Follow these steps carefully to set up the Perceive-Chatbot successfully and enjoy using its features!
+   Create a file named `.env` in the root directory of the project. This file will store environment variables required for the application. Ensure to add necessary configuration details in this file.
+
+4. **Install Dependencies**
+
+   Install the required Python dependencies using `pip`. Run the following commands:
+
+   ```
+   pip install AzureOpenAI
+   pip install python-dotenv
+   ```
+
+5. **Run the Application**
+
+   To start the Perceive-Chatbot application, execute the following command:
+
+   ```
+   python perceive_chatbot.py
+   ```
+
+   This command will run the main Python script of the chatbot application.
+
+### Usage
+
+Once the application is running, you can interact with the Perceive-Chatbot through a command-line interface or integrate it into your existing Python projects.
+
+### Additional Notes
+
+- Ensure that you have proper permissions and access rights to the Azure and OpenAI services used by the Perceive-Chatbot.
+- Refer to the official documentation of Azure and OpenAI for detailed information on configuring and using their services.
+
+By following these steps, you should be able to set up and run the Perceive-Chatbot project successfully.
