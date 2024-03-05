@@ -1,5 +1,7 @@
 # Ignore .env files
 .env
+env
+venv
 
 # Ignore .vscode files
 .vscode
