@@ -46,12 +46,10 @@ source venv/bin/activate
 
 ### Step 4: Install Dependencies
 
-Install the required Python dependencies using `pip`. Run the following commands:
+With your virtual environment activated, install the required dependencies from your requirements.txt file:
 
-```bash
-pip install AzureOpenAI
-pip install python-dotenv
-pip install fastapi
+```
+pip freeze > requirements.txt
 
 ```
 
@@ -126,11 +124,11 @@ Before setting up the Perceive-Chatbot project, ensure you have the following pr
 
 4. **Install Dependencies**
 
-   Install the required Python dependencies using `pip`. Run the following commands:
+   With your virtual environment activated, install the required dependencies from your requirements.txt file:
 
    ```
-   pip install AzureOpenAI
-   pip install python-dotenv
+   pip freeze > requirements.txt
+
    ```
 
 5. **Run the Application**

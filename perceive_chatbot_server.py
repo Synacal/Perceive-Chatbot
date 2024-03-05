@@ -15,14 +15,19 @@ client = AzureOpenAI(
 class Message(BaseModel):
     user_input: str
 
+class Question(BaseModel):
+    user_input: str
+
 @app.post("/generate/")
-async def generate_response(message: Message):
-    system_prompt = """The user answers the following question: "What is the full name of the company developing the AI-Driven Predictive Maintenance Solution?"
+async def generate_response(message: Message,answeredQuestion: Question):
+    
+    system_prompt = f"""The user answers the following question: {answeredQuestion.user_input}
                     Then, check if the user prompt contains the following points:
                         "Evaluate the answer's level of detail regarding the technical description. Does it include operational mechanisms, implementation methods, and examples of real-world applications? If not, ask for specific details or real-world use cases that are missing."
 
                     The answer should be only in JSON format: 
-                        {status: "true/false", question: "question"}
+                        {{status: "true/false", 
+                        question: "question"}}
                     status and question json data must be included.
                     
                     The status should be returned "true" as JSON status and any question must be returned as question JSON, only if the user request contains all the above facts. If not or you cant understand, the status should be given as "false". If "false", to get a complete answer, a question must be returned from the question JSON again."""
