@@ -1,10 +1,18 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from openai import AzureOpenAI
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 client = AzureOpenAI(
     azure_endpoint="https://chatbotmedipredict.openai.azure.com/",
