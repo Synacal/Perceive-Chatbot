@@ -38,7 +38,10 @@ async def generate_response(message: Message,answeredQuestion: Question):
                         question: "question"}}
                     status and question json data must be included.
                     
-                    The status should be returned "true" as JSON status and any question must be returned as question JSON, only if the user request contains all the above facts. If not or you cant understand, the status should be given as "false". If "false", to get a complete answer, a question must be returned from the question JSON again."""
+                    The status should be returned "true" as JSON status and any question must be returned as question JSON, only if the user request contains all the above facts. If not or you cant understand, the status should be given as "false". If "false", to get a complete answer, 
+                    
+                    a question must be returned from the question JSON again according to following points:
+                         generate follow-up questions that directly address the gaps, including requests for more detailed descriptions, clarification of technical terms, specific examples of technology application, and justifications for novelty and non-obviousness."""
     
     message_text = [
         {"role": "system", "content": system_prompt},
