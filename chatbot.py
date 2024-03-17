@@ -20,18 +20,6 @@ client = AzureOpenAI(
     api_version="2024-02-15-preview"
 )
 
-class Message(BaseModel):
-    user_input: str
-
-class QuestionID(BaseModel):
-    user_input: int
-
-class UserID(BaseModel):
-    user_input: int
-
-class SessionID(BaseModel):
-    user_input: int
-
 def select_question(question_id: int):
     questions = ['What specific technologies or innovations within NeuraWear are you looking to license, and what makes these aspects unique and valuable for potential licensees?',
                 'Who are your ideal licensees for NeuraWear\'s technology, and in which industries or sectors do they primarily operate?',
@@ -158,15 +146,17 @@ def select_follow_up_question(question_id:int):
     return follow_up_questions[question_id]
 
 @app.post("/generate/")
-async def generate_response(message: Message,answeredQuestionID: QuestionID,userID: UserID,sessionID: SessionID):
+async def generate_response(answer: str,answeredQuestionID: int,userID: int,sessionID: int):
     
-    answeredQuestion = select_question(answeredQuestionID.user_input)
+    answeredQuestion = select_question(answeredQuestionID)
 
-    followUpQuestion = select_follow_up_question(answeredQuestionID.user_input)
+    checkPrompt = select_prompt(answeredQuestionID)
+
+    followUpQuestion = select_follow_up_question(answeredQuestionID)
 
     system_prompt = f"""The user answers the following question: {answeredQuestion}
                     Then, check if the user prompt contains the following points:
-                        "Evaluate the answer's level of detail regarding the technical description. Does it include operational mechanisms, implementation methods, and examples of real-world applications? If not, ask for specific details or real-world use cases that are missing."
+                        {checkPrompt}
 
                     The answer should be only in JSON format: 
                         {{status: "true/false", 
@@ -179,7 +169,7 @@ async def generate_response(message: Message,answeredQuestionID: QuestionID,user
     
     message_text = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": message.user_input}
+        {"role": "user", "content": answer}
     ]
 
     try:
@@ -195,9 +185,13 @@ async def generate_response(message: Message,answeredQuestionID: QuestionID,user
         )
 
         content = completion.choices[0].message.content
-        generated_content_json = json.loads(content)
-        generated_content_json["sessionID"] = sessionID.user_input
-        generated_content_json["userID"] = userID.user_input
+        if content:
+            generated_content_json = json.loads(content)
+            generated_content_json["userID"] = userID
+            generated_content_json["sessionID"] = sessionID
+        else:
+            generated_content_json = {"error": "Server error. Please try again later."}
+        
         return generated_content_json
 
     except Exception as e:
