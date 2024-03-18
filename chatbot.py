@@ -68,36 +68,47 @@ def select_prompt(question_id:int):
         #Synthetic data for IP validity analysis
         #1 prompt
         f"""
+        Verify the full name of the company developing the AI-based Predictive Analytics for Healthcare, which should include 'MediPredict Solutions'. Also, ensure the response includes details about empowering healthcare professionals with cutting-edge tools to predict health outcomes more accurately and improve the overall quality of care.
         """,
         #2 prompt
         f"""
+        Validate the concise description of the AI-based Predictive Analytics for Healthcare technology, focusing on its utilization of advanced machine learning algorithms and big data analytics. The description should also mention its mission to revolutionize patient care and provide early warnings and personalized treatment insights.
         """,
         #3 prompt
         f"""
+        Assess the user's response regarding the technical aspects and unique features of the AI-based Predictive Analytics for Healthcare. Request elaboration on specific AI technologies, machine learning algorithms, unique features, and how they empower healthcare professionals and improve patient outcomes.
         """,    
         #4 prompt
         f"""
+        Confirm the user's understanding of specific patents or prior art related to AI in healthcare. Inquire about the identified patents, their differences from the user's solution, and how the user's platform stands out in terms of machine learning models, data integration, and empowering healthcare professionals.
         """,    
         #5 prompt
         f"""
+        Evaluate how the AI-based Predictive Analytics for Healthcare meets the criteria of novelty in its field, focusing on its integration of diverse machine learning models, data fusion approach, use of NLP for unstructured data interpretation, and how these aspects contribute to its mission.
         """,
         #6 prompt
         f"""
+        Check the explanation provided for why the features of the AI-based Predictive Analytics for Healthcare are considered non-obvious, emphasizing its unique combination of machine learning algorithms, data integration capabilities, real-time analysis, NLP usage, and how these aspects align with its mission.
         """,
         #7 prompt
         f"""
+        Examine the applicability of the AI-based Predictive Analytics for Healthcare to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission.
         """,
         #8 prompt
         f"""
+        Evaluate the user's strategy for patent filing, including targeted geographies and patent offices. Request specifics on key markets, rationale for choices, considerations for demand, regulatory environments, and how these strategies align with the company's mission.
         """,
         #9 prompt
         f"""
+        Verify how enablement is ensured in the patent application for the AI-based Predictive Analytics for Healthcare, focusing on comprehensive details, code snippets, workflow diagrams provided, and how they contribute to the mission of empowering healthcare professionals.
         """,
         #10 prompt
         f"""
+        Confirm how definiteness of claims is ensured in the patent application for the AI-based Predictive Analytics for Healthcare, emphasizing clear, concise claims supported by detailed technology descriptions, highlighting unique aspects, and how they align with the company's mission.
         """,
         #11 prompt
         f"""
+        Request the exact claims present in the patent application for the AI-based Predictive Analytics solution, seeking details on the method for predicting health outcomes, application of NLP, real-time analysis, genetic information integration, specific healthcare applications covered in the claims, and how they contribute to achieving the company's mission.
         """,
 
         #IP licensing strategy process document
@@ -124,7 +135,7 @@ def select_prompt(question_id:int):
             Strategy for achieving goals through licensing""",
         #15 prompt   
         f"""
-
+        Review the user's preferred licensing model for NeuraWear, which includes a mix of exclusive and non-exclusive licensing agreements. Evaluate how this preference aligns with their strategic objectives, focusing on offering exclusive licenses to strategic partners in niche medical applications and non-exclusive licenses for consumer electronics to foster broader adoption and innovation. Ensure the response emphasizes the goal of penetrating specific healthcare segments while encouraging innovation in consumer electronics.
         """,
         #16 prompt
         f"""Assess the strategy behind geographic targeting for licensing.
@@ -135,7 +146,7 @@ def select_prompt(question_id:int):
             Trends and regulatory considerations""",
         #17 prompt
         f"""
-
+        Assess the user's financial expectations from licensing agreements for NeuraWear, which include upfront payments ranging from $100,000 to $500,000 and royalty rates between 4% and 7% of net sales. Evaluate the reasoning behind these financial expectations, considering factors such as market positioning, licensee's applications, and strategic value of the technology
         """,
         #18 prompt
         f"""Evaluate the preparedness for negotiating complex agreements. If the response does not reflect a comprehensive strategy.
@@ -146,8 +157,8 @@ def select_prompt(question_id:int):
             Readiness for managing IP compliance""",
         #19 prompt
         f"""
-            
-            """,
+        Evaluate the key terms and conditions prioritized in the user's licensing agreements for NeuraWear, focusing on strict quality control provisions to maintain technology integrity, clear definitions of fields of use to protect market segments, and robust audit rights for compliance and accurate royalty reporting. Verify how these terms align with the user's strategic goals and technology protection objectives.   
+        """,
         #20 prompt
         f"""Examine the openness to and strategy for forming strategic partnerships or cross-licensing agreements. 
 
@@ -208,69 +219,31 @@ def select_prompt(question_id:int):
 
     return prompts[question_id]
 
-def select_follow_up_question(question_id:int):
-    follow_up_questions = [
-        #Synthetic data for IP validity analysis
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        f"""""",
-        #IP licensing strategy process document
-        f"""what specific aspects of the innovation need further clarification?""",
-        f"""what additional information is needed to identify the ideal licensees?""",
-        f"""which aspects of the business strategy require more detailed explanation?""",
-        f"""what specific details about the licensing model need further clarification?""",
-        f"""what market data or trends could provide further justification for these regional choices?""",
-        f"""what are your financial expectations from licensing agreements?""",
-        f"""what legal considerations or contractual details are not yet addressed?""",
-        f"""what key terms and conditions are you prioritizing in your licensing agreements?""",
-        f"""how such partnerships would work and their strategic fit?""",
-        f"""what metrics and KPIs will you use to evaluate the success of your licensing strategy?""",
-        f"""what support will be provided, request detailed information on enforcement mechanisms and licensee support systems""",
-        f"""how do you plan to handle sublicensing rights, audit rights, and quality control provisions to safeguard the integrity and value of your licensed IP?""",
-        f"""how these fields align with current and emerging market needs.""",
-        #IP Valuation questions list
-        f"""Could you specify which pricing strategies you've considered and which one you're leaning towards? It would also be helpful to know the reasons behind your preference and how you plan to implement it.""",
-        f"""Can you provide a detailed breakdown of how you calculate the gross margin for both your product sales and subscription services, including the costs factored into these calculations?""",
-        f"""Could you approximate the total development costs you've incurred so far, including any major categories of expenses like R&D, legal, or marketing?""",
-        f"""Can you estimate the future costs required for the remaining development, marketing, and launch phases of your product or service, and how you plan to allocate these costs?""",
-        f"""What factors are you considering in determining your discount rate for future cash flows, and what range or specific rate are you currently leaning towards?""",
-        f"""Can you share any preliminary annual revenue growth projections you have, along with the assumptions or market research that support these figures?""",
-        f"""Could you specify the main categories of your anticipated operating expenses and provide a rough allocation or percentage breakdown for each category?""",
-        f"""Could you outline your sales revenue targets for the next 5 years and explain the basis or methodology for these projections, including any market trends or data you're relying on?""",
-        f"""Can you share specific insights or findings from your market and competitive analysis, including how these insights are influencing your product development, pricing, and marketing strategies?"""
-
-    ]
-    return follow_up_questions[question_id]
 
 @app.post("/generate/")
-async def generate_response(answer: str,answeredQuestionID: int,userID: int,sessionID: int):
+async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: int):
     
-    answeredQuestion = select_question(answeredQuestionID)
+    answeredQuestion = select_question(QuestionID-1)
 
-    checkPrompt = select_prompt(answeredQuestionID)
-
-    followUpQuestion = select_follow_up_question(answeredQuestionID)
+    checkPrompt = select_prompt(QuestionID-1)
 
     system_prompt = f"""The user answers the following question: {answeredQuestion}
                     Then, check if the user prompt contains the following points:
                         {checkPrompt}
+                        The user prompt should include all the above details for completeness.
 
-                    The answer should be only in JSON format: 
+                    The output response should be only in JSON format: 
                         {{status: "true/false", 
                         question: "question"}}
-                    status and question json data must be included.
+                    The JSON data must include status and question fields.
                     
-                    The status should be returned "true" as JSON status and any question must be returned as question JSON, only if the user request contains all the above facts. If not or you cant understand, the status should be given as "false". If "false", to get a complete answer, 
+                    If the user request contains all the required facts, return the status as "true" in JSON format along with any relevant question from the question JSON.
+
+                    If the user request does not contain all the required facts or input is not understandable or lacks the required information, return the status as "false" in JSON format. If "false" is returned, provide a follow-up question from the question JSON to help the user provide a complete answer. 
                     
-                    a question must be returned from the question JSON again. question = {followUpQuestion}"""
+                    Ensure that the follow-up questions directly address any gaps, request more detailed descriptions, seek clarifications on technical terms, ask for specific examples of technology application, and justify novelty and non-obviousness.
+                    
+                    The output response should always be in JSON format."""
     
     message_text = [
         {"role": "system", "content": system_prompt},
