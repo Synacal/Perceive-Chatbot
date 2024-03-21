@@ -267,6 +267,7 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
             generated_content_json = json.loads(content)
             generated_content_json["userID"] = userID
             generated_content_json["sessionID"] = sessionID
+            generated_content_json["questionID"] = QuestionID
         else:
             generated_content_json = {"error": "Server error. Please try again later."}
         
