@@ -48,22 +48,36 @@ def select_question(question_id: int):
                 'What metrics and KPIs will you use to evaluate the success of your licensing strategy?',
                 'Do you have any performance requirements or specific expectations from licensees to ensure they contribute effectively to the licensed technology\'s success?',
                 'How do you plan to handle sublicensing rights, audit rights, and quality control provisions to safeguard the integrity and value of your licensed IP?',
-                'Are there any particular fields of use you are considering for NeuraWear\'s licensing agreements, and how do these choices reflect market demands and opportunities?'
+                'Are there any particular fields of use you are considering for NeuraWear\'s licensing agreements, and how do these choices reflect market demands and opportunities?',
                 
                 #IP Valuation questions list
                 'What is the pricing strategy for your product or service?',
                 'How do you calculate the gross margin for your offerings?',
-                'What are the total development costs incurred for your product or service?'
-                'What future costs do you anticipate for full development and market launch?'
+                'What are the total development costs incurred for your product or service?',
+                'What future costs do you anticipate for full development and market launch?',
                 'What discount rate do you apply to future cash flows and why?',
                 'What is the projected annual revenue growth rate, and how did you arrive at this figure?',
                 'What are the anticipated operating expenses, and how are they allocated?',
                 'How do you project sales revenue for your products or services over the next 5 years?',
                 'What market and competitive analysis data have you gathered, and how does it influence your strategy?',
+
+                # Qs for Market potential report
+                "What is the full legal name of your company, and what is its primary mission?",
+                "Can you describe the key product or technology your company has developed?",
+                "Who is the target audience for your product or service?",
+                "What specific problem does your product or service solve for your target audience?",
+                "How does your product or service stand out from existing market offerings?",
+                "What pricing strategy has your company adopted for its product or service?",
+                "Could you explain your company's business model and how it generates revenue?",
+                "What are the primary and potential secondary revenue streams for your company?",
+                "How is your company's cost structure organized, and what impact does it have on pricing and profitability?",
+                "Which sales and distribution channels is your company planning to use?",
+                "Who are your main competitors, and what differentiates your product or service from theirs?"
                 ]
     return questions[question_id]
 
 def select_prompt(question_id:int):
+
     prompts = [
         #Synthetic data for IP validity analysis
         #1 prompt
@@ -215,6 +229,20 @@ def select_prompt(question_id:int):
         #33 prompt
         f"""Evaluate if the answer identifies key competitors and market share, discusses relevant market trends and technological advancements, and explains how this data influences the company's strategic direction.""",  
         
+
+
+        # Market analysis Prompts
+        "Confirm the response includes the full legal name of the company and provides a comprehensive overview of its core mission and business focus. Check if the answer details how the company aims to impact its industry or target market through its products, services, or innovations.",
+        "Verify the description clearly outlines the key product or technology developed by the company, including its main functions, how it works, and the unique benefits it offers to users. Ensure the answer highlights the technological innovation and its application.",
+        "Ensure the answer specifies the target audience for the company's product or service, including demographic details, consumer behaviors, and preferences. Confirm that the response identifies why this market segment is targeted and how the product meets their needs.",
+        "Check if the response articulates the specific problem or need the product or service addresses for its target audience. It should describe how the offering uniquely solves this problem and the benefits it provides over existing solutions.",
+        "Confirm the answer details the product's or service's competitive advantages, including how it outperforms existing offerings in the market. Look for mentions of unique features, technology, cost-effectiveness, or any other factors that give it an edge.",
+        "Verify that the response outlines the company's pricing strategy, explaining how the price was determined and the factors influencing this decision. It should also address how the pricing reflects the product's value proposition and market positioning.",
+        "Ensure the answer provides a clear explanation of the company's business model, including how it generates revenue, the value it offers customers, and its strategy for growth. Confirm it covers any unique aspects of their approach to reaching the market and securing income.",
+        "Check if the response identifies all primary and potential secondary revenue streams for the company. It should detail how each stream contributes to the overall financial sustainability and future growth plans.",
+        "Confirm the answer breaks down the company's cost structure, highlighting both fixed and variable costs, and discusses its implications on product pricing and overall profitability. Look for strategies mentioned for maintaining profitability.",
+        "Verify the response identifies the sales and distribution channels the company uses or plans to use, explaining the choice and how these channels align with the company’s overall sales and marketing strategy.",
+        "Ensure the answer provides an analysis of the competitive landscape, including direct and indirect competitors. It should evaluate how the company's offering compares in terms of features, pricing, and quality, and discuss strategies for differentiation and market positioning."
     ]
 
     return prompts[question_id]
@@ -226,24 +254,52 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
     answeredQuestion = select_question(QuestionID-1)
 
     checkPrompt = select_prompt(QuestionID-1)
+    print(answeredQuestion)
+    print(checkPrompt)
+    # system_prompt = f"""The user answers the following question: {answeredQuestion}
+    #                 Then, check if the user prompt contains the following points:
+    #                     {checkPrompt}
+    #                     The user prompt should include all the above details for completeness.
 
-    system_prompt = f"""The user answers the following question: {answeredQuestion}
-                    Then, check if the user prompt contains the following points:
-                        {checkPrompt}
-                        The user prompt should include all the above details for completeness.
+    #                 If the user request does not contain all the required facts or input is 
+    #                 not understandable or lacks the required information, return the status as 
+    #                 "false" in JSON format. If "false" is returned, provide a follow-up question 
+    #                 from the question JSON to help the user provide a complete answer. 
+                    
+    #                 Ensure that the follow-up questions directly address any gaps, request 
+    #                 more detailed descriptions, seek clarifications on technical terms, ask for 
+    #                 specific examples of technology application, and justify novelty and non-obviousness.
 
-                    The output response should be only in JSON format: 
-                        {{status: "true/false", 
-                        question: "question"}}
-                    The JSON data must include status and question fields.
+    #                 The output response should be only in JSON format: 
+    #                     {{status: "true/false", 
+    #                     question: "question"}}
+    #                 The JSON data must include status and question fields.
                     
-                    If the user request contains all the required facts, return the status as "true" in JSON format along with any relevant question from the question JSON.
+    #                 If the user request contains all the required facts, return the status as 
+    #                 "true" in JSON format along with any relevant question from the question JSON.
+                    
+    #                 The output response should always be in JSON format."""
+    system_prompt = f"""Given the user's response to the question: '{answeredQuestion}',
+            evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
+            {checkPrompt}
+            The response should encapsulate all specified points to be considered complete.
 
-                    If the user request does not contain all the required facts or input is not understandable or lacks the required information, return the status as "false" in JSON format. If "false" is returned, provide a follow-up question from the question JSON to help the user provide a complete answer. 
-                    
-                    Ensure that the follow-up questions directly address any gaps, request more detailed descriptions, seek clarifications on technical terms, ask for specific examples of technology application, and justify novelty and non-obviousness.
-                    
-                    The output response should always be in JSON format."""
+            If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
+            {{"status": "false", "question": "<appropriate follow-up question from the predefined list>"}}
+            This indicates the need for additional information to fulfill the request comprehensively.
+
+            For every gap identified in the user's response, select a follow-up question that precisely targets 
+            the missing information. This could involve requesting more elaborate explanations, clarification of 
+            technical terms, specific instances of technology application, or arguments supporting the novelty and 
+            uniqueness of the concept.
+
+            Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
+            {{"status": "true", "question": ""}}
+
+            Always format the output in JSON, including 'status' and 'question' keys, to streamline the evaluation 
+            process and guide the user towards providing a fully rounded response.
+            """
+
     
     message_text = [
         {"role": "system", "content": system_prompt},
@@ -263,14 +319,18 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
         )
 
         content = completion.choices[0].message.content
+        print (content)
         if content:
-            generated_content_json = json.loads(content)
-            generated_content_json["userID"] = userID
-            generated_content_json["sessionID"] = sessionID
-            generated_content_json["questionID"] = QuestionID
+            try:
+                generated_content_json = json.loads(content)
+                generated_content_json["userID"] = userID
+                generated_content_json["sessionID"] = sessionID
+                generated_content_json["questionID"] = QuestionID
+            except json.JSONDecodeError:
+                return {"error": "Invalid JSON response from the API. Please check the format."}
         else:
             generated_content_json = {"error": "Server error. Please try again later."}
-        
+
         return generated_content_json
 
     except Exception as e:
