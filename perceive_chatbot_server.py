@@ -22,18 +22,24 @@ client = AzureOpenAI(
 
 def select_question(question_id: int):
     questions = [
+                #Common Qs
+                'What is the full name of the company, and what is its core mission?',
+                'Please provide a concise description of the technology or product your company has developed.',
+                'Describe the technical aspects and unique features of the key product or technology developed by the company. How does your product or technology introduce innovation or novelty within its field?',
+                "Could you explain your company's business model and how it generates revenue? What are the different revenue streams for your company, including primary and potential ancillary streams?",
+                'What is your strategy for protecting the intellectual property associated with your product or technology? Are there specific patents or prior art that you have encountered during your research? What similarities or differences did you find?',
+                
                 #Synthetic data for IP validity analysis 
-                'What is the full name of the company developing the AI-based Predictive Analytics for Healthcare?',
-                'Please provide a concise description of the AI-based Predictive Analytics for Healthcare technology.',
-                'Describe the technical aspects and unique features of the AI-based Predictive Analytics for Healthcare.',
+                # 'What is the full name of the company developing the key product or technology developed by the company?',
+                # 'Please provide a concise description of the key product or technology developed by the company technology.',
                 'Can you tell me more about the specific patents or prior art you may have encountered during your research? What similarities or differences did you find?',
-                'How does the AI-based Predictive Analytics for Healthcare meet the criteria of novelty in its field?',
-                'Can you explain why the features of the AI-based Predictive Analytics for Healthcare are considered non-obvious to someone skilled in the field?',
-                'How is the AI-based Predictive Analytics for Healthcare applicable to industrial needs in its domain?',
+                'How does the key product or technology developed by the company meet the criteria of novelty in its field?',
+                'Can you explain why the features of the key product or technology developed by the company are considered non-obvious to someone skilled in the field?',
+                'How is the key product or technology developed by the company applicable to industrial needs in its domain?',
                 'What is your strategy for patent filing, including geographies and patent offices?',
-                'How have you ensured enablement in the patent application for the AI-based Predictive Analytics for Healthcare?',
-                'How have you ensured the definiteness of claims in your patent application for the AI-based Predictive Analytics for Healthcare?',
-                'Can you provide the exact claims that will be present in the patent application for your AI-based Predictive Analytics solution?',
+                'How have you ensured enablement in the patent application for the key product or technology developed by the company?',
+                'How have you ensured the definiteness of claims in your patent application for the key product or technology developed by the company?',
+                'Can you provide the exact claims that will be present in the patent application for your key product or technology developed?',
 
                 #IP licensing strategy process document
                 'What specific technologies or innovations within NeuraWear are you looking to license, and what makes these aspects unique and valuable for potential licensees?',
@@ -62,13 +68,13 @@ def select_question(question_id: int):
                 'What market and competitive analysis data have you gathered, and how does it influence your strategy?',
 
                 # Qs for Market potential report
-                "What is the full legal name of your company, and what is its primary mission?",
-                "Can you describe the key product or technology your company has developed?",
-                "Who is the target audience for your product or service?",
+                # "What is the full legal name of your company, and what is its primary mission?",
+                # "Can you describe the key product or technology your company has developed?",
+                # "Who is the target audience for your product or service?",
                 "What specific problem does your product or service solve for your target audience?",
                 "How does your product or service stand out from existing market offerings?",
                 "What pricing strategy has your company adopted for its product or service?",
-                "Could you explain your company's business model and how it generates revenue?",
+                # "Could you explain your company's business model and how it generates revenue?",
                 "What are the primary and potential secondary revenue streams for your company?",
                 "How is your company's cost structure organized, and what impact does it have on pricing and profitability?",
                 "Which sales and distribution channels is your company planning to use?",
@@ -79,34 +85,32 @@ def select_question(question_id: int):
 def select_prompt(question_id:int):
 
     prompts = [
+        # Common questions
+        "Confirm the response includes the full legal name of the company and provides a comprehensive overview of its core mission and business focus. Check if the answer details how the company aims to impact its industry or target market through its products, services, or innovations.",
+        "Verify the description clearly outlines the key product or technology developed by the company, including its main functions, how it works, and the unique benefits it offers to users. Ensure the answer highlights the technological innovation and its application.",
+        f"""
+        Assess the user's response regarding the technical aspects and unique features of the key product or technology developed by the company. Request elaboration How does your product or technology introduce innovation or novelty within its field?.
+        """,
+        "Check if the response identifies all primary and potential secondary revenue streams for the company. It should detail how each stream contributes to the overall financial sustainability and future growth plans.",
+        'Check if the response identifies all strategy for protecting the intellectual property associated with related product or technology?'
+
+
+
         #Synthetic data for IP validity analysis
-        #1 prompt
         f"""
-        Verify the full name of the company developing the AI-based Predictive Analytics for Healthcare, which should include 'MediPredict Solutions'. Also, ensure the response includes details about empowering healthcare professionals with cutting-edge tools to predict health outcomes more accurately and improve the overall quality of care.
-        """,
-        #2 prompt
-        f"""
-        Validate the concise description of the AI-based Predictive Analytics for Healthcare technology, focusing on its utilization of advanced machine learning algorithms and big data analytics. The description should also mention its mission to revolutionize patient care and provide early warnings and personalized treatment insights.
-        """,
-        #3 prompt
-        f"""
-        Assess the user's response regarding the technical aspects and unique features of the AI-based Predictive Analytics for Healthcare. Request elaboration on specific AI technologies, machine learning algorithms, unique features, and how they empower healthcare professionals and improve patient outcomes.
-        """,    
-        #4 prompt
-        f"""
-        Confirm the user's understanding of specific patents or prior art related to AI in healthcare. Inquire about the identified patents, their differences from the user's solution, and how the user's platform stands out in terms of machine learning models, data integration, and empowering healthcare professionals.
+        Confirm the user's understanding of specific patents or prior art related to their product or technology. Inquire about the identified patents, their differences from the user's solution, and how the user's platform stands out in terms of machine learning models, data integration, and empowering healthcare professionals.
         """,    
         #5 prompt
         f"""
-        Evaluate how the AI-based Predictive Analytics for Healthcare meets the criteria of novelty in its field, focusing on its integration of diverse machine learning models, data fusion approach, use of NLP for unstructured data interpretation, and how these aspects contribute to its mission.
+        Evaluate how the key product or technology developed by the company meets the criteria of novelty in its field, focusing on its integration of diverse machine learning models, data fusion approach, use of NLP for unstructured data interpretation, and how these aspects contribute to its mission.
         """,
         #6 prompt
         f"""
-        Check the explanation provided for why the features of the AI-based Predictive Analytics for Healthcare are considered non-obvious, emphasizing its unique combination of machine learning algorithms, data integration capabilities, real-time analysis, NLP usage, and how these aspects align with its mission.
+        Check the explanation provided for why the features of the key product or technology developed by the company are considered non-obvious, emphasizing its unique combination of machine learning algorithms, data integration capabilities, real-time analysis, NLP usage, and how these aspects align with its mission.
         """,
         #7 prompt
         f"""
-        Examine the applicability of the AI-based Predictive Analytics for Healthcare to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission.
+        Examine the applicability of the key product or technology developed by the company to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission.
         """,
         #8 prompt
         f"""
@@ -114,11 +118,11 @@ def select_prompt(question_id:int):
         """,
         #9 prompt
         f"""
-        Verify how enablement is ensured in the patent application for the AI-based Predictive Analytics for Healthcare, focusing on comprehensive details, code snippets, workflow diagrams provided, and how they contribute to the mission of empowering healthcare professionals.
+        Verify how enablement is ensured in the patent application for the key product or technology developed by the company, focusing on comprehensive details, code snippets, workflow diagrams provided, and how they contribute to the mission of empowering healthcare professionals.
         """,
         #10 prompt
         f"""
-        Confirm how definiteness of claims is ensured in the patent application for the AI-based Predictive Analytics for Healthcare, emphasizing clear, concise claims supported by detailed technology descriptions, highlighting unique aspects, and how they align with the company's mission.
+        Confirm how definiteness of claims is ensured in the patent application for the key product or technology developed by the company, emphasizing clear, concise claims supported by detailed technology descriptions, highlighting unique aspects, and how they align with the company's mission.
         """,
         #11 prompt
         f"""
@@ -209,6 +213,7 @@ def select_prompt(question_id:int):
             Strategic selection of fields of use
             Market analysis supporting these choices
             Alignment with current and future market demands""",
+
         #IP Valuation questions list
         #25 prompt
         f"""Evaluate if the answer specifies the type of pricing strategy used (competitive, value-based, etc.), mentions the factors considered (cost, market competition, customer value), and if it covers different offerings (products and services).""",
@@ -232,13 +237,13 @@ def select_prompt(question_id:int):
 
 
         # Market analysis Prompts
-        "Confirm the response includes the full legal name of the company and provides a comprehensive overview of its core mission and business focus. Check if the answer details how the company aims to impact its industry or target market through its products, services, or innovations.",
-        "Verify the description clearly outlines the key product or technology developed by the company, including its main functions, how it works, and the unique benefits it offers to users. Ensure the answer highlights the technological innovation and its application.",
-        "Ensure the answer specifies the target audience for the company's product or service, including demographic details, consumer behaviors, and preferences. Confirm that the response identifies why this market segment is targeted and how the product meets their needs.",
+        # "Confirm the response includes the full legal name of the company and provides a comprehensive overview of its core mission and business focus. Check if the answer details how the company aims to impact its industry or target market through its products, services, or innovations.",
+        # "Verify the description clearly outlines the key product or technology developed by the company, including its main functions, how it works, and the unique benefits it offers to users. Ensure the answer highlights the technological innovation and its application.",
+        # "Ensure the answer specifies the target audience for the company's product or service, including demographic details, consumer behaviors, and preferences. Confirm that the response identifies why this market segment is targeted and how the product meets their needs.",
         "Check if the response articulates the specific problem or need the product or service addresses for its target audience. It should describe how the offering uniquely solves this problem and the benefits it provides over existing solutions.",
         "Confirm the answer details the product's or service's competitive advantages, including how it outperforms existing offerings in the market. Look for mentions of unique features, technology, cost-effectiveness, or any other factors that give it an edge.",
         "Verify that the response outlines the company's pricing strategy, explaining how the price was determined and the factors influencing this decision. It should also address how the pricing reflects the product's value proposition and market positioning.",
-        "Ensure the answer provides a clear explanation of the company's business model, including how it generates revenue, the value it offers customers, and its strategy for growth. Confirm it covers any unique aspects of their approach to reaching the market and securing income.",
+        # "Ensure the answer provides a clear explanation of the company's business model, including how it generates revenue, the value it offers customers, and its strategy for growth. Confirm it covers any unique aspects of their approach to reaching the market and securing income.",
         "Check if the response identifies all primary and potential secondary revenue streams for the company. It should detail how each stream contributes to the overall financial sustainability and future growth plans.",
         "Confirm the answer breaks down the company's cost structure, highlighting both fixed and variable costs, and discusses its implications on product pricing and overall profitability. Look for strategies mentioned for maintaining profitability.",
         "Verify the response identifies the sales and distribution channels the company uses or plans to use, explaining the choice and how these channels align with the company’s overall sales and marketing strategy.",
