@@ -74,6 +74,8 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
             Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
             {{"status": "true", "question": ""}}
 
+            Avoid generating apology messages or phrases like "I'm sorry" in the follow-up questions or responses.
+
             Always format the output in JSON, including 'status' and 'question' keys, to streamline the evaluation 
             process and guide the user towards providing a fully rounded response.
             """
@@ -100,6 +102,12 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
         if content:
             try:
                 generated_content_json = json.loads(content)
+                if "status" not in generated_content_json or "question" not in generated_content_json:
+                    return {"status": "false", 
+                            "question": answeredQuestion,
+                            "userID": userID,
+                            "sessionID": sessionID,
+                            "questionID": QuestionID}
                 generated_content_json["userID"] = userID
                 generated_content_json["sessionID"] = sessionID
                 generated_content_json["questionID"] = QuestionID
