@@ -63,7 +63,8 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
             The response should encapsulate all specified points to be considered complete.
 
             If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
-            {{"status": "false", "question": "<appropriate follow-up question from the predefined list>"}}
+            {{"status": "false"(indicates incompleteness),
+              "question": "<appropriate follow-up question from the predefined list>"}}
             This indicates the need for additional information to fulfill the request comprehensively.
 
             For every gap identified in the user's response, select a follow-up question that precisely targets 
@@ -72,7 +73,8 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
             uniqueness of the concept.
 
             Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
-            {{"status": "true", "question": ""}}
+            {{"status": "true", 
+            "question": ""(empty string)}}
 
             Avoid generating apology messages or phrases like "I'm sorry" in the follow-up questions or responses.
 
@@ -99,12 +101,13 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
         )
 
         content = completion.choices[0].message.content
+
         if content:
             try:
                 generated_content_json = json.loads(content)
                 if "status" not in generated_content_json or "question" not in generated_content_json:
                     return {"status": "false", 
-                            "question": answeredQuestion,
+                            "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
                             "userID": userID,
                             "sessionID": sessionID,
                             "questionID": QuestionID}
@@ -112,9 +115,21 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
                 generated_content_json["sessionID"] = sessionID
                 generated_content_json["questionID"] = QuestionID
             except json.JSONDecodeError:
-                return {"error": "Invalid JSON response from the API. Please check the format."}
+                 generated_content_json = {
+                "status": "false", 
+                "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
+                "userID": userID,
+                "sessionID": sessionID,
+                "questionID": QuestionID,
+            }
         else:
-            generated_content_json = {"error": "Server error. Please try again later."}
+            generated_content_json = {
+                "status": "false", 
+                "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
+                "userID": userID,
+                "sessionID": sessionID,
+                "questionID": QuestionID,
+            }
 
         return generated_content_json
 
