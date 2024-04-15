@@ -67,7 +67,7 @@ prompts = [
         Assess the user's response regarding the technical aspects and unique features of the key product or technology developed by the company. Request elaboration How does your product or technology introduce innovation or novelty within its field?.
         """,
         "Check if the response identifies all primary and potential secondary revenue streams for the company. It should detail how each stream contributes to the overall financial sustainability and future growth plans.",
-        'Check if the response identifies all strategy for protecting the intellectual property associated with related product or technology?'
+        "Check if the response identifies all strategy for protecting the intellectual property associated with related product or technology?",
 
 
 
@@ -85,7 +85,7 @@ prompts = [
         """,
         #7 prompt
         f"""
-        Examine the applicability of the key product or technology developed by the company to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission.
+        Examine the applicability of the key product or technology developed by the company to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission. Based on the provided answer, evaluate how ARSight addresses industrial needs in terms of efficiency, safety, and learning. Consider its practical applications across industries and how it meets the challenges and demands of the digital age.
         """,
         #8 prompt
         f"""

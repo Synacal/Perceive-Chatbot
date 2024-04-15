@@ -57,13 +57,16 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
     answeredQuestion = select_question(QuestionID-1)
 
     checkPrompt = select_prompt(QuestionID-1)
+
+    print("answeredQuestion",answeredQuestion)
+    print("checkPrompt",checkPrompt)
     system_prompt = f"""Given the user's response to the question: '{answeredQuestion}',
             evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
             {checkPrompt}
             The response should encapsulate all specified points to be considered complete.
 
             If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
-            {{"status": "false"(indicates incompleteness),
+            {{"status": "false",
               "question": "<appropriate follow-up question from the predefined list>"}}
             This indicates the need for additional information to fulfill the request comprehensively.
 
@@ -74,7 +77,7 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
 
             Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
             {{"status": "true", 
-            "question": ""(empty string)}}
+            "question": ""}}
 
             Avoid generating apology messages or phrases like "I'm sorry" in the follow-up questions or responses.
 
@@ -101,6 +104,7 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
         )
 
         content = completion.choices[0].message.content
+        print("content",content)
 
         if content:
             try:
