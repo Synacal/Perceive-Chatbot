@@ -63,11 +63,13 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
     system_prompt = f"""Given the user's response to the question: '{answeredQuestion}',
             evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
             {checkPrompt}
+            
             The response should encapsulate all specified points to be considered complete.
 
             If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
-            {{"status": "false",
+            {{"status": "false", 
               "question": "<appropriate follow-up question from the predefined list>"}}
+            
             This indicates the need for additional information to fulfill the request comprehensively.
 
             For every gap identified in the user's response, select a follow-up question that precisely targets 
@@ -78,7 +80,7 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
             Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
             {{"status": "true", 
             "question": ""}}
-
+            
             Avoid generating apology messages or phrases like "I'm sorry" in the follow-up questions or responses.
 
             Always format the output in JSON, including 'status' and 'question' keys, to streamline the evaluation 

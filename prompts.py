@@ -75,84 +75,84 @@ prompts = [
         f"""
         Confirm the user's understanding of specific patents or prior art related to their product or technology. Inquire about the identified patents, their differences from the user's solution, and how the user's platform stands out in terms of machine learning models, data integration, and empowering healthcare professionals.
         """,    
-        #5 prompt
+        #7 prompt
         f"""
         Evaluate how the key product or technology developed by the company meets the criteria of novelty in its field, focusing on its integration of diverse machine learning models, data fusion approach, use of NLP for unstructured data interpretation, and how these aspects contribute to its mission.
         """,
-        #6 prompt
+        #8 prompt
         f"""
         Check the explanation provided for why the features of the key product or technology developed by the company are considered non-obvious, emphasizing its unique combination of machine learning algorithms, data integration capabilities, real-time analysis, NLP usage, and how these aspects align with its mission.
         """,
-        #7 prompt
-        f"""
-        Examine the applicability of the key product or technology developed by the company to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission. Based on the provided answer, evaluate how ARSight addresses industrial needs in terms of efficiency, safety, and learning. Consider its practical applications across industries and how it meets the challenges and demands of the digital age.
-        """,
-        #8 prompt
-        f"""
-        Evaluate the user's strategy for patent filing, including targeted geographies and patent offices. Request specifics on key markets, rationale for choices, considerations for demand, regulatory environments, and how these strategies align with the company's mission.
-        """,
         #9 prompt
         f"""
-        Verify how enablement is ensured in the patent application for the key product or technology developed by the company, focusing on comprehensive details, code snippets, workflow diagrams provided, and how they contribute to the mission of empowering healthcare professionals.
+        Examine the applicability of the key product or technology developed by the company to industrial needs within its domain, emphasizing early disease detection, personalized treatment plans, versatility across healthcare settings, and how these aspects contribute to its mission. Based on the provided answer, evaluate how ARSight addresses industrial needs in terms of efficiency, safety, and learning. Consider its practical applications across industries and how it meets the challenges and demands of the digital age. If the user's answer demonstrates that ARSight enhances efficiency, safety, and learning in manufacturing and maintenance, education and training, and design and architecture, and its practical applications across industries showcase its capacity to meet the challenges of the digital age, then confirm the completeness with a JSON response having a "true" status and an empty string for the question key.
         """,
         #10 prompt
         f"""
-        Confirm how definiteness of claims is ensured in the patent application for the key product or technology developed by the company, emphasizing clear, concise claims supported by detailed technology descriptions, highlighting unique aspects, and how they align with the company's mission.
+        Evaluate the user's strategy for patent filing, including targeted geographies and patent offices. Request specifics on key markets, rationale for choices, considerations for demand, regulatory environments, and how these strategies align with the company's mission.
         """,
         #11 prompt
+        f"""
+        Verify how enablement is ensured in the patent application for the key product or technology developed by the company, focusing on comprehensive details, code snippets, workflow diagrams provided, and how they contribute to the mission of empowering healthcare professionals. If the user's answer clearly demonstrates the inclusion of meticulously documented development processes, detailed descriptions of algorithms, clear instructions for reproduction, examples, and best practice scenarios showcasing application and effectiveness, and a commitment to transparency and innovation dissemination, then confirm the completeness with a JSON response having a "true" status and an empty string for the question key.
+        """,
+        #12 prompt
+        f"""
+        Confirm how definiteness of claims is ensured in the patent application for the key product or technology developed by the company, emphasizing clear, concise claims supported by detailed technology descriptions, highlighting unique aspects, and how they align with the company's mission.
+        """,
+        #13 prompt
         f"""
         Request the exact claims present in the patent application for the AI-based Predictive Analytics solution, seeking details on the method for predicting health outcomes, application of NLP, real-time analysis, genetic information integration, specific healthcare applications covered in the claims, and how they contribute to achieving the company's mission.
         """,
 
         #IP licensing strategy process document
-        #12 prompt
+        #14 prompt
         f"""Review the description of the technology intended for licensing. Ensure it details the unique attributes, advantages over current market offerings, and why it’s valuable to licensees.
         
         Parameters to Check:
             Comprehensive description of the technology
             Unique attributes and competitive advantages
             Value proposition to potential licensees""",
-        #13 prompt
+        #15 prompt
         f"""Confirm whether the target market for the technology is clearly defined. Evaluate if there’s an understanding of how the technology meets the needs of these sectors.
 
         Parameters to Check:
             Clear definition of target market and sectors
             Alignment of technology with sector needs
             Justification for sector selection based on technology’s capabilities""",
-        #14 prompt
+        #16 prompt
         f"""Determine if the business goals for IP licensing are specific and how the licensing model supports achieving these goals.
 
         Parameters to Check:
             Specific business goals related to IP licensing
             Licensing model's support for these goal
             Strategy for achieving goals through licensing""",
-        #15 prompt   
+        #17 prompt   
         f"""
-        Review the user's preferred licensing model for NeuraWear, which includes a mix of exclusive and non-exclusive licensing agreements. Evaluate how this preference aligns with their strategic objectives, focusing on offering exclusive licenses to strategic partners in niche medical applications and non-exclusive licenses for consumer electronics to foster broader adoption and innovation. Ensure the response emphasizes the goal of penetrating specific healthcare segments while encouraging innovation in consumer electronics.
+        Review the user's preferred licensing model for NeuraWear, which includes a mix of exclusive and non-exclusive licensing agreements. Evaluate how this preference aligns with their strategic objectives, focusing on offering exclusive licenses to strategic partners in niche medical applications and non-exclusive licenses for consumer electronics to foster broader adoption and innovation. Ensure the response includes detailed metrics such as upfront fees, royalties, and performance milestones, demonstrating a clear strategy for revenue generation and market penetration. If the user's answer provides comprehensive details about the licensing model metrics, strategic alignment with objectives, and a clear revenue generation strategy, confirm the completeness with a JSON response having a "true" status and an empty string for the question key.
         """,
-        #16 prompt
+        #18 prompt
         f"""Assess the strategy behind geographic targeting for licensing.
 
         Parameters to Check:
             Rationale for choosing specific geographic regions
             Market data supporting these choices
             Trends and regulatory considerations""",
-        #17 prompt
+        #19 prompt
         f"""
         Assess the user's financial expectations from licensing agreements for NeuraWear, which include upfront payments ranging from $100,000 to $500,000 and royalty rates between 4% and 7% of net sales. Evaluate the reasoning behind these financial expectations, considering factors such as market positioning, licensee's applications, and strategic value of the technology
         """,
-        #18 prompt
+        #20 prompt
         f"""Evaluate the preparedness for negotiating complex agreements. If the response does not reflect a comprehensive strategy.
         
         Parameters to Check:
             Strategy for negotiation of complex agreements
             Considerations for legal and contractual complexities
             Readiness for managing IP compliance""",
-        #19 prompt
+        #21 prompt
         f"""
         Evaluate the key terms and conditions prioritized in the user's licensing agreements for NeuraWear, focusing on strict quality control provisions to maintain technology integrity, clear definitions of fields of use to protect market segments, and robust audit rights for compliance and accurate royalty reporting. Verify how these terms align with the user's strategic goals and technology protection objectives.   
         """,
-        #20 prompt
+        #22 prompt
         f"""Examine the openness to and strategy for forming strategic partnerships or cross-licensing agreements. 
 
         Parameters to Check:
@@ -160,28 +160,28 @@ prompts = [
             Benefits and strategic fit of potential partnerships
             Approach to cross-licensing opportunities
             """,
-        #21 prompt
+        #23 prompt
         f"""Analyze the comprehensiveness of the metrics and KPIs provided for licensing strategy evaluation.
 
         Parameters to Check:
             Variety and relevance of metrics and KPIs
             Inclusion of qualitative metrics like licensee satisfaction
             Measurement of technological adoption by licensees""",
-        #22 prompt
+        #24 prompt
         f"""Scrutinize the adequacy of performance requirements for licensees. 
 
         Parameters to Check:
             Specificity of performance requirements
             Enforcement mechanisms for performance standards
             Support systems in place for licensees""",
-        #23 prompt
+        #25 prompt
         f"""Probe the strategy for managing sublicensing rights, conducting audits, and ensuring quality control. 
 
         Parameters to Check:
             Sublicensing approval process and criteria
             Audit procedures and frequency
             Quality control measures and licensee product standards""",
-        #24 prompt
+        #26 prompt
         f"""Inquire about the strategic decision-making behind the selection of fields of use for licensing. 
 
         Parameters to Check:
@@ -190,23 +190,23 @@ prompts = [
             Alignment with current and future market demands""",
 
         #IP Valuation questions list
-        #25 prompt
-        f"""Evaluate if the answer specifies the type of pricing strategy used (competitive, value-based, etc.), mentions the factors considered (cost, market competition, customer value), and if it covers different offerings (products and services).""",
-        #26 prompt
-        f"""Check if the answer includes a formula or method for calculating gross margins for both products and services, mentions specific percentages, and explains the impact of these margins on business operations.""",
         #27 prompt
-        f"""Determine if the answer provides a specific total cost figure, breaks down the cost categories (R&D, legal fees, market research), and reflects on the significance of these costs in the product/service development.""",
+        f"""Evaluate if the answer specifies the type of pricing strategy used (competitive, value-based, etc.), mentions the factors considered (cost, market competition, customer value), and if it covers different offerings (products and services).""",
         #28 prompt
-        f"""Assess if the answer estimates future costs with a clear breakdown (product development, marketing campaign, distribution), explains the rationale behind the estimate, and outlines the strategic plan for these investments.""",
+        f"""Check if the answer includes a formula or method for calculating gross margins for both products and services, mentions specific percentages, and explains the impact of these margins on business operations.""",
         #29 prompt
-        f"""Verify if the answer specifies a discount rate percentage, provides justification based on industry risks and competitive landscape, and explains how the rate was determined.""",
+        f"""Determine if the answer provides a specific total cost figure, breaks down the cost categories (R&D, legal fees, market research), and reflects on the significance of these costs in the product/service development.""",
         #30 prompt
-        f"""Ensure the answer mentions a specific growth rate, details the factors contributing to this projection (market adoption, expansion, marketing strategies), and discusses the basis for these projections.""",
+        f"""Assess if the answer estimates future costs with a clear breakdown (product development, marketing campaign, distribution), explains the rationale behind the estimate, and outlines the strategic plan for these investments.""",
         #31 prompt
-        f"""Confirm if the answer outlines total projected operating expenses, provides allocation percentages across departments (R&D, marketing, administrative), and justifies these allocations with strategic considerations.""",
+        f"""Verify if the answer specifies a discount rate percentage, provides justification based on industry risks and competitive landscape, and explains how the rate was determined.""",
         #32 prompt
-        f"""Check if the answer gives projected revenue figures, describes the methodology for these projections (market trends, pre-order data, marketing strategies), and considers both products and services.""",
+        f"""Ensure the answer mentions a specific growth rate, details the factors contributing to this projection (market adoption, expansion, marketing strategies), and discusses the basis for these projections.""",
         #33 prompt
+        f"""Confirm if the answer outlines total projected operating expenses, provides allocation percentages across departments (R&D, marketing, administrative), and justifies these allocations with strategic considerations.""",
+        #34 prompt
+        f"""Check if the answer gives projected revenue figures, describes the methodology for these projections (market trends, pre-order data, marketing strategies), and considers both products and services.""",
+        #35 prompt
         f"""Evaluate if the answer identifies key competitors and market share, discusses relevant market trends and technological advancements, and explains how this data influences the company's strategic direction.""",  
         
 
