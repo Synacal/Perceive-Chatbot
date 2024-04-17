@@ -81,7 +81,7 @@ prompts = [
         """,
         #8 prompt
         f"""
-        Check the explanation provided for why the features of the key product or technology developed by the company are considered non-obvious, emphasizing its unique combination of machine learning algorithms, data integration capabilities, real-time analysis, NLP usage, and how these aspects align with its mission.
+        Check the explanation provided for why the features of the key product or technology developed by the company are considered non-obvious, emphasizing its unique combination of machine learning algorithms, data integration capabilities, real-time analysis, NLP usage, and how these aspects align with its mission. There's no need for detailed information on how your spatial computing algorithm works.
         """,
         #9 prompt
         f"""
