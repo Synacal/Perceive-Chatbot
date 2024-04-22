@@ -1,62 +1,12 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from openai import AzureOpenAI
-from fastapi.middleware.cors import CORSMiddleware
-import os
 import json
-from typing import List
-from prompts import questions, prompts
-from dotenv import load_dotenv
-import psycopg2
-from psycopg2.extras import execute_values
+from fastapi import HTTPException
+from app.utils.prompts import questions, prompts
+from app.core.azure_client import client
 
-load_dotenv()
+async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: int):
+    answeredQuestion = questions[QuestionID-1]
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-client = AzureOpenAI(
-    azure_endpoint="https://chatbotmedipredict.openai.azure.com/",
-    api_key=os.getenv("AZURE_OPENAI_KEY"),
-    api_version="2024-02-15-preview"
-)
-
-def select_question(question_id: int):
-    return questions[question_id]
-
-def select_prompt(question_id:int):
-    return prompts[question_id]
-
-# Define Pydantic models for the request and response
-class Answer(BaseModel):
-    question_id: str
-    session_id: str
-    user_id: str
-    answer: str
-
-class AnswerList(BaseModel):
-    answers: List[Answer]
-
-conn = psycopg2.connect(
-    dbname="pn-chatbot", 
-    user="synacal", 
-    password="ZnkyD5knABer9#F", 
-    host="pnchatbot.postgres.database.azure.com"
-)
-
-
-@app.post("/generate/")
-async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: int):
-    
-    answeredQuestion = select_question(QuestionID-1)
-
-    checkPrompt = select_prompt(QuestionID-1)
+    checkPrompt = prompts[QuestionID-1]
 
     system_prompt = f"""Given the user's response to the question: '{answeredQuestion}',
             evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
@@ -139,26 +89,4 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
         return generated_content_json
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/add-answers/")
-async def create_answers(answer_list: AnswerList):
-    answers = answer_list.answers
-    query = """
-    INSERT INTO user_chats (question_id, session_id, user_id, answer)
-    VALUES %s
-    """
-    
-    values = [(str(ans.question_id), str(ans.session_id), str(ans.user_id), ans.answer) for ans in answers]
-    
-    try:
-        # Create a cursor and use `execute_values` to efficiently insert multiple rows
-        cur = conn.cursor()
-        execute_values(cur, query, values)
-        conn.commit()
-        cur.close()
-        return {"status": "success", "inserted_count": len(values)}
-    except Exception as e:
-        conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
