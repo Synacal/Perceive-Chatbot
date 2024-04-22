@@ -10,3 +10,7 @@ class Answer(BaseModel):
 
 class AnswerList(BaseModel):
     answers: List[Answer]
+
+class AnswerQuery(BaseModel):
+    user_id: str
+    session_id: str
