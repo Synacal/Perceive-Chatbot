@@ -53,6 +53,23 @@ conn = psycopg2.connect(
 
 @app.post("/generate/")
 async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: int):
+
+    # Fetch chat history from the database based on user_id and session_id
+    try:
+        # Convert user_id and session_id to string
+        user_id = str(userID)
+        session_id = str(sessionID)
+        cur = conn.cursor()
+        # Fetch the last 10 answers along with their related questions
+        cur.execute(
+            "SELECT user_chats.answer, questions.question FROM user_chats JOIN questions ON questions.question_id = user_chats.question_id WHERE user_id = %s AND session_id = %s ORDER BY index DESC LIMIT 10",
+            (user_id, session_id)
+        )
+        last_10_answers = cur.fetchall()
+        cur.close()
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
     
     answeredQuestion = select_question(QuestionID-1)
 
@@ -119,6 +136,26 @@ async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: i
                 generated_content_json["userID"] = userID
                 generated_content_json["sessionID"] = sessionID
                 generated_content_json["questionID"] = QuestionID
+
+                if generated_content_json["status"] == "true":
+                    # Insert the answer and question ID, session ID, and user ID into the database
+                    query = """
+                    INSERT INTO user_chats (question_id, session_id, user_id, answer)
+                    VALUES %s
+                    """
+                    
+                    values = [(str(QuestionID), str(sessionID), str(userID), answer)]
+              
+                    try:
+                        # Create a cursor and use `execute_values` to efficiently insert multiple rows
+                        cur = conn.cursor()
+                        execute_values(cur, query, values)
+                        conn.commit()
+                        cur.close()
+                    except Exception as e:
+                        conn.rollback()
+                        raise HTTPException(status_code=500, detail=str(e))
+                    
             except json.JSONDecodeError:
                  generated_content_json = {
                 "status": "false", 

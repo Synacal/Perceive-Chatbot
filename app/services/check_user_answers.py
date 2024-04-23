@@ -2,6 +2,8 @@ import json
 from fastapi import HTTPException
 from app.utils.prompts import questions, prompts
 from app.core.azure_client import client
+from app.core.database import get_db_connection
+from psycopg2.extras import execute_values
 
 async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: int):
     answeredQuestion = questions[QuestionID-1]
@@ -69,6 +71,26 @@ async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: 
                 generated_content_json["userID"] = userID
                 generated_content_json["sessionID"] = sessionID
                 generated_content_json["questionID"] = QuestionID
+
+                if generated_content_json["status"] == "true":
+                    # Insert the answer and question ID, session ID, and user ID into the database
+                    query = """
+                    INSERT INTO user_chats (question_id, session_id, user_id, answer)
+                    VALUES %s
+                    """
+                    
+                    values = [(str(QuestionID), str(sessionID), str(userID), answer)]
+                    conn=get_db_connection()
+                    try:
+                        # Create a cursor and use `execute_values` to efficiently insert multiple row
+                        cur = conn.cursor()
+                        execute_values(cur, query, values)
+                        conn.commit()
+                        cur.close()
+                    except Exception as e:
+                        conn.rollback()
+                        raise HTTPException(status_code=500, detail=str(e))
+                    
             except json.JSONDecodeError:
                  generated_content_json = {
                 "status": "false", 
