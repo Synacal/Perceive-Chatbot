@@ -17,7 +17,7 @@ async def add_answer_list(answer_list: AnswerList):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.post("/get-answers/")
+@router.get("/get-answers/")
 async def get_answer_list(answer_query: AnswerQuery):
     try:
         response_data = await get_answers(answer_query)
