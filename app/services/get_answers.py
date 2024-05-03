@@ -5,17 +5,18 @@ from app.core.database import get_db_connection
 from psycopg2.extras import execute_values
 import psycopg2.extras
 
-async def get_answers(query: AnswerQuery):
+async def get_answers(user_id: str, session_id: str):
     sql = """
     SELECT question_id, session_id, user_id, answer
     FROM user_chats
     WHERE user_id = %s AND session_id = %s;
     """
 
-    values = (query.user_id, query.session_id)
+    values = (user_id, session_id)
     
     try:
         conn=get_db_connection()
+        print("Connected to DB!")
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Use DictCursor to access data by column names
         cur.execute(sql, values)  # Correct function for executing a query with parameters
         rows = cur.fetchall()

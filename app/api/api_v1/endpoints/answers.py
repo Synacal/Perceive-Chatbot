@@ -18,9 +18,9 @@ async def add_answer_list(answer_list: AnswerList):
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/get-answers/")
-async def get_answer_list(answer_query: AnswerQuery):
+async def get_answer_list(userID: str,sessionID: str):
     try:
-        response_data = await get_answers(answer_query)
+        response_data = await get_answers(userID,sessionID)
         return response_data
     except HTTPException as e:
         raise e
