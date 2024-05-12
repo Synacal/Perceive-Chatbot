@@ -4,7 +4,9 @@ questions = [
                 'Please provide a concise description of the technology or product your company has developed.',
                 'Describe the technical aspects and unique features of the key product or technology developed by the company. How does your product or technology introduce innovation or novelty within its field?',
                 "Could you explain your company's business model and how it generates revenue? What are the different revenue streams for your company, including primary and potential ancillary streams?",
-                'What is your strategy for protecting the intellectual property associated with your product or technology? Are there specific patents or prior art that you have encountered during your research? What similarities or differences did you find?',
+                
+                # new validity analysis question
+                'Can you provide key single-word terms that describe the core technologies or features of your innovation? For keywords that consist of two or three words, please separate each word with a comma. These keywords will be used to conduct a comprehensive prior art search to ensure the uniqueness of your intellectual property.',
                 
                 #Synthetic data for IP validity analysis 
                 # 'What is the full name of the company developing the key product or technology developed by the company?',
@@ -55,7 +57,27 @@ questions = [
                 "What are the primary and potential secondary revenue streams for your company?",
                 "How is your company's cost structure organized, and what impact does it have on pricing and profitability?",
                 "Which sales and distribution channels is your company planning to use?",
-                "Who are your main competitors, and what differentiates your product or service from theirs?"
+                "Who are your main competitors, and what differentiates your product or service from theirs?",
+
+
+                #Market analysis
+                "What is the full name of the company, and what is its core mission?",
+                "Please provide a concise description of the technology or product your company has developed.",
+                "Describe the technical aspects and unique features of the key product or technology developed by the company. How does your product or technology introduce innovation or novelty within its field?",
+                "What internal metrics does NeuraWear use to measure success in aligning with market dynamics and industry trends?",
+                "How does NeuraWear assess the impact of global market drivers and restraints on its product development and marketing strategies?",
+                "Can you describe a recent strategic decision made by NeuraWear in response to the projected market growth in wearable technology? What was the rationale behind this decision?",
+                "How does NeuraWear define its primary target market within the wearable technology industry?",
+                "What data-driven methods does NeuraWear use to segment its customer base?",
+                "What are the key factors that influence the purchasing decisions of NeuraWear's customers?",
+                "How has consumer feedback shaped the development of new features in NeuraWear products?",
+                "Can you describe the competitive advantages of NeuraWear's latest wearable device compared to its main competitors?",
+                "What role does intellectual property play in NeuraWear's product differentiation strategy?",
+                "What primary and secondary revenue streams-based pricing strategy has NeuraWear adopted for its flagship product, and why?",
+                "What are NeuraWear's sales revenue and customer base expansion targets for the next five years, especially in emerging markets?",
+                "What are NeuraWear's customer acquisition targets for the upcoming year, and what key metrics will you use to measure success?",
+                "What are NeuraWear's long-term customer retention targets, and how do you measure effectiveness in retaining customers?"
+
                 ]
 
 
@@ -67,9 +89,9 @@ prompts = [
         Assess the user's response regarding the technical aspects and unique features of the key product or technology developed by the company. Request elaboration How does your product or technology introduce innovation or novelty within its field?.
         """,
         "Check if the response identifies all primary and potential secondary revenue streams for the company. It should detail how each stream contributes to the overall financial sustainability and future growth plans.",
-        "Check if the response identifies all strategy for protecting the intellectual property associated with related product or technology?",
-
-
+        
+        #validity analysis new question
+        "Check if the response includes a list of key single-word terms that describe the core technologies or features of the innovation, ensuring each term is separated by a comma and includes the following keywords: Spatial, Ergonomic, Adaptive, Computing, Display, Clarity, User, Engagement. Verify that there are no missing or extraneous words in the list.",
 
         #Synthetic data for IP validity analysis
         f"""
@@ -222,5 +244,23 @@ prompts = [
         "Check if the response identifies all primary and potential secondary revenue streams for the company. It should detail how each stream contributes to the overall financial sustainability and future growth plans.",
         "Confirm the answer breaks down the company's cost structure, highlighting both fixed and variable costs, and discusses its implications on product pricing and overall profitability. Look for strategies mentioned for maintaining profitability.",
         "Verify the response identifies the sales and distribution channels the company uses or plans to use, explaining the choice and how these channels align with the company’s overall sales and marketing strategy.",
-        "Ensure the answer provides an analysis of the competitive landscape, including direct and indirect competitors. It should evaluate how the company's offering compares in terms of features, pricing, and quality, and discuss strategies for differentiation and market positioning."
+        "Ensure the answer provides an analysis of the competitive landscape, including direct and indirect competitors. It should evaluate how the company's offering compares in terms of features, pricing, and quality, and discuss strategies for differentiation and market positioning.",
+
+        #Market analysis
+        "Confirm if the response includes the full legal name of the company (NextGen Innovations Inc.), a description of its core mission focusing on revolutionizing digital interaction through AR technologies, an overview of primary business activities related to ARSight development, specific technologies or products developed like ARSight, and references to the company's history or background.",
+        "Verify if the description provides detailed information about ARSight's main functions including real-time overlays, immersive 3D interactions, and enriched learning environments, explains the technology behind ARSight such as advanced spatial computing algorithms and lightweight AR glasses, describes the user interface and design, outlines the target user experience, and lists key features along with their benefits.",
+        "Assess how the response defines the target demographic for NeuraWear's wearable technology industry focusing on health-conscious consumers aged 25 to 45, tech-savvy individuals with disposable income, and addresses specific user needs or preferences like personalized health insights through AI integration, identifies the market niche, presents data or research supporting the target market choice, and mentions the geographic focus for the target market.",
+        "Check if the response describes how NeuraWear assesses the impact of global market drivers and restraints on its product development and marketing strategies using economic indicators, consumer trends, and regulatory changes to adapt strategies, forecast demand, adjust pricing strategies, guide product development, and ensure compliance for market entry and sustained operations.",
+        "Evaluate if the response describes a recent strategic decision made by NeuraWear in response to the projected market growth in wearable technology, explains the rationale behind the decision focusing on investing in AI and machine learning capabilities, driven by consumer demand for personalized health insights, and aims to provide superior functionality and customization to set products apart in the market.",
+        "Confirm if the response defines NeuraWear's primary target market within the wearable technology industry as health-conscious consumers aged 25 to 45, tech-savvy individuals with disposable income, explains data-driven methods used to segment the customer base such as cluster analysis techniques on demographic, behavioral, and psychographic factors, and outlines how these methods lead to targeted marketing strategies and product offerings.",
+        "Verify if the response lists key factors influencing purchasing decisions for NeuraWear's customers like functionality and accuracy of health tracking, aesthetic design, perceived value of AI features, and customer testimonials, and explains how consumer feedback has shaped the development of new features in NeuraWear products like enhanced sleep tracking, stress management tools, and integration with third-party health applications.",
+        "Check if the response describes the competitive advantages of NeuraWear's latest wearable device compared to its main competitors such as real-time mood assessment using EEG signals, adaptive learning algorithms, and unique health monitoring and customization features, and explains the role of intellectual property in NeuraWear's product differentiation strategy focusing on protecting unique neuro-adaptive technologies and maintaining a competitive edge through patents.",
+        "Assess if the response explains NeuraWear's pricing strategy for its flagship product, NeuroBand X, using a value-based pricing strategy set at $299, justifies the pricing reflecting advanced technology and health benefits compared to competitors, discusses sales revenue and customer base expansion targets for the next five years, customer acquisition and engagement targets, and long-term customer retention targets with specific metrics for success measurement.",
+        "Evaluate if the response includes a detailed description of NeuraWear's business model, revenue streams, and cost structure focusing on the revenue model, product pricing, subscription models, future monetization plans, customer lifecycle value, strategies for scaling the business model, primary and secondary revenue streams, revenue diversification plans, cost optimization strategies, gross and net profit margins discussion, and plans for achieving and maintaining profitability.",
+        "Confirm if the response outlines NeuraWear's sales and distribution channels including primary and secondary channels, strategies for optimizing each channel, partnerships and collaborations for distribution, balancing direct sales with retail or partner sales, adaptation to different market or regional channels, competitive landscape identification of direct and indirect competitors, comparative analysis of product features and pricing, strategy for competitive differentiation, plans to address competition and market challenges, and methods for tracking and responding to competitive moves.",
+        "Check if the response provides a comprehensive explanation of NeuraWear's competitive advantage, including clear identification of competitors, specific features that outperform the competition, data analysis and interpretation capabilities, unique selling propositions (USPs), and any proprietary technology or intellectual property that contributes to its competitive edge.",
+        "Verify the completeness of the response regarding NeuraWear's pricing analysis and revenue streams, ensuring it includes details on the primary and secondary revenue streams-based pricing strategy for the flagship product, justification of the pricing model, comparison with competitor pricing, reflection of the value proposition in the pricing, any tiered pricing or discount strategies, and future revenue growth projections.",
+        "Evaluate the response on NeuraWear's future sales and market expansion targets, focusing on the sales revenue and customer base expansion targets for the next five years, especially in emerging markets. Confirm if the response provides specific growth rates, targets for revenue and customer base expansion, strategies for achieving these targets, and considerations for emerging markets in Asia and South America.",
+        "Check if the response outlines NeuraWear's customer acquisition and engagement targets for the upcoming year, including the number of new users targeted, demographic focus, key metrics used to measure success such as cost per acquisition (CPA), conversion rates, and initial user engagement levels.",
+        "Confirm the response regarding NeuraWear's long-term customer retention targets and effectiveness measurement, ensuring it includes targets for annual customer retention rate over the next five years, methods for tracking retention metrics such as churn rate, customer satisfaction scores, and renewal rates, and strategies for maintaining high customer retention levels."
     ]

@@ -67,6 +67,7 @@ Start the FastAPI server by running the following command:
 
 ```bash
 uvicorn perceive_chatbot_server:app --reload
+uvicorn main:app --reload
 ```
 
 This command tells uvicorn to run the `perceive_chatbot_server` module (Python file) and use the `app` instance of FastAPI. The `--reload` flag enables automatic reloading of the server when code changes are detected.
