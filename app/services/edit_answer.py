@@ -3,7 +3,7 @@ from app.core.database import get_db_connection, get_database_connection
 from app.models.answers import AnswerList
 from psycopg2.extras import execute_values
 
-async def edit_answer(user_id: str, session_id: str, question_id: str, new_answer: str):
+async def edit_answer_function(user_id: str, session_id: str, question_id: str, new_answer: str):
     sql = """
     UPDATE user_chats
     SET answer = %s
