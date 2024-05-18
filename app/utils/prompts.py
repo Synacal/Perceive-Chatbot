@@ -61,9 +61,7 @@ questions = [
 
 
                 #Market analysis
-                "What is the full name of the company, and what is its core mission?",
-                "Please provide a concise description of the technology or product your company has developed.",
-                "Describe the technical aspects and unique features of the key product or technology developed by the company. How does your product or technology introduce innovation or novelty within its field?",
+                
                 "What internal metrics does NeuraWear use to measure success in aligning with market dynamics and industry trends?",
                 "How does NeuraWear assess the impact of global market drivers and restraints on its product development and marketing strategies?",
                 "Can you describe a recent strategic decision made by NeuraWear in response to the projected market growth in wearable technology? What was the rationale behind this decision?",
@@ -77,7 +75,6 @@ questions = [
                 "What are NeuraWear's sales revenue and customer base expansion targets for the next five years, especially in emerging markets?",
                 "What are NeuraWear's customer acquisition targets for the upcoming year, and what key metrics will you use to measure success?",
                 "What are NeuraWear's long-term customer retention targets, and how do you measure effectiveness in retaining customers?"
-
                 ]
 
 
@@ -247,9 +244,6 @@ prompts = [
         "Ensure the answer provides an analysis of the competitive landscape, including direct and indirect competitors. It should evaluate how the company's offering compares in terms of features, pricing, and quality, and discuss strategies for differentiation and market positioning.",
 
         #Market analysis
-        "Confirm if the response includes the full legal name of the company (NextGen Innovations Inc.), a description of its core mission focusing on revolutionizing digital interaction through AR technologies, an overview of primary business activities related to ARSight development, specific technologies or products developed like ARSight, and references to the company's history or background.",
-        "Verify if the description provides detailed information about ARSight's main functions including real-time overlays, immersive 3D interactions, and enriched learning environments, explains the technology behind ARSight such as advanced spatial computing algorithms and lightweight AR glasses, describes the user interface and design, outlines the target user experience, and lists key features along with their benefits.",
-        "Assess how the response defines the target demographic for NeuraWear's wearable technology industry focusing on health-conscious consumers aged 25 to 45, tech-savvy individuals with disposable income, and addresses specific user needs or preferences like personalized health insights through AI integration, identifies the market niche, presents data or research supporting the target market choice, and mentions the geographic focus for the target market.",
         "Check if the response describes how NeuraWear assesses the impact of global market drivers and restraints on its product development and marketing strategies using economic indicators, consumer trends, and regulatory changes to adapt strategies, forecast demand, adjust pricing strategies, guide product development, and ensure compliance for market entry and sustained operations.",
         "Evaluate if the response describes a recent strategic decision made by NeuraWear in response to the projected market growth in wearable technology, explains the rationale behind the decision focusing on investing in AI and machine learning capabilities, driven by consumer demand for personalized health insights, and aims to provide superior functionality and customization to set products apart in the market.",
         "Confirm if the response defines NeuraWear's primary target market within the wearable technology industry as health-conscious consumers aged 25 to 45, tech-savvy individuals with disposable income, explains data-driven methods used to segment the customer base such as cluster analysis techniques on demographic, behavioral, and psychographic factors, and outlines how these methods lead to targeted marketing strategies and product offerings.",
