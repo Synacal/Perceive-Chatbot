@@ -30,12 +30,18 @@ def get_pdf_content(attachment_base64: str) -> str:
 def get_questions(title: str) -> list:
     try:
         # Get the questions from the title
-        if title == "Market analysis":
+        if title == "Synthetic data for IP validity analysis":
+            selectedQuestions = questions[0:2] + questions[5:13]
+        elif title == "IP licensing strategy process document":
+            selectedQuestions = questions[13:26]
+        elif title == "IP Valuation questions list":
+            selectedQuestions = questions[26:35]
+        elif title == "Qs for Market potential report":
+            selectedQuestions = questions[35:42]
+        elif title == "Market analysis":
             selectedQuestions = questions[0:3] + questions[42:55]
-        elif title == "Business model":
-            selectedQuestions = questions[3:7] + questions[55:62]
         else:
-            selectedQuestions = questions[7:42]
+            selectedQuestions = questions[0:3]
         return selectedQuestions
     except Exception as e:
         raise HTTPException(
@@ -46,12 +52,18 @@ def get_questions(title: str) -> list:
 def get_prompts(title: str) -> list:
     try:
         # Get the prompts from the title
-        if title == "Market analysis":
+        if title == "Synthetic data for IP validity analysis":
+            selectedPrompts = prompts[0:2] + prompts[5:13]
+        elif title == "IP licensing strategy process document":
+            selectedPrompts = prompts[13:26]
+        elif title == "IP Valuation questions list":
+            selectedPrompts = prompts[26:35]
+        elif title == "Qs for Market potential report":
+            selectedPrompts = prompts[35:42]
+        elif title == "Market analysis":
             selectedPrompts = prompts[0:3] + prompts[42:55]
-        elif title == "Business model":
-            selectedPrompts = prompts[3:7] + prompts[55:62]
         else:
-            selectedPrompts = prompts[7:42]
+            selectedPrompts = prompts[0:3]
         return selectedPrompts
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error getting prompts: {str(e)}")
@@ -71,22 +83,12 @@ async def check_user_attachment(questions: list, prompts: list, content: str) ->
     If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
     {{
     "responses": [
-        {{"status": "false", "question": "<appropriate follow-up question from the predefined list>"}},
+        {{"question": "<question that has not been fully answered>"}},
         ...
     ]
+    questions that has not been fully answered should be included in the responses key of the output JSON format.
     }}
 
-    This indicates the need for additional information to fulfill the request comprehensively.
-
-    For every gap identified in the user's response, select a follow-up question that precisely targets the missing information. This could involve requesting more elaborate explanations, clarification of technical terms, specific instances of technology application, or arguments supporting the novelty and uniqueness of the concept. It should be included in the question key of the output JSON format. Always format the output in JSON, including 'status' and 'question' keys, to streamline the evaluation process and guide the user towards providing a fully rounded response.
-
-    Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
-    {{
-    "responses": [
-        {{"status": "true", "question": ""}},
-        ...
-    ]
-    }}
     """
     message_text = [
         {"role": "system", "content": system_prompt},
@@ -110,7 +112,7 @@ async def check_user_attachment(questions: list, prompts: list, content: str) ->
 
         if content:
             try:
-                generated_content_json = json.loads(content)
+                generated_content_json = content
                 return generated_content_json
             except json.JSONDecodeError:
                 return {
