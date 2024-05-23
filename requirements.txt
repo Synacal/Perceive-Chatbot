@@ -64,7 +64,6 @@ tqdm==4.66.2
 traitlets==5.14.3
 typing_extensions==4.10.0
 urllib3==2.2.1
-uuid==1.30
 uvicorn==0.27.1
 wcwidth==0.2.13
 yarl==1.9.4
