@@ -5,6 +5,7 @@ from PyPDF2 import PdfReader
 from app.utils.prompts import questions, prompts
 from app.core.azure_client import client
 import json
+from app.utils.prompts import questions, prompts
 
 
 def get_pdf_content(attachment_base64: str) -> str:
@@ -140,6 +141,16 @@ async def check_user_attachment(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error generating response: {str(e)}"
+        )
+
+
+def find_question_number(question: str) -> int:
+    try:
+        question_number = questions.index(question) + 1
+        return question_number
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error finding question number: {str(e)}"
         )
 
 

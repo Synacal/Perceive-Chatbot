@@ -1,14 +1,18 @@
 from fastapi import APIRouter, HTTPException
 from psycopg2.extras import execute_values
 from app.models.attachments import Attachment, attachmentAnswerList
-from app.services.add_attachment import (
+from app.services.check_attachment import (
     get_pdf_content,
     get_questions,
     check_user_attachment,
     get_prompts,
     check_user_attachment_temp,
+    find_question_number,
 )
-from app.services.add_attachment_answer import add_attachment_answers
+from app.services.add_attachment_answer import (
+    add_attachment_answers,
+    add_attachment_answer_content,
+)
 
 router = APIRouter()
 
@@ -90,7 +94,12 @@ async def add_attachment_temp(attachment: Attachment):
                 attachment.category_id,
             )
             if result["status"] == "false":
-                uncompletedQuestions.append(i + 1)
+                question_number = find_question_number(questions[i])
+                uncompletedQuestions.append(question_number)
+
+        # await add_attachment_answer_content(
+        #    content, attachment.session_id, attachment.user_id, attachment.category_id
+        # )
         return uncompletedQuestions
     except HTTPException as e:
         raise e
