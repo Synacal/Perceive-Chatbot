@@ -3,7 +3,9 @@ from typing import List
 
 
 class Attachment(BaseModel):
-    title: str
+    category_id: str
+    session_id: str
+    user_id: str
     attachment: str
 
 

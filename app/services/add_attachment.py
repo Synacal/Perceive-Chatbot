@@ -27,18 +27,18 @@ def get_pdf_content(attachment_base64: str) -> str:
         )
 
 
-def get_questions(title: str) -> list:
+def get_questions(category_id: str) -> list:
     try:
-        # Get the questions from the title
-        if title == "Synthetic data for IP validity analysis":
+        # Get the questions from the category
+        if category_id == "1":
             selectedQuestions = questions[0:2] + questions[5:13]
-        elif title == "IP licensing strategy process document":
+        elif category_id == "2":
             selectedQuestions = questions[13:26]
-        elif title == "IP Valuation questions list":
+        elif category_id == "3":
             selectedQuestions = questions[26:35]
-        elif title == "Qs for Market potential report":
+        elif category_id == "4":
             selectedQuestions = questions[35:42]
-        elif title == "Market analysis":
+        elif category_id == "5":
             selectedQuestions = questions[0:3] + questions[42:55]
         else:
             selectedQuestions = questions[0:3]
@@ -49,18 +49,18 @@ def get_questions(title: str) -> list:
         )
 
 
-def get_prompts(title: str) -> list:
+def get_prompts(category_id: str) -> list:
     try:
-        # Get the prompts from the title
-        if title == "Synthetic data for IP validity analysis":
+        # Get the prompts from the category
+        if category_id == "1":
             selectedPrompts = prompts[0:2] + prompts[5:13]
-        elif title == "IP licensing strategy process document":
+        elif category_id == "2":
             selectedPrompts = prompts[13:26]
-        elif title == "IP Valuation questions list":
+        elif category_id == "3":
             selectedPrompts = prompts[26:35]
-        elif title == "Qs for Market potential report":
+        elif category_id == "4":
             selectedPrompts = prompts[35:42]
-        elif title == "Market analysis":
+        elif category_id == "5":
             selectedPrompts = prompts[0:3] + prompts[42:55]
         else:
             selectedPrompts = prompts[0:3]
@@ -69,27 +69,44 @@ def get_prompts(title: str) -> list:
         raise HTTPException(status_code=400, detail=f"Error getting prompts: {str(e)}")
 
 
-async def check_user_attachment(questions: list, prompts: list, content: str) -> dict:
+async def check_user_attachment(
+    questions: list,
+    prompts: list,
+    content: str,
+    session_id: str,
+    user_id: str,
+    category_id: str,
+):
+    print(json.dumps(questions))
+    print(json.dumps(prompts))
+
     system_prompt = f"""
-    Given the user's response to the questions: {json.dumps(questions)},
+        Given the user's response to the questions: {json.dumps(questions)},
 
-    evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
-    {json.dumps(prompts)}
+        evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
+        {json.dumps(prompts)}
 
-    Questions and completeness criteria are entered in order to match each other.
+        Questions and completeness criteria are entered in order to match each other.
 
-    The response should encapsulate all specified points to be considered complete.
+        The response should encapsulate all specified points to be considered complete.
 
-    If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
-    {{
-    "responses": [
-        {{"question": "<question that has not been fully answered>"}},
-        ...
-    ]
-    questions that has not been fully answered should be included in the responses key of the output JSON format.
-    }}
+        If the user's input lacks any required details, is ambiguous, or misses critical information, the output should be:
+        "responses": [
+            {{ "index list  of the question that has not been fully answered" }},
+            ...
+        ]
 
-    """
+        example response (if question 1 and 3 are not answered fully):
+        {{
+            "responses": [
+                1,
+                3
+            ]
+        }}
+
+        questions that have not been fully answered should be included in the responses key of the output JSON format.
+        """
+
     message_text = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": content},
