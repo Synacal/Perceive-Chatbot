@@ -16,9 +16,9 @@ from app.services.add_attachment_answer import (
 
 router = APIRouter()
 
-
+"""
 @router.post("/attachment-temp/")
-async def add_attachment(attachment: Attachment):
+async def add_attachment_temp(attachment: Attachment):
     try:
         questions = get_questions(attachment.category_id)
         content = get_pdf_content(attachment.attachment)
@@ -37,10 +37,11 @@ async def add_attachment(attachment: Attachment):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
+"""
 
 
 @router.post("/attachment/")
-async def add_attachment_temp(attachment: Attachment):
+async def add_attachment(attachment: Attachment):
     try:
         content = get_pdf_content(attachment.attachment)
         questions = get_questions(attachment.category_id)
