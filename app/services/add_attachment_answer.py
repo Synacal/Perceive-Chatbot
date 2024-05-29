@@ -32,3 +32,28 @@ async def add_attachment_answers(answer_list: AnswerList):
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+async def add_attachment_answer_content(content, session_id, user_id, category_id):
+    query = """
+    INSERT INTO attachment_chats (question_id, session_id, user_id, answer,category_id)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    values = (
+        "0",
+        str(session_id),
+        str(user_id),
+        content,
+        str(category_id),
+    )
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        cur.close()
+        return {"status": "success"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
