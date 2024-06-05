@@ -1,18 +1,26 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from app.models.prior_art_search import SearchQuery, PatentAnalysis
+from app.models.prior_art_search import (
+    SearchQuery,
+    PatentAnalysis,
+    PatentList,
+    SearchRequest,
+)
 
 # from app.models.document import Document  # Assuming Document is a Pydantic model for your database entries
-from app.services.prior_art_search import search_documents, search_patents
+from app.services.ip_validity_analysis import search_documents, search_patents
 
 router = APIRouter()
 
 
-@router.post("/keyword-search")
-async def keyword_search(query: SearchQuery):
+@router.post("/ip_validity_analysis", response_model=PatentList)
+async def keyword_search(request: SearchRequest):
     try:
-        response_data = await search_documents(query)
-        return response_data
+        response_data = await search_documents(request.query)
+        response_data2 = await search_patents(
+            response_data, request.answer_list.description
+        )
+        return response_data2
     except HTTPException as e:
         raise e
     except Exception as e:
