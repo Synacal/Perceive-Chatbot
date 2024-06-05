@@ -5,7 +5,6 @@ from app.api.api_v1.endpoints import (
     prior_art_search,
     attachments,
     ip_validity_analysis,
-    test,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,5 +22,3 @@ app.include_router(answers.router)
 app.include_router(prior_art_search.router)
 app.include_router(attachments.router)
 app.include_router(ip_validity_analysis.router)
-
-app.include_router(test.router)

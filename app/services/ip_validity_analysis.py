@@ -15,6 +15,8 @@ from app.utils.prior_art_search_helpers import (
 import asyncio
 import numpy as np
 from typing import List, Dict
+from sklearn.metrics.pairwise import cosine_similarity
+import time
 
 
 async def search_documents(query: SearchQuery) -> List[PatentResult]:
@@ -27,8 +29,8 @@ async def search_documents(query: SearchQuery) -> List[PatentResult]:
             """
             SELECT id, title, COALESCE(abstract, ''), claim_text
             FROM target.patents
-            WHERE (title_abstract_tsvector @@ {ts_query})
-               OR (claims_tsvector @@ {ts_query});
+            WHERE ((title_abstract_tsvector @@ {ts_query} AND title IS NOT NULL AND title != '' AND abstract IS NOT NULL AND abstract != '' AND claim_text IS NOT NULL AND claim_text != '')
+            OR (claims_tsvector @@ {ts_query} AND title IS NOT NULL AND title != '' AND abstract IS NOT NULL AND abstract != '' AND claim_text IS NOT NULL AND claim_text != ''));
             """
         ).format(ts_query=ts_query)
 
@@ -75,73 +77,54 @@ async def search_documents(query: SearchQuery) -> List[PatentResult]:
 #  return embeddings
 
 
-async def vectorize_texts_async(texts: List[str]) -> List[List[float]]:
-    return await asyncio.gather(
-        *[vectorize_description_with_retry(text) for text in texts]
-    )
-
-
-async def encode_texts(texts: List[str]) -> List[List[float]]:
+def encode_texts(texts: List[str]) -> List[List[float]]:
     print("Starting encoding process...")
-    embeddings = await vectorize_texts_async(texts)
+    embeddings = vectorize_texts(texts)
     print("Encoding process completed.")
     return embeddings
 
 
-async def search_patents_temp(
-    patents: List[PatentResult], description: str
-) -> PatentList:
-    patent_texts = [
-        f"{patent.title} {patent.abstract} {patent.content}" for patent in patents
-    ]
-    print("Patent texts: ", patent_texts)
-
-    description_embedding_task = encode_texts([description])
-    patent_embeddings_task = encode_texts(patent_texts)
-
-    print("Running tasks...1")
-    description_embedding, patent_embeddings = await asyncio.gather(
-        description_embedding_task, patent_embeddings_task
-    )
-    print("Running tasks...2")
-
-    description_embedding = np.array(description_embedding[0])
-    patent_embeddings = np.array(patent_embeddings)
-
-    print("Description embedding shape: ", description_embedding.shape)
-
-    similarities = np.dot(patent_embeddings, description_embedding) / (
-        np.linalg.norm(patent_embeddings, axis=1)
-        * np.linalg.norm(description_embedding)
-    )
-    print("Similarities: ", similarities)
-    top5_indices = np.argsort(similarities)[::-1][:5]
-
-    top5_patents = [patents[idx] for idx in top5_indices]
-
-    return PatentList(patents=top5_patents)
+def vectorize_texts(texts: List[str]):
+    embeddings = []
+    for text in texts:
+        embedding = vectorize_description(text)
+        print(f"Vectorized text ")
+        embeddings.append(embedding)
+        # Add a 10 second delay
+        time.sleep(10)
+    return embeddings
 
 
 async def search_patents(patents: List[PatentResult], description: str) -> PatentList:
-    patent_abstracts = [patent.abstract for patent in patents]
+    patent_texts = [f"{patent.abstract} " for patent in patents]
+    print("Patent texts: ", patent_texts)
 
+    # Ensure that you await the results of the asynchronous tasks
     description_embedding_task = encode_texts([description])
-    patent_abstract_embeddings_task = encode_texts(patent_abstracts)
+    patent_embeddings_task = vectorize_texts(patent_texts)
 
-    description_embedding, patent_abstract_embeddings = await asyncio.gather(
-        description_embedding_task, patent_abstract_embeddings_task
-    )
+    description_embedding = description_embedding_task
+    patent_embeddings = patent_embeddings_task
 
-    description_embedding = np.array(description_embedding[0])
-    patent_abstract_embeddings = np.array(patent_abstract_embeddings)
+    # description_embedding = np.array(description_embedding[0])
+    # patent_embeddings = np.array(patent_embeddings)
 
-    similarities = np.dot(patent_abstract_embeddings, description_embedding) / (
-        np.linalg.norm(patent_abstract_embeddings, axis=1)
-        * np.linalg.norm(description_embedding)
-    )
+    # Convert lists to NumPy arrays
+    description_embedding = np.array(description_embedding).reshape(1, -1)
+    patent_embeddings = np.array(patent_embeddings)
 
-    top5_indices = np.argsort(similarities)[::-1][:5]
+    # Ensure patent_embeddings are reshaped correctly
+    if len(patent_embeddings.shape) == 1:
+        patent_embeddings = patent_embeddings.reshape(1, -1)
 
-    top5_patents = [patents[idx] for idx in top5_indices]
+    # Compute cosine similarity
+    similarities = cosine_similarity(description_embedding, patent_embeddings)
 
-    return PatentList(patents=top5_patents)
+    # Print similarities for each patent
+    similarity_dict: Dict[str, float] = {}
+    for i, patent in enumerate(patents):
+        similarity = similarities[0][i]
+        similarity_dict[patent.id] = similarity
+        print(f"Similarity with patent {patent.id}: {similarity}")
+
+    return PatentList(patents=patents)
