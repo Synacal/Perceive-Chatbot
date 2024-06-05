@@ -1,5 +1,11 @@
 from fastapi import FastAPI
-from app.api.api_v1.endpoints import check_user_answer, answers, prior_art_search,attachments
+from app.api.api_v1.endpoints import (
+    check_user_answer,
+    answers,
+    prior_art_search,
+    attachments,
+    common,
+)
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -15,3 +21,5 @@ app.include_router(check_user_answer.router)
 app.include_router(answers.router)
 app.include_router(prior_art_search.router)
 app.include_router(attachments.router)
+
+app.include_router(common.router)
