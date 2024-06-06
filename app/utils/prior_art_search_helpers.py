@@ -1,17 +1,24 @@
 from app.core.database import get_percieve_db_connection
-from app.core.pinecone import get_pinecone_client
+
+# from app.core.pinecone import get_pinecone_client
 from app.core.azure_client import client
 
+
 def vectorize_description(description: str):
-    model="embedding-model"
+    model = "embedding-model"
     # client = get_pinecone_client()
-    vector = client.embeddings.create(input=[description], model=model).data[0].embedding
+    vector = (
+        client.embeddings.create(input=[description], model=model).data[0].embedding
+    )
     return vector
 
+
+"""
 def query_pinecone_index(description_vector, top_k=5):
     index = get_pinecone_client()
     response = index.query(vector=description_vector, top_k=top_k, include_metadata=True)
-    return response
+    return response"""
+
 
 def generate_analysis(description: str, patent_data: dict):
     system_prompt = f"""Analyze the provided patent information against the user's invention description to identify and 
@@ -47,5 +54,11 @@ def generate_analysis(description: str, patent_data: dict):
                         Conclude with a brief summary of the potential implications of these similarities and differences on the user’s ability to patent the invention.
         """
     message_text = [{"role": "system", "content": system_prompt}]
-    completion = client.chat.completions.create(model="gpt-35-turbo", messages=message_text, temperature=0.7, max_tokens=800, top_p=0.95)
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo",
+        messages=message_text,
+        temperature=0.7,
+        max_tokens=800,
+        top_p=0.95,
+    )
     return completion.choices[0].message.content
