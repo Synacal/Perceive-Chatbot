@@ -20,9 +20,9 @@ async def add_answer_list(draft_data: Draft):
 
 
 @router.get("/draft-by-ids/")
-async def get_draft(userID: str, reportID: str):
+async def get_draft(user_id: str, report_id: str):
     try:
-        response_data = await get_draft_by_ids(userID, reportID)
+        response_data = await get_draft_by_ids(user_id, report_id)
         return response_data
     except HTTPException as e:
         raise e
@@ -31,9 +31,9 @@ async def get_draft(userID: str, reportID: str):
 
 
 @router.get("/drafts-by-user-id/")
-async def get_drafts(userID: str):
+async def get_drafts(user_id: str):
     try:
-        response_data = await get_drafts_by_user_id(userID)
+        response_data = await get_drafts_by_user_id(user_id)
         return response_data
     except HTTPException as e:
         raise e

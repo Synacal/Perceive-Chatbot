@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 
 class Draft(BaseModel):
-    session_id: str
+    report_id: str
     user_id: str
+    current_page: str
     other_data: Dict[str, Any]
