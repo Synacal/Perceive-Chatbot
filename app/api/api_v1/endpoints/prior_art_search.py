@@ -19,7 +19,7 @@ async def keyword_search(query: SearchQuery):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-"""  
+"""
 @router.post("/vector-search")
 async def keyword_search(query: PatentAnalysis):
     # try:
