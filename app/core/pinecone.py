@@ -1,4 +1,4 @@
-from pinecone import Pinecone
+"""from pinecone import Pinecone
 import os
 from dotenv import load_dotenv
 
@@ -10,3 +10,4 @@ def get_pinecone_client():
     index_name = os.getenv("PINECONE_INDEX_NAME")
     index = pc.Index(index_name)
     return index
+    """
