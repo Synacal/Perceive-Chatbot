@@ -98,7 +98,7 @@ async def get_draft_by_ids(UserID: str, ReportID: str):
             )
 
         return answer
-        return answer
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
