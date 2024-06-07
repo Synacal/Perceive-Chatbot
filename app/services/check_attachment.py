@@ -70,11 +70,11 @@ def get_prompts(category_id: str) -> list:
         raise HTTPException(status_code=400, detail=f"Error getting prompts: {str(e)}")
 
 
-async def check_user_attachment(
+async def check_user_attachment_temp(
     questions: list,
     prompts: list,
     content: str,
-    session_id: str,
+    report_id: str,
     user_id: str,
     category_id: str,
 ):
@@ -154,7 +154,7 @@ def find_question_number(question: str) -> int:
         )
 
 
-async def check_user_attachment_temp(
+async def check_user_attachment(
     answeredQuestion: str,
     checkPrompt: str,
     content: str,
@@ -184,7 +184,8 @@ async def check_user_attachment_temp(
 
             Conversely, if the user's answer meets all the outlined criteria, confirm the completeness with:
             {{"status": "true", 
-            "question": ""}}
+            "question": "",
+            "answer": "<the user's response to the question>"}}
             
             Avoid generating apology messages or phrases like "I'm sorry" in the follow-up questions or responses.
 

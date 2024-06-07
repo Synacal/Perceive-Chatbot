@@ -12,55 +12,64 @@ from app.services.check_attachment import (
 from app.services.add_attachment_answer import (
     add_attachment_answers,
     add_attachment_answer_content,
+    add_attachment_answer_by_llm,
 )
 
 router = APIRouter()
-
-"""
-@router.post("/attachment-temp/")
-async def add_attachment_temp(attachment: Attachment):
-    try:
-        questions = get_questions(attachment.category_id)
-        content = get_pdf_content(attachment.attachment)
-        prompts = get_prompts(attachment.category_id)
-        result = await check_user_attachment(
-            questions,
-            prompts,
-            content,
-            attachment.session_id,
-            attachment.user_id,
-            attachment.category_id,
-        )
-        return result
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail=str(e))
-"""
 
 
 @router.post("/attachment/")
 async def add_attachment(attachment: Attachment):
     try:
         content = get_pdf_content(attachment.attachment)
-        questions = get_questions(attachment.category_id)
-        prompts = get_prompts(attachment.category_id)
+        uncompleted_questions = []
+        print("1")
+        for category_id in attachment.category_ids:
+            questions = get_questions(category_id)
+            prompts = get_prompts(category_id)
 
-        uncompletedQuestions = []
-        for i in range(len(questions)):
-            result = await check_user_attachment_temp(
-                questions[i],
-                prompts[i],
+            print("2")
+
+            attachment_content = await add_attachment_answer_content(
                 content,
-                attachment.session_id,
+                attachment.report_id,
                 attachment.user_id,
-                attachment.category_id,
+                category_id,
             )
-            if result["status"] == "false":
-                question_number = find_question_number(questions[i])
-                uncompletedQuestions.append(question_number)
-        return uncompletedQuestions
+
+            for i in range(len(questions)):
+
+                print("3")
+                result = await check_user_attachment(
+                    questions[i],
+                    prompts[i],
+                    content,
+                    attachment.report_id,
+                    attachment.user_id,
+                    category_id,
+                )
+                print("4")
+                if result["status"] == "false":
+                    question_number = find_question_number(questions[i])
+                    uncompleted_questions.append(
+                        {
+                            "question_id": question_number,
+                        }
+                    )
+                    print("5")
+                else:
+                    question_number = find_question_number(questions[i])
+                    print("5.1")
+                    data = await add_attachment_answer_by_llm(
+                        question_number,
+                        attachment.report_id,
+                        attachment.user_id,
+                        result["answer"],
+                        category_id,
+                    )
+                    print("6")
+        return uncompleted_questions
+
     except HTTPException as e:
         raise e
     except Exception as e:
