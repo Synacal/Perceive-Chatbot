@@ -35,29 +35,38 @@ async def add_attachment_answers(answer_list: AnswerList):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def add_attachment_answer_by_llm(answer: Answer):
+async def add_attachment_answer_by_llm(
+    question_number,
+    report_id,
+    user_id,
+    content,
+    category_id,
+):
     query = """
     INSERT INTO attachment_chats (question_id, report_id, user_id, answer,category_id,attachment_flag)
-    VALUES %s
+    VALUES  (%s, %s, %s, %s, %s, %s)
     """
 
     values = (
-        str(answer.question_id),
-        str(answer.report_id),
-        str(answer.user_id),
-        str(answer.answer),
-        str(answer.category_id),
+        str(question_number),
+        str(report_id),
+        str(user_id),
+        str(content),
+        str(category_id),
         True,
     )
 
     try:
-        conn = get_database_connection()
+        conn = get_db_connection()
         cur = conn.cursor()
-        execute_values(cur, query, values)
+        cur.execute(query, values)
         conn.commit()
         cur.close()
-        return {"status": "success", "inserted_count": len(values)}
+        return {
+            "status": "success",
+        }
     except Exception as e:
+        print(e)
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -65,7 +74,7 @@ async def add_attachment_answer_by_llm(answer: Answer):
 async def add_attachment_answer_content(content, report_id, user_id, category_id):
     query = """
     INSERT INTO attachment (report_id, user_id, content, category_id)
-    VALUES (%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s)
     """
     values = (
         str(report_id),

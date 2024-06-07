@@ -23,18 +23,23 @@ async def add_attachment(attachment: Attachment):
     try:
         content = get_pdf_content(attachment.attachment)
         uncompleted_questions = []
-
+        print("1")
         for category_id in attachment.category_ids:
             questions = get_questions(category_id)
             prompts = get_prompts(category_id)
 
+            print("2")
+
+            attachment_content = await add_attachment_answer_content(
+                content,
+                attachment.report_id,
+                attachment.user_id,
+                category_id,
+            )
+
             for i in range(len(questions)):
-                attachment_content = await add_attachment_answer_content(
-                    content,
-                    attachment.report_id,
-                    attachment.user_id,
-                    category_id,
-                )
+
+                print("3")
                 result = await check_user_attachment(
                     questions[i],
                     prompts[i],
@@ -43,6 +48,7 @@ async def add_attachment(attachment: Attachment):
                     attachment.user_id,
                     category_id,
                 )
+                print("4")
                 if result["status"] == "false":
                     question_number = find_question_number(questions[i])
                     uncompleted_questions.append(
@@ -50,14 +56,18 @@ async def add_attachment(attachment: Attachment):
                             "question_id": question_number,
                         }
                     )
+                    print("5")
                 else:
-                    add_attachment_answer_by_llm(
+                    question_number = find_question_number(questions[i])
+                    print("5.1")
+                    data = await add_attachment_answer_by_llm(
                         question_number,
                         attachment.report_id,
                         attachment.user_id,
-                        content,
+                        result["answer"],
                         category_id,
                     )
+                    print("6")
         return uncompleted_questions
 
     except HTTPException as e:
