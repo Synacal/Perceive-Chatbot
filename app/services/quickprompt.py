@@ -9,21 +9,23 @@ from app.models.quickprompt import QuickPrompt
 
 async def add_quickprompt(prompt_data: QuickPrompt):
     query = """
-        INSERT INTO quickprompt (report_id, user_id, prompt_data,content) VALUES %s
-        """
+    INSERT INTO quickprompt (report_id, user_id, prompt_data, content) 
+    VALUES (%(report_id)s, %(user_id)s, %(prompt_data)s::jsonb, %(content)s)
+    """
 
-    values = [
-        (
-            prompt_data.report_id,
-            prompt_data.user_id,
-            json.dumps(prompt_data.prompt_data),
-            prompt_data.content,
-        )
-    ]
+    values = {
+        "report_id": prompt_data.report_id,
+        "user_id": prompt_data.user_id,
+        "prompt_data": json.dumps(
+            prompt_data.prompt_data
+        ),  # Convert list of dicts to JSON string
+        "content": prompt_data.content,
+    }
+
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        execute_values(cur, query, values)
+        cur.execute(query, values)  # Use execute instead of execute_values
         conn.commit()
         return {"status": "success"}
     except Exception as e:
@@ -104,20 +106,21 @@ async def get_quickprompts_by_user_id(user_id: str):
 async def update_quickprompt_by_user_id_and_report_id(prompt_data: QuickPrompt):
     query = """
         UPDATE quickprompt
-        SET content = %s, prompt_data = %s
-        WHERE user_id = %s AND report_id = %s
+        SET content = %(content)s, prompt_data = %(prompt_data)s::jsonb
+        WHERE user_id = %(user_id)s AND report_id = %(report_id)s
         """
-    values = (
-        prompt_data.content,
-        json.dumps(prompt_data.prompt_data),
-        prompt_data.user_id,
-        prompt_data.report_id,
-    )
+    values = {
+        "content": prompt_data.content,
+        "prompt_data": json.dumps(prompt_data.prompt_data),
+        "user_id": prompt_data.user_id,
+        "report_id": prompt_data.report_id,
+    }
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(query, values)
         conn.commit()
+        return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
