@@ -98,8 +98,38 @@ async def get_draft_by_ids(UserID: str, ReportID: str):
             )
 
         return answer
-        return answer
+
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+async def update_draft_by_user_id_and_report_id(draft_data: Draft):
+    query = """
+        UPDATE draft SET other_data = %s, current_page = %s WHERE user_id = %s AND report_id = %s
+        """
+    other_data_str = json.dumps(draft_data.other_data)
+    values = (
+        other_data_str,
+        draft_data.current_page,
+        draft_data.user_id,
+        draft_data.report_id,
+    )
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        return {"status": "success"}
+    except Exception as e:
+        if conn:
+            conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if cur:
