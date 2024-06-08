@@ -13,30 +13,49 @@ from app.services.ip_validity_analysis import (
     create_novelty_assessment,
 )
 
+from app.services.ip_validity_analysis.common import (
+    create_assessment,
+)
+
 router = APIRouter()
 
 
-@router.post("/ip_validity_analysis", response_model=PatentList)
+@router.post("/ip_validity_analysis")
 async def keyword_search(request: SearchRequest):
     try:
         response_data = await search_documents(request.query)
         print(len(response_data))
-        response_data = response_data[:20]
+        response_data = response_data[:6]
         response_data2 = await search_patents(
             response_data, request.answer_list.description
         )
-        return response_data2
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        novelly_assessment = await create_novelty_assessment(
+            response_data2, request.answer_list.description
+        )
 
+        patentability_criteria = [
+            "Novelty (35 U.S.C. § 102)",
+            "Non-Obviousness (35 U.S.C. § 103)",
+            "Utility (35 U.S.C. § 101)",
+            "Enablement (35 U.S.C. § 112(a))",
+            "Written Description (35 U.S.C. § 112(a))",
+            "Definiteness (35 U.S.C. § 112(b))",
+            "Industrial Application",
+            "Clarity & Sufficiency",
+            "Scope & Definition",
+        ]
+        non_obviousness = await create_assessment(
+            response_data2,
+            request.answer_list.description,
+            patentability_criteria[1],
+        )
+        if novelly_assessment is None:
+            raise HTTPException(
+                status_code=500, detail="Error generating novelty assessment."
+            )
 
-@router.post("/novelty-assessment")
-async def data_compilation(patent_ids: List[str], answer_list: PatentAnalysis):
-    try:
-        response_data = await create_novelty_assessment(patent_ids, answer_list)
-        return response_data
+        # Ensure that the novelty_assessment matches the expected return type
+        return novelly_assessment
     except HTTPException as e:
         raise e
     except Exception as e:

@@ -128,18 +128,31 @@ async def search_patents(patents: List[PatentResult], description: str) -> Paten
         similarity_dict[patent.id] = similarity
         print(f"Similarity with patent {patent.id}: {similarity}")
 
-    return PatentList(patents=patents)
+    # Sort the similarities and get the top 10 most similar patent IDs
+    sorted_similarities = sorted(
+        similarity_dict.items(), key=lambda item: item[1], reverse=True
+    )
+    top_10_patent_ids = [patent_id for patent_id, _ in sorted_similarities[:5]]
+
+    return top_10_patent_ids
 
 
-async def create_novelty_assessment(patent_ids: List[str], answer_list: PatentAnalysis):
+async def create_novelty_assessment(patent_ids: List[str], answer_list: str):
     patent_abstracts = []
+
+    print("Patent IDs: ", patent_ids)
     for patent_id in patent_ids:
         patent = await get_patent_by_id(patent_id)
-        patent_abstracts.append(patent.abstract)
+        if patent:
+            patent_abstracts.append(patent)
+            print(f"Patent {patent_id} abstract: {patent}")
+    if not patent_abstracts:
+        raise HTTPException(
+            status_code=404, detail="No patent abstracts found for the provided IDs."
+        )
 
-    novely_point = await compare_novelty(patent_abstracts, answer_list)
-    # Use the patent_abstracts in your further processing
-    return {"status": "success", "patent_ids": patent_ids, "answer_list": answer_list}
+    novelty_point = await compare_novelty(patent_abstracts, answer_list)
+    return novelty_point
 
 
 async def get_patent_by_id(patent_id: str):
@@ -155,10 +168,7 @@ async def get_patent_by_id(patent_id: str):
         with conn.cursor() as cur:
             cur.execute(query, [value])
             result = cur.fetchone()
-            if result:
-                return PatentResult(id=patent_id, abstract=result[0])
-            else:
-                return None
+            return result[0] if result else None
     except Exception as e:
         print(f"Error fetching patent {patent_id}: {e}")
         return None
@@ -166,13 +176,42 @@ async def get_patent_by_id(patent_id: str):
         conn.close()
 
 
-async def compare_novelty(patent_abstracts: List[str], answer_list: PatentAnalysis):
+async def compare_novelty(patent_abstracts: List[str], answer_list: str):
+
+    # Truncate abstracts to avoid exceeding token limits
+    max_abstract_length = 40000 // len(patent_abstracts)
+    truncated_abstracts = [
+        abstract[:max_abstract_length] for abstract in patent_abstracts
+    ]
+
+    print("Truncated abstracts: ")
+
     # Perform novelty assessment
-    system_prompt = f"Given the following patent abstracts, please provide an analysis of the novelty of the invention described in the patent: {patent_abstracts}."
-    answer = answer_list.description
+    system_prompt = (
+        "Given the following patent abstracts, please provide an analysis of the novelty of the invention described in the patent. "
+        "Your analysis should include the following sections:\n"
+        "1. Positive Features:\n"
+        "    a. Innovative Integration of Technologies:\n"
+        "        - Detail any significant engineering achievements that address multiple challenges.\n"
+        "    b. Sophisticated Network Management:\n"
+        "        - Explain any sophisticated approaches to network management introduced by the invention.\n"
+        "    c. Targeted Beamforming Application:\n"
+        "        - Describe any complex technical challenges overcome in the development.\n"
+        "2. Opinion:\n"
+        "    - Provide an opinion on the non-obviousness of the technology, highlighting substantial departures from conventional solutions and creative problem-solving.\n"
+        "3. Caveats:\n"
+        "    a. Prior Art and Comparative Analysis:\n"
+        "        - Note the need to evaluate the inventive step against similar technologies.\n"
+        "    b. Technical Documentation and Challenges:\n"
+        "        - Suggest documenting specific engineering challenges and solutions.\n"
+        "    c. Comparison with Existing Solutions:\n"
+        "        - Emphasize the need to show how the technology surpasses existing solutions in solving problems.\n"
+        "Additionally, provide a novelty score from 0 to 100, where 0 indicates no novelty and 100 indicates complete novelty."
+    )
+
     message_text = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": answer},
+        {"role": "user", "content": answer_list},
     ]
 
     try:
@@ -187,8 +226,12 @@ async def compare_novelty(patent_abstracts: List[str], answer_list: PatentAnalys
             stop=None,
         )
 
+        print("Novelty assessment completion: ")
+
         content = completion.choices[0].message.content
-        return content
+
+        # Parse the response into a structured dictionary
+        return {"novelty_assessment": content}
 
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")
