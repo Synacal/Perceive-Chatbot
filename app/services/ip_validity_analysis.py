@@ -17,6 +17,7 @@ import numpy as np
 from typing import List, Dict
 from sklearn.metrics.pairwise import cosine_similarity
 import time
+from app.core.azure_client import client
 
 
 async def search_documents(query: SearchQuery) -> List[PatentResult]:
@@ -128,3 +129,67 @@ async def search_patents(patents: List[PatentResult], description: str) -> Paten
         print(f"Similarity with patent {patent.id}: {similarity}")
 
     return PatentList(patents=patents)
+
+
+async def create_novelty_assessment(patent_ids: List[str], answer_list: PatentAnalysis):
+    patent_abstracts = []
+    for patent_id in patent_ids:
+        patent = await get_patent_by_id(patent_id)
+        patent_abstracts.append(patent.abstract)
+
+    novely_point = await compare_novelty(patent_abstracts, answer_list)
+    # Use the patent_abstracts in your further processing
+    return {"status": "success", "patent_ids": patent_ids, "answer_list": answer_list}
+
+
+async def get_patent_by_id(patent_id: str):
+    query = """
+    SELECT abstract
+    FROM target.patents
+    WHERE id = %s;
+    """
+    value = patent_id
+    try:
+        conn = get_percieve_db_connection()
+
+        with conn.cursor() as cur:
+            cur.execute(query, [value])
+            result = cur.fetchone()
+            if result:
+                return PatentResult(id=patent_id, abstract=result[0])
+            else:
+                return None
+    except Exception as e:
+        print(f"Error fetching patent {patent_id}: {e}")
+        return None
+    finally:
+        conn.close()
+
+
+async def compare_novelty(patent_abstracts: List[str], answer_list: PatentAnalysis):
+    # Perform novelty assessment
+    system_prompt = f"Given the following patent abstracts, please provide an analysis of the novelty of the invention described in the patent: {patent_abstracts}."
+    answer = answer_list.description
+    message_text = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": answer},
+    ]
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-35-turbo",
+            messages=message_text,
+            temperature=0.7,
+            max_tokens=800,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=None,
+        )
+
+        content = completion.choices[0].message.content
+        return content
+
+    except Exception as e:
+        print(f"Error generating novelty assessment: {e}")
+        return None

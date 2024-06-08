@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from app.models.prior_art_search import (
-    SearchQuery,
     PatentAnalysis,
     PatentList,
     SearchRequest,
@@ -11,6 +10,7 @@ from app.models.prior_art_search import (
 from app.services.ip_validity_analysis import (
     search_documents,
     search_patents,
+    create_novelty_assessment,
 )
 
 router = APIRouter()
@@ -32,14 +32,12 @@ async def keyword_search(request: SearchRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/vector-search")
-async def keyword_search(query: PatentAnalysis):
-    # try:
-    response_data = await search_patents(query)
-    return response_data
-
-
-# except HTTPException as e:
-#     raise e
-# except Exception as e:
-#     raise HTTPException(status_code=500, detail=str(e))
+@router.post("/novelty-assessment")
+async def data_compilation(patent_ids: List[str], answer_list: PatentAnalysis):
+    try:
+        response_data = await create_novelty_assessment(patent_ids, answer_list)
+        return response_data
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
