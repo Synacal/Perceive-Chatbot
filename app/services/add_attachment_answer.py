@@ -65,9 +65,11 @@ async def add_attachment_answer_by_llm(
     requirement_gathering_id,
 ):
     query = """
-    INSERT INTO attachment_chats (question_id, report_id, user_id, answer,attachment_flag,requirement_gathering_id
-    VALUES  (%s, %s, %s, %s, %s, %s)
-    """
+    INSERT INTO attachment_chats (question_id, report_id, user_id, answer, attachment_flag, requirement_gathering_id)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    ON CONFLICT (question_id, report_id, user_id, requirement_gathering_id) DO UPDATE 
+    SET answer = EXCLUDED.answer
+"""
 
     values = (
         str(question_number),
@@ -97,6 +99,9 @@ async def add_attachment_answer_content(content, requirement_gathering_id, user_
     query = """
     INSERT INTO attachment (user_id, content, requirement_gathering_id)
     VALUES (%s, %s, %s)
+    ON CONFLICT (requirement_gathering_id, user_id)
+    DO UPDATE SET
+        content = EXCLUDED.content
     """
     values = (str(user_id), content, requirement_gathering_id)
 
