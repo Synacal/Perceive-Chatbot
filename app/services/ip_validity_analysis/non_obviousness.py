@@ -32,7 +32,16 @@ async def compare_non_obviousness(patent_abstracts: List[str], answer_list: str)
         "    ■ Suggest documenting specific engineering challenges and solutions.\n"
         "  ○ Comparison with Existing Solutions:\n"
         "    ■ Emphasize the need to show how the technology surpasses existing solutions in solving problems.\n\n"
-        "Additionally, provide a non-obviousness score from 0 to 100, where 0 indicates no inventive step and 100 indicates a significant inventive step."
+        "Additionally, provide a non-obviousness score from 1 to 10, with the following rubric:\n"
+        "4. Patentability Criteria Scoring Rubric:\n"
+        "    - Non-Obviousness Score (out of 10):\n"
+        "        • 1-3 (Low): The technology's advancements are obvious to professionals in the field and represent logical next steps rather than inventive leaps.\n"
+        "        • 4-6 (Medium): The technology demonstrates an inventive step that may not be immediately obvious, incorporating unique approaches or solving problems in unexpected ways.\n"
+        "        • 7-10 (High): The technology's development required overcoming significant technical challenges, offering solutions that are not intuitive or straightforward, showcasing a high degree of creativity and innovation.\n"
+        "5. Rationale:\n"
+        "   - Provide a rationale for the assigned score, detailing why the technology falls into the low, medium, or high category. For example: 'The combination of technologies suggests an inventive step, but detailed innovation specifics are crucial.'\n"
+        "6. How to Improve:\n"
+        "   - Suggest ways to improve the non-obviousness score. For example: 'Document and detail the unique engineering challenges and solutions developed, particularly in dynamic routing.'"
     )
     message_text = [
         {"role": "system", "content": system_prompt},
@@ -59,7 +68,7 @@ async def compare_non_obviousness(patent_abstracts: List[str], answer_list: str)
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
-        return {"novelty_assessment": content}
+        return {content}
 
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")

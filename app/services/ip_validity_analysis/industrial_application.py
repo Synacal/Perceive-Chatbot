@@ -16,14 +16,26 @@ async def compare_industrial_application(patent_abstracts: List[str], answer_lis
         "Given the following patent abstracts, please provide a detailed analysis of the industrial applicability and utility "
         "of the invention described in the patent. Your analysis should include the following sections:\n\n"
         "Industrial Applicability\n"
-        "● Positive Features:\n"
+        "1. Positive Features:\n"
         "  ○ Versatile Use Cases:\n"
         "    ■ Describe various applications across key sectors.\n"
         "  ○ Focus on Global Connectivity:\n"
         "    ■ Explain the significance of wide coverage and global connectivity.\n"
-        "● Opinion:\n"
+        "2. Opinion:\n"
         "  - Provide an opinion on the industrial applicability, including suggestions for enhancing the case for applicability.\n\n"
-        "Additionally, provide an industrial applicability score and a utility score from 0 to 100, where 0 indicates no applicability/utility and 100 indicates complete applicability/utility."
+        "3. Patentability Criteria Scoring Rubric:\n"
+        "    - Industrial Applicability Score (out of 10):\n"
+        "        • 1-3 (Low): The technology has limited or niche applicability, with few practical uses in existing industries.\n"
+        "        • 4-6 (Medium): The technology is applicable in several industries, offering solutions to known problems but may face challenges in widespread adoption or implementation.\n"
+        "        • 7-10 (High): The technology has broad industry applicability, with potential to significantly impact multiple sectors by addressing critical challenges or improving efficiency and productivity.\n"
+        "    - Utility Score (out of 10):\n"
+        "        • 1-3 (Low): The technology offers minimal utility, with limited practical applications or benefits.\n"
+        "        • 4-6 (Medium): The technology provides moderate utility, solving some problems but may not be widely adopted due to existing alternatives or limitations.\n"
+        "        • 7-10 (High): The technology offers high utility, addressing critical needs and providing significant practical benefits in its application.\n"
+        "4. Rationale:\n"
+        "   - Provide a rationale for the assigned scores, detailing why the technology falls into the low, medium, or high category. For example: 'The technology addresses significant connectivity challenges, demonstrating strong market and practical relevance.'\n"
+        "5. How to Improve:\n"
+        "   - Suggest ways to improve the industrial applicability and utility scores. For example: 'Expand on specific case studies showing the technology in action across different sectors to illustrate direct impacts.'"
     )
     message_text = [
         {"role": "system", "content": system_prompt},
@@ -50,7 +62,7 @@ async def compare_industrial_application(patent_abstracts: List[str], answer_lis
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
-        return {"novelty_assessment": content}
+        return {content}
 
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")
