@@ -5,10 +5,13 @@ from app.core.azure_client import client
 from app.core.database import get_db_connection
 from psycopg2.extras import execute_values
 
-async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: int):
-    answeredQuestion = questions[QuestionID-1]
 
-    checkPrompt = prompts[QuestionID-1]
+async def check_user_answers(
+    answer: str, QuestionID: int, userID: str, requirement_gathering_id: int
+):
+    answeredQuestion = questions[QuestionID - 1]
+
+    checkPrompt = prompts[QuestionID - 1]
 
     system_prompt = f"""Given the user's response to the question: '{answeredQuestion}',
             evaluate the completeness based on these criteria and provide the response always in JSON format as given below:
@@ -39,10 +42,9 @@ async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: 
             process and guide the user towards providing a fully rounded response.
             """
 
-    
     message_text = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": answer}
+        {"role": "user", "content": answer},
     ]
 
     try:
@@ -54,7 +56,7 @@ async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: 
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
-            stop=None
+            stop=None,
         )
 
         content = completion.choices[0].message.content
@@ -62,25 +64,41 @@ async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: 
         if content:
             try:
                 generated_content_json = json.loads(content)
-                if "status" not in generated_content_json or "question" not in generated_content_json:
-                    return {"status": "false", 
-                            "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
-                            "userID": userID,
-                            "sessionID": sessionID,
-                            "questionID": QuestionID}
+                if (
+                    "status" not in generated_content_json
+                    or "question" not in generated_content_json
+                ):
+                    return {
+                        "status": "false",
+                        "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
+                        "userID": userID,
+                        "sessionID": requirement_gathering_id,
+                        "questionID": QuestionID,
+                    }
                 generated_content_json["userID"] = userID
-                generated_content_json["sessionID"] = sessionID
+                generated_content_json["sessionID"] = requirement_gathering_id
                 generated_content_json["questionID"] = QuestionID
 
                 if generated_content_json["status"] == "true":
                     # Insert the answer and question ID, session ID, and user ID into the database
                     query = """
-                    INSERT INTO user_chats (question_id, session_id, user_id, answer)
+                    INSERT INTO user_chats (question_id, requirement_gathering_id, user_id, answer)
                     VALUES %s
+                    ON CONFLICT (question_id, requirement_gathering_id, user_id)
+                    DO UPDATE SET
+                        answer = EXCLUDED.answer
                     """
-                    
-                    values = [(str(QuestionID), str(sessionID), str(userID), answer)]
-                    conn=get_db_connection()
+
+                    values = [
+                        (
+                            str(QuestionID),
+                            str(requirement_gathering_id),
+                            str(userID),
+                            answer,
+                        )
+                    ]
+
+                    conn = get_db_connection()
                     try:
                         # Create a cursor and use `execute_values` to efficiently insert multiple row
                         cur = conn.cursor()
@@ -90,21 +108,21 @@ async def check_user_answers(answer: str,QuestionID: int,userID: int,sessionID: 
                     except Exception as e:
                         conn.rollback()
                         raise HTTPException(status_code=500, detail=str(e))
-                    
+
             except json.JSONDecodeError:
-                 generated_content_json = {
-                "status": "false", 
-                "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
-                "userID": userID,
-                "sessionID": sessionID,
-                "questionID": QuestionID,
-            }
+                generated_content_json = {
+                    "status": "false",
+                    "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
+                    "userID": userID,
+                    "sessionID": requirement_gathering_id,
+                    "questionID": QuestionID,
+                }
         else:
             generated_content_json = {
-                "status": "false", 
+                "status": "false",
                 "question": f"I couldn't identify the required details in your response to the question: '{answeredQuestion}'. Can you provide more specific information or elaborate further?",
                 "userID": userID,
-                "sessionID": sessionID,
+                "sessionID": requirement_gathering_id,
                 "questionID": QuestionID,
             }
 

@@ -5,10 +5,15 @@ import json
 
 router = APIRouter()
 
+
 @router.post("/generate/")
-async def generate_response(answer: str,QuestionID: int,userID: int,sessionID: int):
+async def generate_response(
+    answer: str, QuestionID: int, userID: str, requirement_gathering_id: int
+):
     try:
-        response_data = await check_user_answers(answer,QuestionID,userID,sessionID)
+        response_data = await check_user_answers(
+            answer, QuestionID, userID, requirement_gathering_id
+        )
         return response_data
     except HTTPException as e:
         raise e
