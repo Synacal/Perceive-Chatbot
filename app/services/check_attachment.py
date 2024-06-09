@@ -158,9 +158,9 @@ async def check_user_attachment(
     answeredQuestion: str,
     checkPrompt: str,
     content: str,
-    session_id: str,
+    requirement_gathering_id,
     user_id: str,
-    category_id: str,
+    report_id: str,
 ):
 
     system_prompt = f"""Given the user's response to the question: '{answeredQuestion}',

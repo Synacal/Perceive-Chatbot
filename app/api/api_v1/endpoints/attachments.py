@@ -13,6 +13,8 @@ from app.services.add_attachment_answer import (
     add_attachment_answers,
     add_attachment_answer_content,
     add_attachment_answer_by_llm,
+    check_user_attachment_answer,
+    get_report_id,
 )
 
 router = APIRouter()
@@ -24,17 +26,20 @@ async def add_attachment(attachment: Attachment):
         content = get_pdf_content(attachment.attachment)
         uncompleted_questions = []
         print("1")
-        for category_id in attachment.category_ids:
-            questions = get_questions(category_id)
-            prompts = get_prompts(category_id)
+        for user_case_id in attachment.user_cases_ids:
+            questions = get_questions(user_case_id)
+            prompts = get_prompts(user_case_id)
 
             print("2")
 
             attachment_content = await add_attachment_answer_content(
                 content,
-                attachment.report_id,
+                attachment.requirement_gathering_id,
                 attachment.user_id,
-                category_id,
+            )
+
+            report_id = await get_report_id(
+                attachment.requirement_gathering_id, user_case_id
             )
 
             for i in range(len(questions)):
@@ -44,9 +49,9 @@ async def add_attachment(attachment: Attachment):
                     questions[i],
                     prompts[i],
                     content,
-                    attachment.report_id,
+                    attachment.requirement_gathering_id,
                     attachment.user_id,
-                    category_id,
+                    report_id,
                 )
                 print("4")
                 if result["status"] == "false":
@@ -62,10 +67,10 @@ async def add_attachment(attachment: Attachment):
                     print("5.1")
                     data = await add_attachment_answer_by_llm(
                         question_number,
-                        attachment.report_id,
+                        report_id,
                         attachment.user_id,
                         result["answer"],
-                        category_id,
+                        attachment.requirement_gathering_id,
                     )
                     print("6")
         return uncompleted_questions
@@ -77,10 +82,18 @@ async def add_attachment(attachment: Attachment):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/attachment-answers/")
-async def add_attachment_answer_list(answer_list: attachmentAnswerList):
+@router.post("/attachment-answer/")
+async def add_attachment_answer(
+    answer: str,
+    QuestionID: str,
+    userID: str,
+    requirement_gathering_id: int,
+    user_case_id: str,
+):
     try:
-        response_data = await add_attachment_answers(answer_list)
+        response_data = await check_user_attachment_answer(
+            answer, QuestionID, userID, requirement_gathering_id, user_case_id
+        )
         return response_data
     except HTTPException as e:
         raise e
