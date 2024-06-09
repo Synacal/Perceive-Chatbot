@@ -6,8 +6,10 @@ from app.models.prior_art_search import SearchQuery
 from app.core.database import get_percieve_db_connection
 from psycopg2 import sql
 from app.models.prior_art_search import PatentAnalysis, PatentResult
-from app.utils.prior_art_search_helpers import vectorize_description, generate_analysis
-from app.core.azure_client import client
+from app.utils.prior_art_search_helpers import (
+    vectorize_description,
+    generate_analysis,
+)
 
 
 async def search_documents(query: SearchQuery):
@@ -39,7 +41,9 @@ async def search_documents(query: SearchQuery):
 
 
 async def search_patents(data: PatentAnalysis):
+
     description_vector = vectorize_description(data.description)
+    print(description_vector)
     query_results = query_pinecone_index(description_vector)
     results = []
 
