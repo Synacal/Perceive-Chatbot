@@ -6,7 +6,6 @@ import json
 from app.services.quickprompt import (
     add_quickprompt,
     get_quickprompt_by_ids,
-    update_quickprompt_by_user_id_and_report_id,
     get_quickprompts_by_user_id,
 )
 
@@ -25,9 +24,9 @@ async def add_quick_prompt(prompt_data: QuickPrompt):
 
 
 @router.get("/quick-prompt-by-ids/")
-async def get_quick_prompt_by_ids(report_id: str, user_id: str):
+async def get_quick_prompt_by_ids(requirement_gathering_id: int, user_id: str):
     try:
-        response_data = await get_quickprompt_by_ids(report_id, user_id)
+        response_data = await get_quickprompt_by_ids(requirement_gathering_id, user_id)
         return response_data
     except HTTPException as e:
         raise e
@@ -39,17 +38,6 @@ async def get_quick_prompt_by_ids(report_id: str, user_id: str):
 async def get_quick_prompt_by_user_id(user_id: str):
     try:
         response_data = await get_quickprompts_by_user_id(user_id)
-        return response_data
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.put("/quick-prompt/")
-async def get_quick_prompt_by_ids(prompt_data: QuickPrompt):
-    try:
-        response_data = await update_quickprompt_by_user_id_and_report_id(prompt_data)
         return response_data
     except HTTPException as e:
         raise e

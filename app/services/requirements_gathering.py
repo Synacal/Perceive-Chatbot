@@ -8,6 +8,7 @@ async def get_requirements_gathering(requirements: RequirementsGathering):
     query = """
     INSERT INTO requirements_gathering (user_id, report_id, user_case_id)
     VALUES (%s, %s, %s)
+    RETURNING requirement_gathering_id
     """
 
     try:
