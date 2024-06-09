@@ -24,11 +24,11 @@ async def search_documents(query: SearchQuery):
         # Construct the full-text search query using parameterized SQL
         query = sql.SQL(
             """
-            SELECT id, title, COALESCE(abstract, ''), claim_text
+            SELECT id, title, abstract, claim_text
             FROM target.patents
-            WHERE ((title_abstract_tsvector @@ {ts_query} AND title IS NOT NULL AND title != '' AND abstract IS NOT NULL AND abstract != '' AND claim_text IS NOT NULL AND claim_text != '')
-            OR (claims_tsvector @@ {ts_query} AND title IS NOT NULL AND title != '' AND abstract IS NOT NULL AND abstract != '' AND claim_text IS NOT NULL AND claim_text != ''));
-            """
+            WHERE (title_abstract_tsvector @@ {ts_query})
+               OR (claims_tsvector @@ {ts_query});
+        """
         ).format(ts_query=ts_query)
         # print(query)
         # Execute the query
@@ -57,3 +57,52 @@ async def search_patents(data: PatentAnalysis):
             PatentResult(id=patent_id, title=title, abstract=abstract, content=content)
         )
     return results
+
+
+def generate_innovation_summary(qa_pairs):
+    """
+    Generates a summary of the user's innovation using Azure AI based on provided question and answer pairs.
+
+    Parameters:
+    - qa_pairs (list of dicts): A list of dictionaries containing 'question' and 'answer' keys.
+
+    Returns:
+    - str: A summary of the innovation.
+    """
+    # Create a single string from all question-answer pairs
+    prompt = f"""Summarize the key points of an innovation based on the following details. 
+    Following details are on user's responses from the database for the predefined set 
+    of questions relevant to their innovation.
+    - Summarize the product or technology that has been developed, emphasizing its purpose and target industry.
+    - Describe in detail the technical aspects and the unique features of the innovation. Highlight how these features contribute to novelty within its field.
+    - Explain the innovation's business model, focusing on primary and potential revenue streams.
+    - Outline the company’s strategy for patent filing, including geographic focus and any prior art or existing patents that have been identified.
+    - Discuss how the innovation meets the criteria for novelty and non-obviousness, which are crucial for IP validity
+
+    User provided answers for set of pre-defined questions: 
+    {qa_pairs}
+    
+    """
+
+    message_text = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": str(qa_pairs)},
+    ]
+
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo",
+        messages=message_text,
+        temperature=0.7,
+        max_tokens=800,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None,
+    )
+
+    content = completion.choices[0].message.content
+
+    # Extract the generated text from the response
+    # summary = response.get("choices", [{}])[0].get("text", "").strip()
+
+    return content

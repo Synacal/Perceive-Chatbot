@@ -1,8 +1,7 @@
 from app.core.database import get_percieve_db_connection
-from app.core.pinecone import get_pinecone_client
+
+# from app.core.pinecone import get_pinecone_client
 from app.core.azure_client import client
-import asyncio
-from fastapi import HTTPException
 
 
 def vectorize_description(description: str):
@@ -14,36 +13,11 @@ def vectorize_description(description: str):
     return vector
 
 
-async def vectorize_description_with_retry(
-    description: str, retry_count: int = 3, initial_delay: int = 5, max_delay: int = 60
-):
-    try:
-        model = "embedding-model"
-        vector = (
-            client.embeddings.create(input=[description], model=model).data[0].embedding
-        )
-        print(f"Vectorized description: {description}")
-        return vector
-    except HTTPException as e:
-        if retry_count > 0 and e.status_code == 429:
-            delay = min(initial_delay * (2 ** (3 - retry_count)), max_delay)
-            if delay == 10:
-                delay = 20  # Increase delay to 20 seconds if the original delay was 10 seconds
-            print(
-                f"Rate limit exceeded. Retrying after {delay} seconds for description: {description}"
-            )
-            await asyncio.sleep(delay)  # Wait for delay seconds before retrying
-            return await vectorize_description_with_retry(description, retry_count - 1)
-        else:
-            raise e
-
-
+"""
 def query_pinecone_index(description_vector, top_k=5):
     index = get_pinecone_client()
-    response = index.query(
-        vector=description_vector, top_k=top_k, include_metadata=True
-    )
-    return response
+    response = index.query(vector=description_vector, top_k=top_k, include_metadata=True)
+    return response"""
 
 
 def generate_analysis(description: str, patent_data: dict):

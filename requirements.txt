@@ -121,7 +121,6 @@ overrides==7.7.0
 packaging==23.2
 pandas==2.1.1
 Pillow==10.0.0
-pinecone==4.0.0
 plotly==5.18.0
 posthog==3.5.0
 proglog==0.1.10
@@ -141,7 +140,6 @@ PyMuPDF==1.23.26
 PyMuPDFb==1.23.22
 pyparsing==3.0.9
 pypdf==4.1.0
-PyPDF2==3.0.1
 PyPika==0.48.9
 pyproject_hooks==1.0.0
 pyreadline3==3.4.1
@@ -180,7 +178,6 @@ typing_extensions==4.8.0
 tzdata==2023.3
 tzlocal==5.1
 urllib3==2.0.6
-uuid==1.30
 uvicorn==0.27.1
 validators==0.22.0
 watchdog==3.0.0
@@ -190,5 +187,4 @@ websockets==12.0
 wrapt==1.16.0
 yarl==1.9.4
 zipp==3.17.0
-
-scikit-learn==1.2.2
+PyPDF2==3.0.1

@@ -6,6 +6,8 @@ from app.api.api_v1.endpoints import (
     attachments,
     ip_validity_analysis,
     requirements_gathering,
+    common,
+    quickprompt,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,3 +26,5 @@ app.include_router(answers.router)
 app.include_router(prior_art_search.router)
 app.include_router(attachments.router)
 app.include_router(ip_validity_analysis.router)
+app.include_router(common.router)
+app.include_router(quickprompt.router)

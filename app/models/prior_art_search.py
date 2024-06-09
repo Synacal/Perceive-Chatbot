@@ -24,3 +24,9 @@ class PatentList(BaseModel):
 class SearchRequest(BaseModel):
     query: SearchQuery
     answer_list: PatentAnalysis
+
+
+class PriorArtSearch(BaseModel):
+    user_id: str
+    session_id: str
+    keywords: List[str]
