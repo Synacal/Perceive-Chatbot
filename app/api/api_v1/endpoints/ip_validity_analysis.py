@@ -7,15 +7,13 @@ from app.models.prior_art_search import (
 )
 
 # from app.models.document import Document  # Assuming Document is a Pydantic model for your database entries
-from app.services.ip_validity_analysis import (
+from app.services.ip_validity_analysis2 import (
     search_documents,
     search_patents,
     create_novelty_assessment,
 )
 
-from app.services.ip_validity_analysis.common import (
-    create_assessment,
-)
+from app.services.ip_validity_analysis.common import create_assessment
 
 router = APIRouter()
 
@@ -29,9 +27,9 @@ async def keyword_search(request: SearchRequest):
         response_data2 = await search_patents(
             response_data, request.answer_list.description
         )
-        novelly_assessment = await create_novelty_assessment(
-            response_data2, request.answer_list.description
-        )
+        # novelly_assessment = await create_novelty_assessment(
+        #    response_data2, request.answer_list.description
+        # )
 
         patentability_criteria = [
             "Novelty (35 U.S.C. § 102)",
@@ -43,19 +41,22 @@ async def keyword_search(request: SearchRequest):
             "Industrial Application",
             "Clarity & Sufficiency",
             "Scope & Definition",
+            "Economic Significance",
         ]
-        non_obviousness = await create_assessment(
-            response_data2,
-            request.answer_list.description,
-            patentability_criteria[1],
-        )
-        if novelly_assessment is None:
-            raise HTTPException(
-                status_code=500, detail="Error generating novelty assessment."
-            )
 
-        # Ensure that the novelty_assessment matches the expected return type
-        return novelly_assessment
+        report = {}
+
+        for i in range(len(patentability_criteria)):
+            assessment = await create_assessment(
+                response_data2,
+                request.answer_list.description,
+                patentability_criteria[i],
+            )
+            report[patentability_criteria[i]] = assessment
+            print(f"Assessment for {patentability_criteria[i]}: {assessment}")
+
+        return report
+
     except HTTPException as e:
         raise e
     except Exception as e:

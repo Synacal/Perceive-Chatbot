@@ -8,11 +8,7 @@ from psycopg2 import sql
 from app.models.prior_art_search import PatentAnalysis, PatentResult, PatentList
 from app.utils.prior_art_search_helpers import (
     vectorize_description,
-    query_pinecone_index,
-    generate_analysis,
-    vectorize_description_with_retry,
 )
-import asyncio
 import numpy as np
 from typing import List, Dict
 from sklearn.metrics.pairwise import cosine_similarity
@@ -170,6 +166,7 @@ async def get_patent_by_id(patent_id: str):
             result = cur.fetchone()
             return result[0] if result else None
     except Exception as e:
+
         print(f"Error fetching patent {patent_id}: {e}")
         return None
     finally:
@@ -211,7 +208,10 @@ async def compare_novelty(patent_abstracts: List[str], answer_list: str):
 
     message_text = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": answer_list},
+        {
+            "role": "user",
+            "content": str(truncated_abstracts) + "\n\nAnswer: " + answer_list,
+        },
     ]
 
     try:

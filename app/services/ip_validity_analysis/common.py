@@ -1,5 +1,28 @@
 from fastapi import HTTPException
 from typing import List
+from app.core.database import get_percieve_db_connection
+from app.core.azure_client import client
+
+from app.services.ip_validity_analysis.novelty import compare_novelty
+from app.services.ip_validity_analysis.non_obviousness import compare_non_obviousness
+from app.services.ip_validity_analysis.utility import compare_utility
+from app.services.ip_validity_analysis.enablement import compare_enablement
+from app.services.ip_validity_analysis.written_description import (
+    compare_written_description,
+)
+from app.services.ip_validity_analysis.definiteness import compare_definiteness
+from app.services.ip_validity_analysis.industrial_application import (
+    compare_industrial_application,
+)
+from app.services.ip_validity_analysis.clarity_and_sufficiency import (
+    compare_clarity_and_sufficiency,
+)
+from app.services.ip_validity_analysis.scope_and_definition import (
+    compare_scope_and_definition,
+)
+from app.services.ip_validity_analysis.economic_significance import (
+    compare_economic_significance,
+)
 
 
 async def create_assessment(patent_ids: List[str], answer_list: str, criterion: str):
@@ -40,6 +63,10 @@ async def create_assessment(patent_ids: List[str], answer_list: str, criterion: 
         )
     elif criterion == "Scope & Definition":
         assessment_point = await compare_scope_and_definition(
+            patent_abstracts, answer_list
+        )
+    elif criterion == "Economic Significance":
+        assessment_point = await compare_economic_significance(
             patent_abstracts, answer_list
         )
 
