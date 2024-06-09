@@ -8,7 +8,6 @@ from psycopg2 import sql
 from app.models.prior_art_search import PatentAnalysis, PatentResult
 from app.utils.prior_art_search_helpers import (
     vectorize_description,
-    query_pinecone_index,
     generate_analysis,
 )
 
