@@ -18,11 +18,11 @@ async def get_requirements_gathering(requirements: RequirementsGathering):
                 # Generate a unique ID for report_id using shortuuid
                 report_id = "PR" + shortuuid.uuid()
                 # Execute the query with the generated report_id
-                cur.execute(
+                result = cur.execute(
                     query, (str(requirements.user_id), report_id, str(user_case_id))
                 )
         conn.commit()
-        return {"status": "success"}
+        return {"status": "success", "requirement_gathering_id": result}
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
