@@ -5,6 +5,7 @@ from app.api.api_v1.endpoints import (
     prior_art_search,
     attachments,
     ip_validity_analysis,
+    requirements_gathering,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -17,6 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(requirements_gathering.router)
 app.include_router(check_user_answer.router)
 app.include_router(answers.router)
 app.include_router(prior_art_search.router)
