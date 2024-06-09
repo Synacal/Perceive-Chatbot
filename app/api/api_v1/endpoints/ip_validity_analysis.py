@@ -7,20 +7,24 @@ from app.services.ip_validity_analysis.common import (
     create_assessment,
     search_documents,
     search_patents,
+    get_answers,
+    get_keywords,
 )
 
 router = APIRouter()
 
 
 @router.post("/ip_validity_analysis")
-async def keyword_search(request: SearchRequest):
+async def ip_validity_analysis(
+    requirement_gathering_id: int, user_case_id: str, type_id: str
+):
     try:
-        response_data = await search_documents(request.query)
+        answers = await get_answers(requirement_gathering_id, user_case_id, type_id)
+        keywords = await get_keywords(answers)
+        response_data = await search_documents(keywords)
         print(len(response_data))
         response_data = response_data[:6]
-        response_data2 = await search_patents(
-            response_data, request.answer_list.description
-        )
+        response_data2 = await search_patents(response_data, answers)
 
         patentability_criteria = [
             "Novelty (35 U.S.C. § 102)",
@@ -40,12 +44,13 @@ async def keyword_search(request: SearchRequest):
         for i in range(len(patentability_criteria)):
             assessment = await create_assessment(
                 response_data2,
-                request.answer_list.description,
+                answers,
                 patentability_criteria[i],
             )
             report[patentability_criteria[i]] = assessment
             print(f"Assessment for {patentability_criteria[i]}: {assessment}")
 
+        await add_report(report, requirement_gathering_id, user_case_id)
         return report
 
     except HTTPException as e:

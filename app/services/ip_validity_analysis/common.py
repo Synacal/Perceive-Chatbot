@@ -36,6 +36,9 @@ from app.utils.prior_art_search_helpers import (
 )
 import time
 import numpy as np
+from app.services.add_attachment_answer import get_report_id
+from app.core.database import get_db_connection
+import json
 
 
 async def search_documents(query: SearchQuery) -> List[PatentResult]:
@@ -210,5 +213,123 @@ async def get_patent_by_id(patent_id: str):
     except Exception as e:
         print(f"Error fetching patent {patent_id}: {e}")
         return None
+    finally:
+        conn.close()
+
+
+async def get_answers(requirement_gathering_id, user_case_id, type_id):
+    try:
+        if type_id == "QA":
+            question_ids = []
+            if user_case_id == "1":
+                question_ids = [0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12]
+            elif user_case_id == "2":
+                question_ids = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+            elif user_case_id == "3":
+                question_ids = [26, 27, 28, 29, 30, 31, 32, 33, 34]
+            elif user_case_id == "4":
+                question_ids = [35, 36, 37, 38, 39, 40, 41]
+            elif user_case_id == "5":
+                question_ids = [
+                    0,
+                    1,
+                    2,
+                    42,
+                    43,
+                    44,
+                    45,
+                    46,
+                    47,
+                    48,
+                    49,
+                    50,
+                    51,
+                    52,
+                    53,
+                    54,
+                ]
+            else:
+                question_ids = [0, 1, 2]
+            query = """
+            SELECT answer
+            FROM user_chats
+            WHERE requirement_gathering_id = %s AND question_id IN %s;
+            """
+            values = (requirement_gathering_id, tuple(question_ids))
+
+        elif type_id == "Attachment":
+            report_id = await get_report_id(requirement_gathering_id, user_case_id)
+            query = """
+            SELECT answer
+            FROM attachment_chats
+            WHERE requirement_gathering_id = %s and WHERE report_id = %s;
+            """
+            values = (requirement_gathering_id,)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid type_id")
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        result = cur.fetchall()
+        answers = [row[0] for row in result]
+
+        # Combine answers into a single paragraph
+        paragraph = " ".join(answers)
+        return paragraph
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
+
+async def get_keywords(answers):
+    system_prompt = f"""create a 2 keywords from the following text: {answers}"""
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-35-turbo",
+            messages=system_prompt,
+            temperature=0.7,
+            max_tokens=800,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=None,
+        )
+
+        content = completion.choices[0].message.content
+        print(content)
+
+        # Extract keywords from the completion
+        if content:
+            try:
+                generated_content_json = content
+                return generated_content_json
+            except json.JSONDecodeError:
+                return {
+                    "status": "Error of code",
+                }
+        else:
+            return {"Error of code"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
+        )
+
+
+async def add_report(report, requirement_gathering_id, user_id):
+    query = """
+    INSERT INTO reports (requirement_gathering_id, user_id, report)
+    VALUES %s
+    """
+    values = [(requirement_gathering_id, user_id, report)]
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
