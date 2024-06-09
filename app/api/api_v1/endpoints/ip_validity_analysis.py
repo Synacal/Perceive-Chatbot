@@ -1,19 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from app.models.prior_art_search import (
-    PatentAnalysis,
-    PatentList,
-    SearchRequest,
-)
 
-# from app.models.document import Document  # Assuming Document is a Pydantic model for your database entries
-from app.services.ip_validity_analysis2 import (
+from app.models.ip_validity_analysis import SearchRequest
+
+from app.services.ip_validity_analysis.common import (
+    create_assessment,
     search_documents,
     search_patents,
-    create_novelty_assessment,
 )
-
-from app.services.ip_validity_analysis.common import create_assessment
 
 router = APIRouter()
 
@@ -27,9 +21,6 @@ async def keyword_search(request: SearchRequest):
         response_data2 = await search_patents(
             response_data, request.answer_list.description
         )
-        # novelly_assessment = await create_novelty_assessment(
-        #    response_data2, request.answer_list.description
-        # )
 
         patentability_criteria = [
             "Novelty (35 U.S.C. § 102)",
