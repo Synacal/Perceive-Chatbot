@@ -217,9 +217,12 @@ async def check_user_answers(
                 if generated_content_json["status"] == "true":
                     # Insert the answer and question ID, session ID, and user ID into the database
                     query = """
-                    INSERT INTO attachment_chats (question_id, report_id, user_id, answer,attachment_flag,requirement_gathering_id)
-                    VALUES %s
-                    """
+                        INSERT INTO attachment_chats (question_id, report_id, user_id, answer, attachment_flag, requirement_gathering_id)
+                        VALUES %s
+                        ON CONFLICT (question_id, report_id, user_id, requirement_gathering_id) DO UPDATE
+                        SET answer = EXCLUDED.answer,
+                            attachment_flag = EXCLUDED.attachment_flag
+                        """
 
                     values = [
                         (
