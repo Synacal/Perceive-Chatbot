@@ -5,25 +5,42 @@ import shortuuid
 
 
 async def get_requirements_gathering(requirements: RequirementsGathering):
-    query = """
-    INSERT INTO requirements_gathering (user_id, report_id, user_case_id)
-    VALUES (%s, %s, %s)
+    fetch_id_query = "SELECT nextval('requirement_gathering_id_seq')"
+    insert_query = """
+    INSERT INTO requirements_gathering (requirement_gathering_id, user_id, report_id, user_case_id)
+    VALUES (%s, %s, %s, %s)
     RETURNING requirement_gathering_id
     """
 
     try:
         conn = get_db_connection()
         with conn.cursor() as cur:
+            # Fetch the next requirement_gathering_id from the sequence
+            cur.execute(fetch_id_query)
+            requirement_gathering_id = cur.fetchone()[0]
+
+            results = []
             for user_case_id in requirements.user_case_ids:
                 # Generate a unique ID for report_id using shortuuid
                 report_id = "PR" + shortuuid.uuid()
-                # Execute the query with the generated report_id
+                # Execute the insert query with the fetched requirement_gathering_id
                 cur.execute(
-                    query, (str(requirements.user_id), report_id, str(user_case_id))
+                    insert_query,
+                    (
+                        requirement_gathering_id,
+                        str(requirements.user_id),
+                        report_id,
+                        str(user_case_id),
+                    ),
                 )
                 result = cur.fetchone()  # Fetch the returned ID
+                results.append(result[0])
+
         conn.commit()
-        return {"status": "success", "requirement_gathering_id": result[0]}
+        return {
+            "status": "success",
+            "requirement_gathering_id": requirement_gathering_id,
+        }
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
