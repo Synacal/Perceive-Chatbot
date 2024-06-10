@@ -41,10 +41,10 @@ from app.core.database import get_db_connection
 import json
 
 
-async def search_documents(query: SearchQuery) -> List[PatentResult]:
+async def search_documents(keywords: List[str]) -> List[PatentResult]:
     try:
         conn = get_percieve_db_connection()
-        query_keywords = " | ".join(query.keywords)
+        query_keywords = " | ".join(keywords)
         ts_query = sql.SQL("plainto_tsquery('english', %s)")
 
         query = sql.SQL(
@@ -218,6 +218,7 @@ async def get_patent_by_id(patent_id: str):
 
 
 async def get_answers(requirement_gathering_id, user_case_id, type_id):
+    conn = None
     try:
         if type_id == "QA":
             question_ids = []
@@ -262,9 +263,12 @@ async def get_answers(requirement_gathering_id, user_case_id, type_id):
             query = """
             SELECT answer
             FROM attachment_chats
-            WHERE requirement_gathering_id = %s and WHERE report_id = %s;
+            WHERE requirement_gathering_id = %s AND report_id = %s;
             """
-            values = (requirement_gathering_id,)
+            values = (
+                requirement_gathering_id,
+                report_id,
+            )
         else:
             raise HTTPException(status_code=400, detail="Invalid type_id")
         conn = get_db_connection()
@@ -279,15 +283,23 @@ async def get_answers(requirement_gathering_id, user_case_id, type_id):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        conn.close()
+        if conn:  # Ensure conn is closed only if it was successfully opened
+            conn.close()
 
 
 async def get_keywords(answers):
-    system_prompt = f"""create a 2 keywords from the following text: {answers}"""
+    system_prompt = (
+        f"Create 2 keywords, separated by a comma, from the following text: {answers}"
+    )
     try:
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": system_prompt},
+        ]
+
         completion = client.chat.completions.create(
             model="gpt-35-turbo",
-            messages=system_prompt,
+            messages=messages,
             temperature=0.7,
             max_tokens=800,
             top_p=0.95,
@@ -299,17 +311,12 @@ async def get_keywords(answers):
         content = completion.choices[0].message.content
         print(content)
 
-        # Extract keywords from the completion
+        # Extract and clean keywords
         if content:
-            try:
-                generated_content_json = content
-                return generated_content_json
-            except json.JSONDecodeError:
-                return {
-                    "status": "Error of code",
-                }
+            keywords = [keyword.strip() for keyword in content.split(",") if keyword]
+            return keywords
         else:
-            return {"Error of code"}
+            return {"status": "No content received"}
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error generating response: {str(e)}"
