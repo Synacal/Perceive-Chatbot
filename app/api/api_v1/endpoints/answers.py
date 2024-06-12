@@ -21,9 +21,9 @@ async def add_answer_list(answer_list: AnswerList):
 
 
 @router.get("/get-answers/")
-async def get_answer_list(userID: str, sessionID: str):
+async def get_answer_list(userID: str, requirement_gathering_id: int):
     try:
-        response_data = await get_answers(userID, sessionID)
+        response_data = get_answers(userID, requirement_gathering_id)
         return response_data
     except HTTPException as e:
         raise e

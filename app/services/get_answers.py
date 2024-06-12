@@ -6,13 +6,13 @@ import psycopg2
 import psycopg2.extras
 
 
-def get_answers(user_id: str, session_id: str):
+def get_answers(user_id: str, requirement_gathering_id: str):
     sql = """
-    SELECT question_id, session_id, user_id, answer
+    SELECT question_id, requirement_gathering_id, user_id, answer
     FROM user_chats
-    WHERE user_id = %s AND session_id = %s;
+    WHERE user_id = %s AND requirement_gathering_id = %s;
     """
-    values = (user_id, session_id)
+    values = (user_id, requirement_gathering_id)
 
     try:
         conn = (
@@ -35,12 +35,13 @@ def get_answers(user_id: str, session_id: str):
         answers = [
             Answer(
                 question_id=row["question_id"],
-                session_id=row["session_id"],
+                requirement_gathering_id=row["requirement_gathering_id"],
                 user_id=row["user_id"],
                 answer=row["answer"],
             )
             for row in rows
         ]
+        print(answers)
         cur.close()
         conn.close()  # Close connection after operation
         return answers
