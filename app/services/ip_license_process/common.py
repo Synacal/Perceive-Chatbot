@@ -14,7 +14,7 @@ from app.services.add_attachment_answer import get_report_id
 from app.core.database import get_db_connection
 import json
 
-from app.models.ip_license_process import PatentResult, PatentList
+from app.models.ip_license_process import PatentResult, PatentList, PatentData
 
 
 async def search_documents(keywords: List[str]) -> List[PatentResult]:
@@ -254,7 +254,7 @@ async def get_summary(answers):
         ]
 
         completion = client.chat.completions.create(
-            model="gpt-35-turbo",
+            model="gpt-4o",
             messages=messages,
             temperature=0.7,
             max_tokens=800,
@@ -284,7 +284,7 @@ async def get_keywords(answers):
         ]
 
         completion = client.chat.completions.create(
-            model="gpt-35-turbo",
+            model="gpt-4o",
             messages=messages,
             temperature=0.7,
             max_tokens=800,
@@ -306,3 +306,68 @@ async def get_keywords(answers):
         raise HTTPException(
             status_code=500, detail=f"Error generating response: {str(e)}"
         )
+
+
+async def get_patent_data(patents: List[str]) -> List[PatentData]:
+    conn = None
+    try:
+        conn = get_percieve_db_connection()
+        cur = conn.cursor()
+
+        query = """
+        SELECT
+            ah.reel_no,
+            ah.frame_no,
+            ah.last_update_date,
+            ah.recorded_date,
+            pae.name AS assignee,
+            ARRAY_AGG(pao.name) AS assignors
+        FROM
+            target.assignment_history AS ah
+        JOIN
+            target.patent_assignees AS pae ON ah.patent_id = pae.patent_id
+        JOIN
+            target.patent_assignors AS pao ON ah.patent_id = pao.patent_id
+        WHERE
+            ah.patent_id = ANY(%s)
+        GROUP BY
+            ah.reel_no,
+            ah.frame_no,
+            ah.last_update_date,
+            ah.recorded_date,
+            pae.name;
+        """
+        cur.execute(query, (patents,))
+        results = cur.fetchall()
+
+        if not results:
+            print(f"No results found for patents: {patents}")
+
+        patent_data = []
+        for row in results:
+            (
+                reel_no,
+                frame_no,
+                last_update_date,
+                recorded_date,
+                assignee,
+                assignors,
+            ) = row
+            patent_data.append(
+                PatentData(
+                    reel_no=reel_no,
+                    frame_no=frame_no,
+                    last_update_date=last_update_date,
+                    recorded_date=recorded_date,
+                    assignee=assignee,
+                    assignors=assignors,
+                ).dict()
+            )
+
+        print(f"Patent data collected: {patent_data}")
+        return patent_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn:
+            conn.close()

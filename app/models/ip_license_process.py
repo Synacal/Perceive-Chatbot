@@ -1,5 +1,6 @@
-from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Any
+from pydantic import BaseModel, validator
+from datetime import date, datetime
 
 
 class ReportParams(BaseModel):
@@ -16,3 +17,12 @@ class PatentResult(BaseModel):
 
 class PatentList(BaseModel):
     patents: List[PatentResult]
+
+
+class PatentData(BaseModel):
+    reel_no: int
+    frame_no: int
+    last_update_date: str
+    recorded_date: date
+    assignee: str
+    assignors: List[str]

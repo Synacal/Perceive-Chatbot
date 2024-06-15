@@ -7,6 +7,7 @@ from app.services.ip_license_process.common import (
     search_documents,
     search_patents,
     get_summary,
+    get_patent_data,
 )
 
 from app.models.ip_license_process import ReportParams
@@ -27,8 +28,9 @@ async def ip_license_process(report_params: ReportParams):
         documents = await search_documents(keywords)
         documents = documents[:6]
         patents = await search_patents(documents, summary)
-        print(patents)
-        print(f"Number of patents found: {len(patents)}")
+        patent_date = await get_patent_data(patents)
+
+        return {"patents": patents, "patent_data": patent_date}
 
     except HTTPException as e:
         raise e
