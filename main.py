@@ -5,6 +5,7 @@ from app.api.api_v1.endpoints import (
     prior_art_search,
     attachments,
     ip_validity_analysis,
+    ip_license_process,
     requirements_gathering,
     common,
     quickprompt,
@@ -26,5 +27,6 @@ app.include_router(answers.router)
 app.include_router(prior_art_search.router)
 app.include_router(attachments.router)
 app.include_router(ip_validity_analysis.router)
+app.include_router(ip_license_process.router)
 app.include_router(common.router)
 app.include_router(quickprompt.router)
