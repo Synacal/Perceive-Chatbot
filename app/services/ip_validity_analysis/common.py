@@ -33,6 +33,7 @@ from psycopg2 import sql
 from sklearn.metrics.pairwise import cosine_similarity
 from app.utils.prior_art_search_helpers import (
     vectorize_description,
+    vectorize_description_with_retries,
 )
 import time
 import numpy as np
@@ -90,26 +91,29 @@ async def search_documents(keywords: List[str]) -> List[PatentResult]:
 
 
 def encode_texts(texts: List[str]) -> List[List[float]]:
-    print("Starting encoding process...")
     embeddings = vectorize_texts(texts)
-    print("Encoding process completed.")
+    print("Encoding summary process completed.")
     return embeddings
 
 
 def vectorize_texts(texts: List[str]):
     embeddings = []
     for text in texts:
-        embedding = vectorize_description(text)
-        print(f"Vectorized text ")
-        embeddings.append(embedding)
-        # Add a 10 second delay
-        time.sleep(10)
+        try:
+            print(f"Vectorizing text: {text}")
+            embedding = vectorize_description_with_retries(text)
+            embeddings.append(embedding)
+            print(f"Successfully vectorized text: {text}")
+            # Add a 10 second delay
+            time.sleep(10)
+        except Exception as e:
+            print(f"Failed to vectorize text: {text}. Error: {e}")
+
     return embeddings
 
 
 async def search_patents(patents: List[PatentResult], description: str) -> PatentList:
     patent_texts = [f"{patent.abstract} " for patent in patents]
-    print("Patent texts: ", patent_texts)
 
     # Ensure that you await the results of the asynchronous tasks
     description_embedding_task = encode_texts([description])
@@ -156,7 +160,7 @@ async def create_assessment(patent_ids: List[str], answer_list: str, criterion: 
         patent = await get_patent_by_id(patent_id)
         if patent:
             patent_abstracts.append(patent)
-            print(f"Patent {patent_id} abstract: {patent}")
+
     if not patent_abstracts:
         raise HTTPException(
             status_code=404, detail="No patent abstracts found for the provided IDs."
@@ -217,40 +221,91 @@ async def get_patent_by_id(patent_id: str):
         conn.close()
 
 
-async def get_answers(requirement_gathering_id, user_case_id, type_id):
+async def get_answers(requirement_gathering_id, user_case_id):
     conn = None
     try:
-        if type_id == "QA":
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Check if requirement_gathering_id exists in user_chats
+        query_user_chats = """
+        SELECT COUNT(*)
+        FROM user_chats
+        WHERE requirement_gathering_id = %s;
+        """
+
+        print("1")
+        cur.execute(query_user_chats, (requirement_gathering_id,))
+        user_chats_count = cur.fetchone()[0]
+
+        # Check if requirement_gathering_id exists in attachment_chats
+        query_attachment_chats = """
+        SELECT COUNT(*)
+        FROM attachment_chats
+        WHERE requirement_gathering_id = %s;
+        """
+        cur.execute(query_attachment_chats, (requirement_gathering_id,))
+        attachment_chats_count = cur.fetchone()[0]
+
+        if user_chats_count > 0:
+
             question_ids = []
+            # Determine question_ids based on user_case_id
             if user_case_id == "1":
-                question_ids = [0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12]
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "10",
+                    "11",
+                    "12",
+                ]
             elif user_case_id == "2":
-                question_ids = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+                question_ids = [
+                    "13",
+                    "14",
+                    "15",
+                    "16",
+                    "17",
+                    "18",
+                    "19",
+                    "20",
+                    "21",
+                    "22",
+                    "23",
+                    "24",
+                    "25",
+                ]
             elif user_case_id == "3":
-                question_ids = [26, 27, 28, 29, 30, 31, 32, 33, 34]
+                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
             elif user_case_id == "4":
-                question_ids = [35, 36, 37, 38, 39, 40, 41]
+                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
             elif user_case_id == "5":
                 question_ids = [
-                    0,
-                    1,
-                    2,
-                    42,
-                    43,
-                    44,
-                    45,
-                    46,
-                    47,
-                    48,
-                    49,
-                    50,
-                    51,
-                    52,
-                    53,
-                    54,
+                    "0",
+                    "1",
+                    "2",
+                    "42",
+                    "43",
+                    "44",
+                    "45",
+                    "46",
+                    "47",
+                    "48",
+                    "49",
+                    "50",
+                    "51",
+                    "52",
+                    "53",
+                    "54",
                 ]
             else:
-                question_ids = [0, 1, 2]
+                question_ids = ["0", "1", "2"]
             query = """
             SELECT answer
             FROM user_chats
@@ -258,7 +313,8 @@ async def get_answers(requirement_gathering_id, user_case_id, type_id):
             """
             values = (requirement_gathering_id, tuple(question_ids))
 
-        elif type_id == "Attachment":
+        elif attachment_chats_count > 0:
+
             report_id = await get_report_id(requirement_gathering_id, user_case_id)
             query = """
             SELECT answer
@@ -271,11 +327,11 @@ async def get_answers(requirement_gathering_id, user_case_id, type_id):
             )
         else:
             raise HTTPException(status_code=400, detail="Invalid type_id")
-        conn = get_db_connection()
-        cur = conn.cursor()
         cur.execute(query, values)
         result = cur.fetchall()
+
         answers = [row[0] for row in result]
+        print(f"Number of answers found: {len(answers)}")
 
         # Combine answers into a single paragraph
         paragraph = " ".join(answers)
@@ -323,12 +379,12 @@ async def get_keywords(answers):
         )
 
 
-async def add_report(report, requirement_gathering_id, user_id):
+async def add_report(report_json, requirement_gathering_id, user_id):
     query = """
     INSERT INTO reports (requirement_gathering_id, user_id, report)
     VALUES %s
     """
-    values = [(requirement_gathering_id, user_id, report)]
+    values = [(requirement_gathering_id, user_id, report_json)]
     conn = get_db_connection()
     try:
         cur = conn.cursor()
@@ -340,3 +396,31 @@ async def add_report(report, requirement_gathering_id, user_id):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
+
+
+async def get_summary(answers):
+    system_prompt = f"Summarize the following text: {answers}"
+    try:
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": system_prompt},
+        ]
+
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=800,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=None,
+        )
+
+        content = completion.choices[0].message.content
+
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
+        )

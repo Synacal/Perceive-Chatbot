@@ -1,4 +1,5 @@
 from app.core.database import get_percieve_db_connection
+import time
 
 # from app.core.pinecone import get_pinecone_client
 from app.core.azure_client import client
@@ -11,6 +12,24 @@ def vectorize_description(description: str):
         client.embeddings.create(input=[description], model=model).data[0].embedding
     )
     return vector
+
+
+def vectorize_description_with_retries(
+    description: str, retries=5, backoff_in_seconds=100
+):
+    for i in range(retries):
+        try:
+            return vectorize_description(description)
+        except Exception as e:
+            if "429" in str(e):
+                print(
+                    f"Rate limit exceeded. Retrying in {backoff_in_seconds} seconds..."
+                )
+                time.sleep(backoff_in_seconds)
+                # backoff_in_seconds *= 2  # Exponential backoff
+            else:
+                raise
+    raise Exception(f"Failed to vectorize description after {retries} retries.")
 
 
 """

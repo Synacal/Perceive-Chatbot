@@ -57,8 +57,6 @@ async def compare_industrial_application(patent_abstracts: List[str], answer_lis
             stop=None,
         )
 
-        print("Novelty assessment completion: ")
-
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
