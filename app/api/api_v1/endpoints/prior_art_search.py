@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import BackgroundTasks, APIRouter, HTTPException, Depends
 from typing import List
 from app.services.get_answers import get_all_answers_with_questions
 from app.models.prior_art_search import (
@@ -20,6 +20,7 @@ from app.services.prior_art_search.common import (
     search_documents,
     search_patents,
     get_patent_by_id,
+    create_report_background,
 )
 
 from app.core.azure_client import client
@@ -50,7 +51,7 @@ async def vector_search(query: PatentAnalysis):
 # except Exception as e:
 #     raise HTTPException(status_code=500, detail=str(e))
 
-
+"""
 @router.post("/prior-art-search-temp")
 async def prior_art_search_temp(query: PriorArtSearch):
     # try:
@@ -64,7 +65,6 @@ async def prior_art_search_temp(query: PriorArtSearch):
     #     raise e
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.post("/prior-art-search")
 async def prior_art_search(report_params: ReportParams):
@@ -82,10 +82,11 @@ async def prior_art_search(report_params: ReportParams):
         response_data = response_data[:3]
         patent_ids = await search_patents(response_data, summary)
         analysis_results = []
+        print("12")
         for patent_id in patent_ids:
             print(patent_id)
             patent = await get_patent_by_id(patent_id)
-            system_prompt = f"""
+            system_prompt = f
                 Analyze the provided patent information against the user's invention description to identify and 
                 describe both similarities and differences, focusing on technical features, innovative aspects, 
                 and potential patentability issues.
@@ -117,12 +118,11 @@ async def prior_art_search(report_params: ReportParams):
                         Differences:
                             A comprehensive outline of how the user's invention diverges from the analyzed patent. Highlight novel features, different technical solutions, or unique applications that are not covered by the patent.
                         Conclude with a brief summary of the potential implications of these similarities and differences on the user’s ability to patent the invention.
-                """
+                
             message_text = [
                 {"role": "system", "content": system_prompt},
                 # {"role": "user", "content": answer}
             ]
-            print(patent["id"])
             completion = client.chat.completions.create(
                 model="gpt-35-turbo",
                 messages=message_text,
@@ -144,6 +144,28 @@ async def prior_art_search(report_params: ReportParams):
             "status": "in-progress",
             "analysis_results": analysis_results,
         }
+        return response
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+"""
+
+
+@router.post("/prior-art-search")
+async def prior_art_search(
+    report_params: ReportParams, background_tasks: BackgroundTasks
+):
+    try:
+        # Start the background task for report creation
+        background_tasks.add_task(create_report_background, report_params)
+        answers = await get_answers_with_questions(
+            report_params.requirement_gathering_id, report_params.user_case_id
+        )
+
+        summary = generate_prior_art_summary(answers)
+        # Return summary and status as "in progress" immediately
+        response = {"summary": summary, "status": "in-progress"}
         return response
     except HTTPException as e:
         raise e

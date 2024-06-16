@@ -15,7 +15,7 @@ from app.services.add_attachment_answer import get_report_id
 from app.core.database import get_db_connection
 import json
 
-from app.models.prior_art_search import PatentResult, PatentList
+from app.models.prior_art_search import PatentResult, PatentList, ReportParams
 
 
 async def get_answers(requirement_gathering_id, user_case_id):
@@ -479,3 +479,107 @@ async def get_patent_by_id(patent_id: str):
         return None
     finally:
         conn.close()
+
+
+async def create_report_background(report_params: ReportParams):
+    try:
+        answers = await get_answers_with_questions(
+            report_params.requirement_gathering_id, report_params.user_case_id
+        )
+
+        summary = generate_prior_art_summary(answers)
+
+        keywords = await get_keywords(answers)
+
+        response_data = await search_documents(keywords)
+
+        response_data = response_data[:3]
+        patent_ids = await search_patents(response_data, summary)
+        analysis_results = []
+
+        for patent_id in patent_ids:
+            print(patent_id)
+            patent = await get_patent_by_id(patent_id)
+            system_prompt = f"""
+                Analyze the provided patent information against the user's invention description to identify and 
+                describe both similarities and differences, focusing on technical features, innovative aspects, 
+                and potential patentability issues.
+                Inputs:
+
+                User's Invention Description: {summary}
+
+                Patent Information to Analyze: {patent}
+
+                Analysis Tasks:
+
+                    Task 1: Identify Similarities:
+                        Prompt: "Given the abstract and claims of Patent X (details provided above) alongside the 
+                        description of the user's invention, identify and describe the key similarities. Focus on 
+                        technical features, shared functionalities, and overlapping application domains. Explain 
+                        how these similarities could impact the patentability of the user’s invention."
+                    Task 2: Identify Differences:
+                        Prompt: "Based on the provided patent information (Patent X) and the user's invention 
+                        description, identify and articulate the significant differences, particularly regarding 
+                        novel features and inventive steps. Describe how these differences enhance the uniqueness 
+                        of the user's invention and contribute to its patentability. Outline any new functionalities, 
+                        technical solutions, or applications that differentiate the user's invention from the patent."
+
+                Output:
+
+                    Format for Response:
+                        Similarities:
+                            A detailed list and explanation of elements or concepts that are similar between the analyzed patent and the user's invention. Include any shared technological approaches or functionalities.
+                        Differences:
+                            A comprehensive outline of how the user's invention diverges from the analyzed patent. Highlight novel features, different technical solutions, or unique applications that are not covered by the patent.
+                        Conclude with a brief summary of the potential implications of these similarities and differences on the user’s ability to patent the invention.
+                """
+            message_text = [
+                {"role": "system", "content": system_prompt},
+                # {"role": "user", "content": answer}
+            ]
+            completion = client.chat.completions.create(
+                model="gpt-35-turbo",
+                messages=message_text,
+                temperature=0.7,
+                max_tokens=800,
+                top_p=0.95,
+                frequency_penalty=0,
+                presence_penalty=0,
+                stop=None,
+            )
+
+            content = completion.choices[0].message.content
+
+            analysis_results.append(content)
+
+        response = {
+            "summary": summary,
+            "status": "in-progress",
+            "analysis_results": analysis_results,
+        }
+
+        str_analysis_results = str(analysis_results)
+        query = """
+        INSERT INTO reports (requirement_gathering_id, user_case_id, report)
+        VALUES %s
+        """
+        values = [
+            (
+                report_params.requirement_gathering_id,
+                report_params.user_case_id,
+                str_analysis_results,
+            )
+        ]
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        print("report generation completed.")
+        return response
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
