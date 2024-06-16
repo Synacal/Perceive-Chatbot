@@ -28,6 +28,7 @@ from app.models.ip_validity_analysis import (
     PatentResult,
     PatentList,
     SearchQuery,
+    ReportParams,
 )
 from psycopg2 import sql
 from sklearn.metrics.pairwise import cosine_similarity
@@ -344,9 +345,7 @@ async def get_answers(requirement_gathering_id, user_case_id):
 
 
 async def get_keywords(answers):
-    system_prompt = (
-        f"Create 2 keywords, separated by a comma, from the following text: {answers}"
-    )
+    system_prompt = f"Extract exactly 2 general product-related keywords from the following text. Ensure these are broad terms like 'satellite' or 'motor' and not specific names, companies, or places. Separate them with a comma: {answers}"
     try:
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
@@ -379,12 +378,12 @@ async def get_keywords(answers):
         )
 
 
-async def add_report(report_str, requirement_gathering_id, user_id):
+async def add_report(report_str, requirement_gathering_id, user_case_id):
     query = """
-    INSERT INTO reports (requirement_gathering_id, user_id, report)
+    INSERT INTO reports (requirement_gathering_id, user_case_id, report)
     VALUES %s
     """
-    values = [(requirement_gathering_id, user_id, report_str)]
+    values = [(requirement_gathering_id, user_case_id, report_str)]
     conn = get_db_connection()
     try:
         cur = conn.cursor()
@@ -424,3 +423,51 @@ async def get_summary(answers):
         raise HTTPException(
             status_code=500, detail=f"Error generating response: {str(e)}"
         )
+
+
+async def create_report_background(report_params: ReportParams):
+    try:
+        answers = await get_answers(
+            report_params.requirement_gathering_id, report_params.user_case_id
+        )
+        summary = await get_summary(answers)
+        keywords = await get_keywords(answers)
+        response_data = await search_documents(keywords)
+        response_data = response_data[:3]
+        response_data2 = await search_patents(response_data, summary)
+
+        patentability_criteria = [
+            "Novelty (35 U.S.C. § 102)",
+            "Non-Obviousness (35 U.S.C. § 103)",
+            "Utility (35 U.S.C. § 101)",
+            "Enablement (35 U.S.C. § 112(a))",
+            "Written Description (35 U.S.C. § 112(a))",
+            "Definiteness (35 U.S.C. § 112(b))",
+            "Industrial Application",
+            "Clarity & Sufficiency",
+            "Scope & Definition",
+            "Economic Significance",
+        ]
+
+        report = {}
+
+        for i in range(len(patentability_criteria)):
+            assessment = await create_assessment(
+                response_data2,
+                answers,
+                patentability_criteria[i],
+            )
+            report[patentability_criteria[i]] = assessment
+
+        # Convert report dictionary to JSON string
+        report_str = str(report)
+        await add_report(
+            report_str,
+            report_params.requirement_gathering_id,
+            report_params.user_case_id,
+        )
+        print("Report generated successfully.")
+        return report
+    except Exception as e:
+        print(f"Error in background task: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
