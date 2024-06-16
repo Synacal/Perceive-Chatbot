@@ -379,12 +379,12 @@ async def get_keywords(answers):
         )
 
 
-async def add_report(report_json, requirement_gathering_id, user_id):
+async def add_report(report_str, requirement_gathering_id, user_id):
     query = """
     INSERT INTO reports (requirement_gathering_id, user_id, report)
     VALUES %s
     """
-    values = [(requirement_gathering_id, user_id, report_json)]
+    values = [(requirement_gathering_id, user_id, report_str)]
     conn = get_db_connection()
     try:
         cur = conn.cursor()

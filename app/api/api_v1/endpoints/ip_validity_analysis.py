@@ -25,16 +25,10 @@ async def ip_validity_analysis(report_params: ReportParams):
             report_params.requirement_gathering_id, report_params.user_case_id
         )
         summary = await get_summary(answers)
-        print("1")
         keywords = await get_keywords(answers)
-        print(keywords)
-        print("2")
         response_data = await search_documents(keywords)
-        print("3")
-        response_data = response_data[:6]
-        print(len(response_data))
+        response_data = response_data[:10]
         response_data2 = await search_patents(response_data, summary)
-        print("4")
 
         patentability_criteria = [
             "Novelty (35 U.S.C. § 102)",
@@ -52,24 +46,20 @@ async def ip_validity_analysis(report_params: ReportParams):
         report = {}
 
         for i in range(len(patentability_criteria)):
-            print("4")
             assessment = await create_assessment(
                 response_data2,
                 answers,
                 patentability_criteria[i],
             )
             report[patentability_criteria[i]] = assessment
-            print("5")
 
         # Convert report dictionary to JSON string
-        report_json = json.dumps(report)
-        print("6")
+        report_str = str(report)
         await add_report(
-            report_json,
+            report_str,
             report_params.requirement_gathering_id,
             report_params.user_case_id,
         )
-        print("7")
         return report
     except HTTPException as e:
         raise e
