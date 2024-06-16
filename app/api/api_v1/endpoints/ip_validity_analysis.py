@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import BackgroundTasks, APIRouter, HTTPException, Depends
 from typing import List
 
 from app.models.ip_validity_analysis import ReportParams
@@ -12,11 +12,12 @@ from app.services.ip_validity_analysis.common import (
     get_keywords,
     add_report,
     get_summary,
+    create_report_background,
 )
 
 router = APIRouter()
 
-
+"""
 @router.post("/ip_validity_analysis")
 async def ip_validity_analysis(report_params: ReportParams):
     try:
@@ -63,5 +64,25 @@ async def ip_validity_analysis(report_params: ReportParams):
         return report
     except HTTPException as e:
         raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+"""
+
+
+@router.post("/ip_validity_analysis")
+async def ip_validity_analysis(
+    report_params: ReportParams, background_tasks: BackgroundTasks
+):
+    try:
+        # Start the background task for report creation
+        background_tasks.add_task(create_report_background, report_params)
+        answers = await get_answers(
+            report_params.requirement_gathering_id, report_params.user_case_id
+        )
+        summary = await get_summary(answers)
+
+        # Return summary and status as "in progress" immediately
+        return {"summary": summary, "status": "in progress"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

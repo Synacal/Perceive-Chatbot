@@ -30,3 +30,8 @@ class PriorArtSearch(BaseModel):
     user_id: str
     session_id: str
     keywords: List[str]
+
+
+class ReportParams(BaseModel):
+    requirement_gathering_id: int
+    user_case_id: str
