@@ -112,3 +112,24 @@ async def get_draft_by_ids(UserID: str, requirement_gathering_id: int):
             cur.close()
         if conn:
             conn.close()
+
+
+async def delete_draft_by_ids(UserID: str, requirement_gathering_id: int):
+    query = """
+        DELETE FROM draft WHERE user_id = %s AND requirement_gathering_id = %s
+        """
+    values = (UserID, requirement_gathering_id)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        return {"status": "success"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
