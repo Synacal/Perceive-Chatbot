@@ -6,6 +6,8 @@ from app.utils.prompts import questions, prompts
 from app.core.azure_client import client
 import json
 from app.utils.prompts import questions, prompts
+from pptx import Presentation
+from docx import Document
 
 
 def get_pdf_content(attachment_base64: str) -> str:
@@ -25,6 +27,69 @@ def get_pdf_content(attachment_base64: str) -> str:
     except Exception as e:
         raise HTTPException(
             status_code=400, detail=f"Error reading PDF content: {str(e)}"
+        )
+
+
+def get_pptx_content(attachment_base64: str) -> str:
+    try:
+        # Decode the base64 string
+        pptx_bytes = base64.b64decode(attachment_base64)
+        # Use BytesIO to read the pptx bytes
+        pptx_file = BytesIO(pptx_bytes)
+        # Open the presentation
+        presentation = Presentation(pptx_file)
+        # Extract text from each slide
+        content = ""
+        for slide in presentation.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    content += shape.text + "\n"
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error reading PPTX content: {str(e)}"
+        )
+
+
+def get_docx_content(attachment_base64: str) -> str:
+    try:
+        # Decode the base64 string
+        docx_bytes = base64.b64decode(attachment_base64)
+        # Use BytesIO to read the docx bytes
+        docx_file = BytesIO(docx_bytes)
+        # Open the document
+        document = Document(docx_file)
+        # Extract text from each paragraph
+        content = ""
+        for paragraph in document.paragraphs:
+            content += paragraph.text + "\n"
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error reading DOCX content: {str(e)}"
+        )
+
+
+def get_content(attachments: list) -> str:
+    try:
+        # Get the content from the attachments
+        content = ""
+        for attachment in attachments:
+            if attachment["attachmentType"] == "pdf":
+                content += get_pdf_content(attachment["attachment"])
+            elif attachment["attachmentType"] == "pptx":
+                content += get_pptx_content(attachment["attachment"])
+            elif attachment["attachmentType"] == "docx":
+                content += get_docx_content(attachment["attachment"])
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Attachment type not supported. Supported types are pdf, pptx, and docx.",
+                )
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error getting content from attachments: {str(e)}"
         )
 
 
