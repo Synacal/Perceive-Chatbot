@@ -4,7 +4,7 @@ from typing import List
 
 class ReportParams(BaseModel):
     requirement_gathering_id: int
-    user_case_id: str
+    use_case_id: str
 
 
 class SearchQuery(BaseModel):

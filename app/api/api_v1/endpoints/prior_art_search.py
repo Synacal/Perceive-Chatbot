@@ -70,7 +70,7 @@ async def prior_art_search_temp(query: PriorArtSearch):
 async def prior_art_search(report_params: ReportParams):
     try:
         answers = await get_answers_with_questions(
-            report_params.requirement_gathering_id, report_params.user_case_id
+            report_params.requirement_gathering_id, report_params.use_case_id
         )
 
         summary = generate_prior_art_summary(answers)
@@ -160,7 +160,7 @@ async def prior_art_search(
         # Start the background task for report creation
         background_tasks.add_task(create_report_background, report_params)
         answers = await get_answers_with_questions(
-            report_params.requirement_gathering_id, report_params.user_case_id
+            report_params.requirement_gathering_id, report_params.use_case_id
         )
 
         summary = generate_prior_art_summary(answers)
