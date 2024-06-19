@@ -3,7 +3,7 @@ from typing import List
 
 
 class Attachment(BaseModel):
-    use_cases_ids: list[str]
+    user_cases_ids: list[str]
     requirement_gathering_id: int
     user_id: str
     attachment: str

@@ -7,8 +7,3 @@ class Draft(BaseModel):
     user_id: str
     current_page: str
     other_data: Dict[str, Any]
-
-
-class SummaryData(BaseModel):
-    requirement_gathering_id: int
-    use_case_ids: list[str]
