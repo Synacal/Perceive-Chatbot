@@ -18,7 +18,7 @@ import json
 from app.models.prior_art_search import PatentResult, PatentList, ReportParams
 
 
-async def get_answers(requirement_gathering_id, use_case_id):
+async def get_answers(requirement_gathering_id, user_case_id):
     conn = None
     try:
         conn = get_db_connection()
@@ -47,8 +47,8 @@ async def get_answers(requirement_gathering_id, use_case_id):
         if user_chats_count > 0:
 
             question_ids = []
-            # Determine question_ids based on use_case_id
-            if use_case_id == "1":
+            # Determine question_ids based on user_case_id
+            if user_case_id == "1":
                 question_ids = [
                     "0",
                     "1",
@@ -62,7 +62,7 @@ async def get_answers(requirement_gathering_id, use_case_id):
                     "11",
                     "12",
                 ]
-            elif use_case_id == "2":
+            elif user_case_id == "2":
                 question_ids = [
                     "13",
                     "14",
@@ -78,11 +78,11 @@ async def get_answers(requirement_gathering_id, use_case_id):
                     "24",
                     "25",
                 ]
-            elif use_case_id == "3":
+            elif user_case_id == "3":
                 question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
-            elif use_case_id == "4":
+            elif user_case_id == "4":
                 question_ids = ["35", "36", "37", "38", "39", "40", "41"]
-            elif use_case_id == "5":
+            elif user_case_id == "5":
                 question_ids = [
                     "0",
                     "1",
@@ -112,7 +112,7 @@ async def get_answers(requirement_gathering_id, use_case_id):
 
         elif attachment_chats_count > 0:
 
-            report_id = await get_report_id(requirement_gathering_id, use_case_id)
+            report_id = await get_report_id(requirement_gathering_id, user_case_id)
             query = """
             SELECT answer
             FROM attachment_chats
@@ -140,7 +140,7 @@ async def get_answers(requirement_gathering_id, use_case_id):
             conn.close()
 
 
-async def get_answers_with_questions(requirement_gathering_id, use_case_id):
+async def get_answers_with_questions(requirement_gathering_id, user_case_id):
     conn = None
     try:
         conn = get_db_connection()
@@ -153,6 +153,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
         WHERE requirement_gathering_id = %s;
         """
 
+        print("1")
         cur.execute(query_user_chats, (requirement_gathering_id,))
         user_chats_count = cur.fetchone()[0]
 
@@ -168,8 +169,8 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
         if user_chats_count > 0:
 
             question_ids = []
-            # Determine question_ids based on use_case_id
-            if use_case_id == "1":
+            # Determine question_ids based on user_case_id
+            if user_case_id == "1":
                 question_ids = [
                     "0",
                     "1",
@@ -183,7 +184,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "11",
                     "12",
                 ]
-            elif use_case_id == "2":
+            elif user_case_id == "2":
                 question_ids = [
                     "13",
                     "14",
@@ -199,11 +200,11 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "24",
                     "25",
                 ]
-            elif use_case_id == "3":
+            elif user_case_id == "3":
                 question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
-            elif use_case_id == "4":
+            elif user_case_id == "4":
                 question_ids = ["35", "36", "37", "38", "39", "40", "41"]
-            elif use_case_id == "5":
+            elif user_case_id == "5":
                 question_ids = [
                     "0",
                     "1",
@@ -234,7 +235,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
 
         elif attachment_chats_count > 0:
 
-            report_id = await get_report_id(requirement_gathering_id, use_case_id)
+            report_id = await get_report_id(requirement_gathering_id, user_case_id)
             query = """
             SELECT qc.question,ac.answer
             FROM attachment_chats ac
@@ -483,7 +484,7 @@ async def get_patent_by_id(patent_id: str):
 async def create_report_background(report_params: ReportParams):
     try:
         answers = await get_answers_with_questions(
-            report_params.requirement_gathering_id, report_params.use_case_id
+            report_params.requirement_gathering_id, report_params.user_case_id
         )
 
         summary = generate_prior_art_summary(answers)
@@ -559,13 +560,13 @@ async def create_report_background(report_params: ReportParams):
 
         str_analysis_results = str(analysis_results)
         query = """
-        INSERT INTO reports (requirement_gathering_id, use_case_id, report)
+        INSERT INTO reports (requirement_gathering_id, user_case_id, report)
         VALUES %s
         """
         values = [
             (
                 report_params.requirement_gathering_id,
-                report_params.use_case_id,
+                report_params.user_case_id,
                 str_analysis_results,
             )
         ]

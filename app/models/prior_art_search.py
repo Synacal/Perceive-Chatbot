@@ -34,4 +34,4 @@ class PriorArtSearch(BaseModel):
 
 class ReportParams(BaseModel):
     requirement_gathering_id: int
-    use_case_id: str
+    user_case_id: str

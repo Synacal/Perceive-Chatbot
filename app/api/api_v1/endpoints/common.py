@@ -8,8 +8,8 @@ from app.services.common import (
     get_draft_by_ids,
     get_drafts_by_user_id,
     delete_draft_by_ids,
-    get_summary_data,
     get_answers_with_questions,
+    get_summary_data,
     get_report_by_user_id,
 )
 
@@ -74,6 +74,8 @@ async def get_summary(summary_data: SummaryData):
             )
             if answers:
                 summary = await get_summary_data(answers)
+            elif answers == []:
+                summary = ""
             else:
                 summary = "false"
             response_data.append({"use_case_id": use_case_id, "summary": summary})

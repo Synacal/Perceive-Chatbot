@@ -28,9 +28,10 @@ async def add_attachment(attachment: Attachment):
         content = get_content(attachment.attachments)
         uncompleted_questions = []
 
-        for use_case_id in attachment.use_cases_ids:
-            questions = get_questions(use_case_id)
-            prompts = get_prompts(use_case_id)
+        print("1")
+        for user_case_id in attachment.user_cases_ids:
+            questions = get_questions(user_case_id)
+            prompts = get_prompts(user_case_id)
 
             attachment_content = await add_attachment_answer_content(
                 content,
@@ -39,7 +40,7 @@ async def add_attachment(attachment: Attachment):
             )
 
             report_id = await get_report_id(
-                attachment.requirement_gathering_id, use_case_id
+                attachment.requirement_gathering_id, user_case_id
             )
 
             for i in range(len(questions)):
@@ -85,12 +86,12 @@ async def add_attachment_answer(
     QuestionID: int,
     userID: str,
     requirement_gathering_id: int,
-    use_case_id: str,
+    user_case_id: str,
 ):
     try:
         print("1")
         response_data = await check_user_attachment_answer(
-            answer, QuestionID, userID, requirement_gathering_id, use_case_id
+            answer, QuestionID, userID, requirement_gathering_id, user_case_id
         )
         return response_data
     except HTTPException as e:
