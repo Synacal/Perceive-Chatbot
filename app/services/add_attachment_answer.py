@@ -43,10 +43,10 @@ async def check_user_attachment_answer(
     QuestionID: str,
     userID: str,
     requirement_gathering_id: int,
-    user_case_id: str,
+    use_case_id: str,
 ):
     try:
-        report_id = await get_report_id(requirement_gathering_id, user_case_id)
+        report_id = await get_report_id(requirement_gathering_id, use_case_id)
         response_data = await check_user_answers(
             answer, QuestionID, userID, requirement_gathering_id, report_id
         )
@@ -119,7 +119,7 @@ async def add_attachment_answer_content(content, requirement_gathering_id, user_
 
 async def get_report_id(requirement_gathering_id, category_id):
     query = """
-    SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND user_case_id = %s
+    SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND use_case_id = %s
     """
     values = (
         requirement_gathering_id,
