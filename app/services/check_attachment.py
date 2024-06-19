@@ -8,6 +8,8 @@ import json
 from app.utils.prompts import questions, prompts
 from pptx import Presentation
 from docx import Document
+import requests
+from bs4 import BeautifulSoup
 
 
 def get_pdf_content(attachment_base64: str) -> str:
@@ -70,7 +72,7 @@ def get_docx_content(attachment_base64: str) -> str:
         )
 
 
-def get_content(attachments: list) -> str:
+async def get_content(attachments: list) -> str:
     try:
         # Get the content from the attachments
         content = ""
@@ -90,6 +92,25 @@ def get_content(attachments: list) -> str:
     except Exception as e:
         raise HTTPException(
             status_code=400, detail=f"Error getting content from attachments: {str(e)}"
+        )
+
+
+async def get_web_content(web_urls: list) -> str:
+    try:
+        # Get the content from the web URLs
+        content = ""
+        for url in web_urls:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+
+            soup = BeautifulSoup(response.text, "html.parser")
+            text = soup.get_text()  # Get the text content from the HTML
+
+            content += text + "\n\n"  # Add the extracted text to the content
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error getting content from web URLs: {str(e)}"
         )
 
 
