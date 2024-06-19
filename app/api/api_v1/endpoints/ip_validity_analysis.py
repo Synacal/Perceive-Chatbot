@@ -23,7 +23,7 @@ async def ip_validity_analysis(report_params: ReportParams):
     try:
 
         answers = await get_answers(
-            report_params.requirement_gathering_id, report_params.user_case_id
+            report_params.requirement_gathering_id, report_params.use_case_id
         )
         summary = await get_summary(answers)
         keywords = await get_keywords(answers)
@@ -59,7 +59,7 @@ async def ip_validity_analysis(report_params: ReportParams):
         await add_report(
             report_str,
             report_params.requirement_gathering_id,
-            report_params.user_case_id,
+            report_params.use_case_id,
         )
         return report
     except HTTPException as e:
@@ -78,7 +78,7 @@ async def ip_validity_analysis(
         # Start the background task for report creation
         background_tasks.add_task(create_report_background, report_params)
         answers = await get_answers(
-            report_params.requirement_gathering_id, report_params.user_case_id
+            report_params.requirement_gathering_id, report_params.use_case_id
         )
         summary = await get_summary(answers)
 
