@@ -74,6 +74,8 @@ async def get_summary(summary_data: SummaryData):
             )
             if answers:
                 summary = await get_summary_data(answers)
+            elif answers == []:
+                summary = ""
             else:
                 summary = "false"
             response_data.append({"use_case_id": use_case_id, "summary": summary})

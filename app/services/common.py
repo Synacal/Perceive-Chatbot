@@ -170,7 +170,7 @@ async def get_report_by_user_id(UserID: str):
 
 async def get_report_id(requirement_gathering_id, category_id):
     query = """
-    SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND use_case_id = %s
+    SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND user_case_id = %s
     """
     values = (
         requirement_gathering_id,
@@ -294,10 +294,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                 report_id,
             )
         else:
-            raise HTTPException(
-                status_code=400,
-                detail="No chats found for the given requirement_gathering_id",
-            )
+            return []
         cur.execute(query, values)
         result = cur.fetchall()
 
