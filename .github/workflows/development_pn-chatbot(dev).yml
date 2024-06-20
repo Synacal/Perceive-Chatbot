@@ -61,6 +61,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
-          app-name: "pn-chatbot-dev"
+          app-name: "pn-chatbot"
           slot-name: "dev"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3657A141EADC47DFBD7A7022751A8F66 }}
