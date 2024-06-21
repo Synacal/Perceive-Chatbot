@@ -247,7 +247,9 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                 report_id,
             )
         else:
-            raise HTTPException(status_code=400, detail="Invalid type_id")
+            raise HTTPException(
+                status_code=500, detail="Details are not relevant for report creation."
+            )
         cur.execute(query, values)
         result = cur.fetchall()
 
