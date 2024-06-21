@@ -76,7 +76,7 @@ def get_docx_content(attachment_base64: str) -> str:
         )
 
 
-async def get_txt_content(attachment_base64: str) -> str:
+def get_txt_content(attachment_base64: str) -> str:
     try:
         # Decode the base64 string
         txt_bytes = base64.b64decode(attachment_base64)
