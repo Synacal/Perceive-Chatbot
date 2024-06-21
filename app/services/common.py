@@ -136,44 +136,41 @@ async def delete_draft_by_ids(UserID: str, requirement_gathering_id: int):
             conn.close()
 
 
-async def get_summary_data(qa_pairs):
-    prompt = f"""
-    Summarize the key points of an innovation based on the following details. 
-    Following details are on user's responses from the database for the predefined set 
-    of questions relevant to their innovation.
-    - Summarize the product or technology that has been developed, emphasizing its purpose and target industry.
-    - Describe in detail the technical aspects and the unique features of the innovation. Highlight how these features contribute to novelty within its field.
-    - Explain the innovation's business model, focusing on primary and potential revenue streams.
-    - Outline the company’s strategy for patent filing, including geographic focus and any prior art or existing patents that have been identified.
-    - Discuss how the innovation meets the criteria for novelty and non-obviousness, which are crucial for IP validity
+async def get_report_by_user_id(UserID: str):
+    query = """
+        SELECT rg.requirement_gathering_id, rg.user_id, 
+               d.current_page, d.other_data,
+               r.user_case_id, r.report
+        FROM requirements_gathering AS rg
+        JOIN reports AS r ON r.requirement_gathering_id = rg.requirement_gathering_id
+        LEFT JOIN draft AS d ON rg.requirement_gathering_id = d.requirement_gathering_id
+        WHERE rg.user_id = %s
+        """
+    values = (UserID,)
+    conn = None
+    cur = None
 
-    User provided answers for set of pre-defined questions: 
-    {qa_pairs}
-    """
-    message_text = [
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": str(qa_pairs)},
-    ]
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cur.execute(query, values)
+        result = cur.fetchall()
 
-    completion = client.chat.completions.create(
-        model="gpt-35-turbo",
-        messages=message_text,
-        temperature=0.7,
-        max_tokens=800,
-        top_p=0.95,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=None,
-    )
-
-    content = completion.choices[0].message.content
-
-    return content
+        # Convert result to list of dictionaries
+        json_result = [dict(row) for row in result]
+        return json_result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 async def get_report_id(requirement_gathering_id, category_id):
     query = """
-    SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND use_case_id = %s
+    SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND user_case_id = %s
     """
     values = (
         requirement_gathering_id,
@@ -220,7 +217,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
 
             question_ids = []
             # Determine question_ids based on use_case_id
-            if use_case_id == "1":
+            if use_case_id == "1" or use_case_id == "2":
                 question_ids = [
                     "0",
                     "1",
@@ -234,7 +231,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "11",
                     "12",
                 ]
-            elif use_case_id == "2":
+            elif use_case_id == "3":
                 question_ids = [
                     "13",
                     "14",
@@ -250,11 +247,11 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "24",
                     "25",
                 ]
-            elif use_case_id == "3":
-                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
             elif use_case_id == "4":
-                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
             elif use_case_id == "5":
+                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+            elif use_case_id == "6":
                 question_ids = [
                     "0",
                     "1",
@@ -272,6 +269,68 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "52",
                     "53",
                     "54",
+                ]
+            elif use_case_id == "7":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "55",
+                    "56",
+                    "57",
+                    "58",
+                    "59",
+                    "60",
+                ]
+            elif use_case_id == "8":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "61",
+                    "62",
+                    "63",
+                    "64",
+                    "65",
+                    "66",
+                    "67",
+                    "68",
+                    "69",
+                    "70",
+                    "71",
+                ]
+            elif use_case_id == "9":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "72",
+                    "73",
+                    "74",
+                    "75",
+                    "76",
+                    "77",
+                    "78",
+                    "79",
+                ]
+            elif use_case_id == "10":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "80",
+                    "81",
+                    "82",
+                    "83",
+                    "84",
+                    "85",
+                    "86",
+                    "87",
+                    "88",
                 ]
             else:
                 question_ids = ["0", "1", "2"]
@@ -297,7 +356,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                 report_id,
             )
         else:
-            raise HTTPException(status_code=400, detail="Invalid type_id")
+            return []
         cur.execute(query, values)
         result = cur.fetchall()
 
@@ -314,33 +373,36 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
             conn.close()
 
 
-async def get_report_by_user_id(UserID: str):
-    query = """
-        SELECT rg.requirement_gathering_id, rg.user_id, 
-               d.current_page, d.other_data,
-               r.use_case_id, r.report
-        FROM requirements_gathering AS rg
-        JOIN reports AS r ON r.requirement_gathering_id = rg.requirement_gathering_id
-        LEFT JOIN draft AS d ON rg.requirement_gathering_id = d.requirement_gathering_id
-        WHERE rg.user_id = %s
-        """
-    values = (UserID,)
-    conn = None
-    cur = None
+async def get_summary_data(qa_pairs):
+    prompt = f"""
+    Summarize the key points of an innovation based on the following details. 
+    Following details are on user's responses from the database for the predefined set 
+    of questions relevant to their innovation.
+    - Summarize the product or technology that has been developed, emphasizing its purpose and target industry.
+    - Describe in detail the technical aspects and the unique features of the innovation. Highlight how these features contribute to novelty within its field.
+    - Explain the innovation's business model, focusing on primary and potential revenue streams.
+    - Outline the company’s strategy for patent filing, including geographic focus and any prior art or existing patents that have been identified.
+    - Discuss how the innovation meets the criteria for novelty and non-obviousness, which are crucial for IP validity
 
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cur.execute(query, values)
-        result = cur.fetchall()
+    User provided answers for set of pre-defined questions: 
+    {qa_pairs}
+    """
+    message_text = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": str(qa_pairs)},
+    ]
 
-        # Convert result to list of dictionaries
-        json_result = [dict(row) for row in result]
-        return json_result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo",
+        messages=message_text,
+        temperature=0.7,
+        max_tokens=800,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None,
+    )
+
+    content = completion.choices[0].message.content
+
+    return content
