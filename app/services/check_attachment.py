@@ -6,8 +6,9 @@ from app.utils.prompts import questions, prompts
 from app.core.azure_client import client
 import json
 from app.utils.prompts import questions, prompts
-from pptx import Presentation
-from docx import Document
+
+# from pptx import Presentation
+# from docx import Document
 
 
 def get_pdf_content(attachment_base64: str) -> str:
@@ -30,6 +31,7 @@ def get_pdf_content(attachment_base64: str) -> str:
         )
 
 
+"""
 def get_pptx_content(attachment_base64: str) -> str:
     try:
         # Decode the base64 string
@@ -68,6 +70,7 @@ def get_docx_content(attachment_base64: str) -> str:
         raise HTTPException(
             status_code=400, detail=f"Error reading DOCX content: {str(e)}"
         )
+"""
 
 
 def get_content(attachments: list) -> str:
@@ -77,10 +80,10 @@ def get_content(attachments: list) -> str:
         for attachment in attachments:
             if attachment["attachmentType"] == "pdf":
                 content += get_pdf_content(attachment["attachment"])
-            elif attachment["attachmentType"] == "pptx":
-                content += get_pptx_content(attachment["attachment"])
-            elif attachment["attachmentType"] == "docx":
-                content += get_docx_content(attachment["attachment"])
+            # elif attachment["attachmentType"] == "pptx":
+            #    content += get_pptx_content(attachment["attachment"])
+            # elif attachment["attachmentType"] == "docx":
+            #   content += get_docx_content(attachment["attachment"])
             else:
                 raise HTTPException(
                     status_code=400,
