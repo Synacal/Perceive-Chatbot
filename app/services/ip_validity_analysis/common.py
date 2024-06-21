@@ -252,7 +252,7 @@ async def get_answers(requirement_gathering_id, user_case_id):
 
             question_ids = []
             # Determine question_ids based on user_case_id
-            if user_case_id == "1":
+            if user_case_id == "1" or user_case_id == "2":
                 question_ids = [
                     "0",
                     "1",
@@ -266,7 +266,7 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "11",
                     "12",
                 ]
-            elif user_case_id == "2":
+            elif user_case_id == "3":
                 question_ids = [
                     "13",
                     "14",
@@ -282,11 +282,11 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "24",
                     "25",
                 ]
-            elif user_case_id == "3":
-                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
             elif user_case_id == "4":
-                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
             elif user_case_id == "5":
+                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+            elif user_case_id == "6":
                 question_ids = [
                     "0",
                     "1",
@@ -304,6 +304,68 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "52",
                     "53",
                     "54",
+                ]
+            elif user_case_id == "7":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "55",
+                    "56",
+                    "57",
+                    "58",
+                    "59",
+                    "60",
+                ]
+            elif user_case_id == "8":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "61",
+                    "62",
+                    "63",
+                    "64",
+                    "65",
+                    "66",
+                    "67",
+                    "68",
+                    "69",
+                    "70",
+                    "71",
+                ]
+            elif user_case_id == "9":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "72",
+                    "73",
+                    "74",
+                    "75",
+                    "76",
+                    "77",
+                    "78",
+                    "79",
+                ]
+            elif user_case_id == "10":
+                question_ids = [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "80",
+                    "81",
+                    "82",
+                    "83",
+                    "84",
+                    "85",
+                    "86",
+                    "87",
+                    "88",
                 ]
             else:
                 question_ids = ["0", "1", "2"]

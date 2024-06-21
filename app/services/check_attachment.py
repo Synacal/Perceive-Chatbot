@@ -6,6 +6,14 @@ from app.utils.prompts import questions, prompts
 from app.core.azure_client import client
 import json
 from app.utils.prompts import questions, prompts
+from pptx import Presentation
+from docx import Document
+import requests
+from bs4 import BeautifulSoup
+from requests.exceptions import RequestException
+
+# from pptx import Presentation
+# from docx import Document
 
 
 def get_pdf_content(attachment_base64: str) -> str:
@@ -28,21 +36,131 @@ def get_pdf_content(attachment_base64: str) -> str:
         )
 
 
+def get_pptx_content(attachment_base64: str) -> str:
+    try:
+        # Decode the base64 string
+        pptx_bytes = base64.b64decode(attachment_base64)
+        # Use BytesIO to read the pptx bytes
+        pptx_file = BytesIO(pptx_bytes)
+        # Open the presentation
+        presentation = Presentation(pptx_file)
+        # Extract text from each slide
+        content = ""
+        for slide in presentation.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    content += shape.text + "\n"
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error reading PPTX content: {str(e)}"
+        )
+
+
+def get_docx_content(attachment_base64: str) -> str:
+    try:
+        # Decode the base64 string
+        docx_bytes = base64.b64decode(attachment_base64)
+        # Use BytesIO to read the docx bytes
+        docx_file = BytesIO(docx_bytes)
+        # Open the document
+        document = Document(docx_file)
+        # Extract text from each paragraph
+        content = ""
+        for paragraph in document.paragraphs:
+            content += paragraph.text + "\n"
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error reading DOCX content: {str(e)}"
+        )
+
+
+async def get_txt_content(attachment_base64: str) -> str:
+    try:
+        # Decode the base64 string
+        txt_bytes = base64.b64decode(attachment_base64)
+        # Convert bytes to string (assuming UTF-8 encoding)
+        content = txt_bytes.decode("utf-8")
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error reading TXT content: {str(e)}"
+        )
+
+
+async def get_content(attachments: list) -> str:
+    try:
+        # Get the content from the attachments
+        content = ""
+        for attachment in attachments:
+            if attachment.fileType == "pdf":
+                content += get_pdf_content(attachment.file)
+            elif attachment.fileType == "pptx":
+                content += get_pptx_content(attachment.file)
+            elif attachment.fileType == "docx":
+                content += get_docx_content(attachment.file)
+            elif attachment.fileType == "txt":
+                content += get_txt_content(attachment.file)
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Attachment type not supported. Supported types are pdf, pptx,txt, and docx.",
+                )
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error getting content from attachments: {str(e)}"
+        )
+
+
+async def get_web_content(web_urls: list) -> str:
+    try:
+        # Get the content from the web URLs
+        content = ""
+        for url in web_urls:
+            try:
+                response = requests.get(url)
+                response.raise_for_status()  # Raise an exception for HTTP errors
+
+                soup = BeautifulSoup(response.text, "html.parser")
+                text = soup.get_text()  # Get the text content from the HTML
+
+                content += text + "\n\n"  # Add the extracted text to the content
+            except RequestException as req_ex:
+                print(f"Error fetching URL '{url}': {str(req_ex)}")
+                # Log the error or handle it as needed
+
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error getting content from web URLs: {str(e)}"
+        )
+
+
 def get_questions(category_id: str) -> list:
     try:
         # Get the questions from the category
-        if category_id == "1":
+        if category_id == "1" or category_id == "2":
             selectedQuestions = questions[0:2] + questions[5:13]
-        elif category_id == "2":
-            selectedQuestions = questions[13:26]
         elif category_id == "3":
-            selectedQuestions = questions[26:35]
+            selectedQuestions = questions[13:26]
         elif category_id == "4":
-            selectedQuestions = questions[35:42]
+            selectedQuestions = questions[26:35]
         elif category_id == "5":
-            selectedQuestions = questions[0:3] + questions[42:55]
+            selectedQuestions = questions[35:42]
+        elif category_id == "6":
+            selectedQuestions = questions[0:4] + questions[42:55]
+        elif category_id == "7":
+            selectedQuestions = questions[0:4] + questions[55:61]
+        elif category_id == "8":
+            selectedQuestions = questions[0:4] + questions[61:72]
+        elif category_id == "9":
+            selectedQuestions = questions[0:4] + questions[72:80]
+        elif category_id == "10":
+            selectedQuestions = questions[0:4] + questions[80:89]
         else:
-            selectedQuestions = questions[0:3]
+            selectedQuestions = questions[0:4]
         return selectedQuestions
     except Exception as e:
         raise HTTPException(
@@ -53,18 +171,26 @@ def get_questions(category_id: str) -> list:
 def get_prompts(category_id: str) -> list:
     try:
         # Get the prompts from the category
-        if category_id == "1":
+        if category_id == "1" or category_id == "2":
             selectedPrompts = prompts[0:2] + prompts[5:13]
-        elif category_id == "2":
-            selectedPrompts = prompts[13:26]
         elif category_id == "3":
-            selectedPrompts = prompts[26:35]
+            selectedPrompts = prompts[13:26]
         elif category_id == "4":
-            selectedPrompts = prompts[35:42]
+            selectedPrompts = prompts[26:35]
         elif category_id == "5":
-            selectedPrompts = prompts[0:3] + prompts[42:55]
+            selectedPrompts = prompts[35:42]
+        elif category_id == "6":
+            selectedPrompts = prompts[0:4] + prompts[42:55]
+        elif category_id == "7":
+            selectedPrompts = prompts[0:4] + prompts[55:61]
+        elif category_id == "8":
+            selectedPrompts = prompts[0:4] + prompts[61:72]
+        elif category_id == "9":
+            selectedPrompts = prompts[0:4] + prompts[72:80]
+        elif category_id == "10":
+            selectedPrompts = prompts[0:4] + prompts[80:89]
         else:
-            selectedPrompts = prompts[0:3]
+            selectedPrompts = prompts[0:4]
         return selectedPrompts
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error getting prompts: {str(e)}")
