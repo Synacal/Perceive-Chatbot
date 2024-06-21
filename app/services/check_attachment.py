@@ -94,13 +94,20 @@ async def get_content(attachments: list) -> str:
         # Get the content from the attachments
         content = ""
         for attachment in attachments:
-            if attachment.fileType == "pdf":
+            if attachment.fileType == "application/pdf":
                 content += get_pdf_content(attachment.file)
-            elif attachment.fileType == "pptx":
+            elif (
+                attachment.fileType
+                == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            ):
                 content += get_pptx_content(attachment.file)
-            elif attachment.fileType == "docx":
+            elif (
+                attachment.fileType == "application/msword"
+                or attachment.fileType
+                == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ):
                 content += get_docx_content(attachment.file)
-            elif attachment.fileType == "txt":
+            elif attachment.fileType == "text/plain":
                 content += get_txt_content(attachment.file)
             else:
                 raise HTTPException(
