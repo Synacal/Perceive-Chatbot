@@ -11,6 +11,7 @@ from app.services.common import (
     get_answers_with_questions,
     get_summary_data,
     get_report_by_user_id,
+    get_completion_precentage,
 )
 
 router = APIRouter()
@@ -90,6 +91,17 @@ async def get_summary(summary_data: SummaryData):
 async def get_report_by_user(user_id: str):
     try:
         response_data = await get_report_by_user_id(user_id)
+        return response_data
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/completion-precentage")
+async def completion_precentage(requirement_gathering_id: int):
+    try:
+        response_data = await get_completion_precentage(requirement_gathering_id)
         return response_data
     except HTTPException as e:
         raise e
