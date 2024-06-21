@@ -72,12 +72,12 @@ async def get_summary(summary_data: SummaryData):
             answers = await get_answers_with_questions(
                 summary_data.requirement_gathering_id, use_case_id
             )
-            if answers:
-                summary = await get_summary_data(answers)
-            elif answers == []:
-                summary = ""
-            else:
-                summary = "false"
+            # if answers:
+            summary = await get_summary_data(answers)
+            # elif answers == []:
+            #    summary = ""
+            # else:
+            #    summary = "false"
             response_data.append({"use_case_id": use_case_id, "summary": summary})
         return response_data
     except HTTPException as e:
