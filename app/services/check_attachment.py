@@ -99,18 +99,26 @@ def get_content(attachments: list) -> str:
 def get_questions(category_id: str) -> list:
     try:
         # Get the questions from the category
-        if category_id == "1":
+        if category_id == "1" or category_id == "2":
             selectedQuestions = questions[0:2] + questions[5:13]
-        elif category_id == "2":
-            selectedQuestions = questions[13:26]
         elif category_id == "3":
-            selectedQuestions = questions[26:35]
+            selectedQuestions = questions[13:26]
         elif category_id == "4":
-            selectedQuestions = questions[35:42]
+            selectedQuestions = questions[26:35]
         elif category_id == "5":
-            selectedQuestions = questions[0:3] + questions[42:55]
+            selectedQuestions = questions[35:42]
+        elif category_id == "6":
+            selectedQuestions = questions[0:4] + questions[42:55]
+        elif category_id == "7":
+            selectedQuestions = questions[0:4] + questions[55:61]
+        elif category_id == "8":
+            selectedQuestions = questions[0:4] + questions[61:72]
+        elif category_id == "9":
+            selectedQuestions = questions[0:4] + questions[72:80]
+        elif category_id == "10":
+            selectedQuestions = questions[0:4] + questions[80:89]
         else:
-            selectedQuestions = questions[0:3]
+            selectedQuestions = questions[0:4]
         return selectedQuestions
     except Exception as e:
         raise HTTPException(
@@ -121,18 +129,26 @@ def get_questions(category_id: str) -> list:
 def get_prompts(category_id: str) -> list:
     try:
         # Get the prompts from the category
-        if category_id == "1":
+        if category_id == "1" or category_id == "2":
             selectedPrompts = prompts[0:2] + prompts[5:13]
-        elif category_id == "2":
-            selectedPrompts = prompts[13:26]
         elif category_id == "3":
-            selectedPrompts = prompts[26:35]
+            selectedPrompts = prompts[13:26]
         elif category_id == "4":
-            selectedPrompts = prompts[35:42]
+            selectedPrompts = prompts[26:35]
         elif category_id == "5":
-            selectedPrompts = prompts[0:3] + prompts[42:55]
+            selectedPrompts = prompts[35:42]
+        elif category_id == "6":
+            selectedPrompts = prompts[0:4] + prompts[42:55]
+        elif category_id == "7":
+            selectedPrompts = prompts[0:4] + prompts[55:61]
+        elif category_id == "8":
+            selectedPrompts = prompts[0:4] + prompts[61:72]
+        elif category_id == "9":
+            selectedPrompts = prompts[0:4] + prompts[72:80]
+        elif category_id == "10":
+            selectedPrompts = prompts[0:4] + prompts[80:89]
         else:
-            selectedPrompts = prompts[0:3]
+            selectedPrompts = prompts[0:4]
         return selectedPrompts
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error getting prompts: {str(e)}")
