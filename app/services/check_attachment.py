@@ -10,6 +10,7 @@ from pptx import Presentation
 from docx import Document
 import requests
 from bs4 import BeautifulSoup
+from requests.exceptions import RequestException
 
 # from pptx import Presentation
 # from docx import Document
@@ -33,7 +34,6 @@ def get_pdf_content(attachment_base64: str) -> str:
         raise HTTPException(
             status_code=400, detail=f"Error reading PDF content: {str(e)}"
         )
-
 
 
 def get_pptx_content(attachment_base64: str) -> str:
@@ -76,23 +76,36 @@ def get_docx_content(attachment_base64: str) -> str:
         )
 
 
+async def get_txt_content(attachment_base64: str) -> str:
+    try:
+        # Decode the base64 string
+        txt_bytes = base64.b64decode(attachment_base64)
+        # Convert bytes to string (assuming UTF-8 encoding)
+        content = txt_bytes.decode("utf-8")
+        return content
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error reading TXT content: {str(e)}"
+        )
+
 
 async def get_content(attachments: list) -> str:
     try:
         # Get the content from the attachments
         content = ""
         for attachment in attachments:
-            if attachment["attachmentType"] == "pdf":
-                content += get_pdf_content(attachment["attachment"])
-
-            elif attachment["attachmentType"] == "pptx":
-                content += get_pptx_content(attachment["attachment"])
-            elif attachment["attachmentType"] == "docx":
-                content += get_docx_content(attachment["attachment"])
+            if attachment.fileType == "pdf":
+                content += get_pdf_content(attachment.file)
+            elif attachment.fileType == "pptx":
+                content += get_pptx_content(attachment.file)
+            elif attachment.fileType == "docx":
+                content += get_docx_content(attachment.file)
+            elif attachment.fileType == "txt":
+                content += get_txt_content(attachment.file)
             else:
                 raise HTTPException(
                     status_code=400,
-                    detail="Attachment type not supported. Supported types are pdf, pptx, and docx.",
+                    detail="Attachment type not supported. Supported types are pdf, pptx,txt, and docx.",
                 )
         return content
     except Exception as e:
@@ -101,19 +114,23 @@ async def get_content(attachments: list) -> str:
         )
 
 
-
 async def get_web_content(web_urls: list) -> str:
     try:
         # Get the content from the web URLs
         content = ""
         for url in web_urls:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise an exception for HTTP errors
+            try:
+                response = requests.get(url)
+                response.raise_for_status()  # Raise an exception for HTTP errors
 
-            soup = BeautifulSoup(response.text, "html.parser")
-            text = soup.get_text()  # Get the text content from the HTML
+                soup = BeautifulSoup(response.text, "html.parser")
+                text = soup.get_text()  # Get the text content from the HTML
 
-            content += text + "\n\n"  # Add the extracted text to the content
+                content += text + "\n\n"  # Add the extracted text to the content
+            except RequestException as req_ex:
+                print(f"Error fetching URL '{url}': {str(req_ex)}")
+                # Log the error or handle it as needed
+
         return content
     except Exception as e:
         raise HTTPException(
