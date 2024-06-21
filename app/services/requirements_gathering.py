@@ -7,7 +7,7 @@ import shortuuid
 async def get_requirements_gathering(requirements: RequirementsGathering):
     fetch_id_query = "SELECT nextval('requirement_gathering_id_seq')"
     insert_query = """
-    INSERT INTO requirements_gathering (requirement_gathering_id, user_id, report_id, use_case_id)
+    INSERT INTO requirements_gathering (requirement_gathering_id, user_id, report_id, user_case_id)
     VALUES (%s, %s, %s, %s)
     RETURNING requirement_gathering_id
     """
@@ -20,7 +20,7 @@ async def get_requirements_gathering(requirements: RequirementsGathering):
             requirement_gathering_id = cur.fetchone()[0]
 
             results = []
-            for use_case_id in requirements.use_case_ids:
+            for user_case_id in requirements.user_case_ids:
                 # Generate a unique ID for report_id using shortuuid
                 report_id = "PR" + shortuuid.uuid()
                 # Execute the insert query with the fetched requirement_gathering_id
@@ -30,7 +30,7 @@ async def get_requirements_gathering(requirements: RequirementsGathering):
                         requirement_gathering_id,
                         str(requirements.user_id),
                         report_id,
-                        str(use_case_id),
+                        str(user_case_id),
                     ),
                 )
                 result = cur.fetchone()  # Fetch the returned ID
