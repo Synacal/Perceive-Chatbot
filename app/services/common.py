@@ -406,3 +406,206 @@ async def get_summary_data(qa_pairs):
     content = completion.choices[0].message.content
 
     return content
+
+
+async def get_completion_precentage(requirement_gathering_id):
+    QA_Count = """
+    SELECT COUNT(DISTINCT question_id) FROM user_chats WHERE requirement_gathering_id = %s AND question_id IN %s
+    """
+    Attachment_Count = """
+    SELECT COUNT(DISTINCT question_id) FROM attachment_chats WHERE requirement_gathering_id = %s AND question_id IN %s
+    """
+    use_case_query = """
+    SELECT user_case_id FROM requirements_gathering WHERE requirement_gathering_id = %s
+    """
+    use_case_values = (requirement_gathering_id,)
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute(use_case_query, (requirement_gathering_id,))
+        use_case_ids = cur.fetchall()
+
+        total_questions_possible = 0
+        total_answered_questions = 0
+
+        for use_case_id_tuple in use_case_ids:
+            use_case_id = use_case_id_tuple[0]
+
+            question_ids = get_questions_ids(use_case_id)
+            question_ids_tuple = tuple(question_ids)
+
+            cur.execute(
+                Attachment_Count, (requirement_gathering_id, question_ids_tuple)
+            )
+            Attachment_count = cur.fetchone()[0]
+            total_answered_questions += Attachment_count
+
+            cur.execute(QA_Count, (requirement_gathering_id, question_ids_tuple))
+            QA_count = cur.fetchone()[0]
+            total_answered_questions += QA_count
+
+            if use_case_id in ["1", "2"]:
+                total_questions_possible += 12
+            elif use_case_id == "3":
+                total_questions_possible += 13
+            elif use_case_id == "4":
+                total_questions_possible += 9
+            elif use_case_id == "5":
+                total_questions_possible += 7
+            elif use_case_id == "6":
+                total_questions_possible += 16
+            elif use_case_id == "7":
+                total_questions_possible += 10
+            elif use_case_id == "8":
+                total_questions_possible += 14
+            elif use_case_id == "9":
+                total_questions_possible += 12
+            elif use_case_id == "10":
+                total_questions_possible += 13
+            else:
+                total_questions_possible += 3
+
+        completion_percentage = (
+            (total_answered_questions / total_questions_possible) * 100
+            if total_questions_possible > 0
+            else 0
+        )
+        if completion_percentage > 100:
+            completion_percentage = 100
+
+        completion_percentage = int(completion_percentage)
+
+        return {"completion_percentage": completion_percentage}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+def get_questions_ids(use_case_id):
+    if use_case_id == "1" or use_case_id == "2":
+        question_ids = [
+            "0",
+            "1",
+            "2",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+        ]
+    elif use_case_id == "3":
+        question_ids = [
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+        ]
+    elif use_case_id == "4":
+        question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
+    elif use_case_id == "5":
+        question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+    elif use_case_id == "6":
+        question_ids = [
+            "0",
+            "1",
+            "2",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "48",
+            "49",
+            "50",
+            "51",
+            "52",
+            "53",
+            "54",
+        ]
+    elif use_case_id == "7":
+        question_ids = [
+            "0",
+            "1",
+            "2",
+            "3",
+            "55",
+            "56",
+            "57",
+            "58",
+            "59",
+            "60",
+        ]
+    elif use_case_id == "8":
+        question_ids = [
+            "0",
+            "1",
+            "2",
+            "3",
+            "61",
+            "62",
+            "63",
+            "64",
+            "65",
+            "66",
+            "67",
+            "68",
+            "69",
+            "70",
+            "71",
+        ]
+    elif use_case_id == "9":
+        question_ids = [
+            "0",
+            "1",
+            "2",
+            "3",
+            "72",
+            "73",
+            "74",
+            "75",
+            "76",
+            "77",
+            "78",
+            "79",
+        ]
+    elif use_case_id == "10":
+        question_ids = [
+            "0",
+            "1",
+            "2",
+            "3",
+            "80",
+            "81",
+            "82",
+            "83",
+            "84",
+            "85",
+            "86",
+            "87",
+            "88",
+        ]
+    else:
+        question_ids = ["0", "1", "2"]
+    return question_ids
