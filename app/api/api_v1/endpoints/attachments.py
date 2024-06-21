@@ -9,6 +9,9 @@ from app.services.check_attachment import (
     check_user_attachment_temp,
     find_question_number,
     get_content,
+
+    get_web_content,
+
 )
 from app.services.add_attachment_answer import (
     add_attachment_answers,
@@ -18,6 +21,10 @@ from app.services.add_attachment_answer import (
     get_report_id,
 )
 
+
+import requests
+from bs4 import BeautifulSoup
+
 router = APIRouter()
 
 
@@ -25,15 +32,18 @@ router = APIRouter()
 async def add_attachment(attachment: Attachment):
     try:
         # content = get_pdf_content(attachment.attachment)
-        content = get_content(attachment.attachments)
+
+        attachment_content = await get_content(attachment.attachments)
+        web_content = await get_web_content(attachment.web_urls)
+        content = attachment_content + web_content
         uncompleted_questions = []
 
-        print("1")
-        for user_case_id in attachment.user_cases_ids:
-            questions = get_questions(user_case_id)
-            prompts = get_prompts(user_case_id)
+        for use_case_id in attachment.use_cases_ids:
+            questions = get_questions(use_case_id)
+            prompts = get_prompts(use_case_id)
 
-            attachment_content = await add_attachment_answer_content(
+            attachment_content_save = await add_attachment_answer_content(
+
                 content,
                 attachment.requirement_gathering_id,
                 attachment.user_id,
