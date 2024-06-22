@@ -30,25 +30,25 @@ router = APIRouter()
 async def add_attachment(attachment: Attachment):
     try:
         # content = get_pdf_content(attachment.attachment)
-
         attachment_content = await get_content(attachment.attachments)
-        print("attachment_content", attachment_content)
-        web_content = await get_web_content(attachment.web_urls)
-        print("web_content", web_content)
+
+        web_content = await get_web_content(
+            attachment.web_urls, attachment.requirement_gathering_id
+        )
+
         content = attachment_content + web_content
-        print("content", content)
+
         uncompleted_questions = []
+
+        attachment_content_save = await add_attachment_answer_content(
+            content,
+            attachment.requirement_gathering_id,
+            attachment.user_id,
+        )
 
         for use_case_id in attachment.user_cases_ids:
             questions = get_questions(use_case_id)
             prompts = get_prompts(use_case_id)
-
-            attachment_content_save = await add_attachment_answer_content(
-                content,
-                attachment.requirement_gathering_id,
-                attachment.user_id,
-            )
-
             report_id = await get_report_id(
                 attachment.requirement_gathering_id, use_case_id
             )
@@ -62,6 +62,7 @@ async def add_attachment(attachment: Attachment):
                     attachment.user_id,
                     report_id,
                 )
+
                 if result["status"] == "false":
                     question_number = find_question_number(questions[i])
                     uncompleted_questions.append(
