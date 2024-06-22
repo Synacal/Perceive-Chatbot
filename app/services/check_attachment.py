@@ -11,9 +11,8 @@ from docx import Document
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
-
-# from pptx import Presentation
-# from docx import Document
+from app.core.database import get_db_connection, get_database_connection
+from psycopg2.extras import execute_values
 
 
 def get_pdf_content(attachment_base64: str) -> str:
@@ -102,8 +101,7 @@ async def get_content(attachments: list) -> str:
             ):
                 content += get_pptx_content(attachment.file)
             elif (
-                attachment.fileType == "application/msword"
-                or attachment.fileType
+                attachment.fileType
                 == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             ):
                 content += get_docx_content(attachment.file)
@@ -121,7 +119,7 @@ async def get_content(attachments: list) -> str:
         )
 
 
-async def get_web_content(web_urls: list) -> str:
+async def get_web_content(web_urls: list, requirement_gathering_id) -> str:
     try:
         # Get the content from the web URLs
         content = ""
@@ -134,7 +132,22 @@ async def get_web_content(web_urls: list) -> str:
                 text = soup.get_text()  # Get the text content from the HTML
 
                 content += text + "\n\n"  # Add the extracted text to the content
-            except RequestException as req_ex:
+
+                # query = """
+                #    INSERT INTO web_content (url, content, requirement_gathering_id)
+                #    VALUES %s
+                # """
+                # values = [(url, text, requirement_gathering_id)]
+
+                # Execute the query to insert the URL and content into the database
+                # conn = get_db_connection()
+                # cur = conn.cursor()
+                # execute_values(cur, query, values)
+                # conn.commit()
+                # cur.close()
+                # conn.close()
+
+            except requests.RequestException as req_ex:
                 print(f"Error fetching URL '{url}': {str(req_ex)}")
                 # Log the error or handle it as needed
 
