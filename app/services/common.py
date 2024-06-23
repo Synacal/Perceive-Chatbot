@@ -168,6 +168,52 @@ async def get_report_by_user_id(UserID: str):
             conn.close()
 
 
+async def get_content_summary(requirement_gathering_id):
+    query = """
+    SELECT content FROM attachment WHERE requirement_gathering_id = %s
+    """
+    values = (requirement_gathering_id,)
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        result = cur.fetchone()
+
+        if result:
+            system_Prompt = f"""
+            Summarize the content of the attached document. Ensure the summary is concise and under 80 words.
+            """
+            message_text = [
+                {"role": "system", "content": system_Prompt},
+                {"role": "user", "content": result[0]},
+            ]
+
+            completion = client.chat.completions.create(
+                model="gpt-35-turbo",
+                messages=message_text,
+                temperature=0.7,
+                max_tokens=800,
+                top_p=0.95,
+                frequency_penalty=0,
+                presence_penalty=0,
+                stop=None,
+            )
+
+            content = completion.choices[0].message.content
+            return content
+        else:
+            return ""
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
 async def get_report_id(requirement_gathering_id, category_id):
     query = """
     SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND user_case_id = %s
