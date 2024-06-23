@@ -73,6 +73,7 @@ async def get_summary(summary_data: SummaryData):
             answers = await get_answers_with_questions(
                 summary_data.requirement_gathering_id, use_case_id
             )
+            print(answers)
             # if answers:
             summary = await get_summary_data(answers)
             # elif answers == []:

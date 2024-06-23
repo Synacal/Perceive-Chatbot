@@ -219,10 +219,8 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
             # Determine question_ids based on use_case_id
             if use_case_id == "1" or use_case_id == "2":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "5",
                     "6",
                     "7",
                     "8",
@@ -230,10 +228,10 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "10",
                     "11",
                     "12",
+                    "13",
                 ]
             elif use_case_id == "3":
                 question_ids = [
-                    "13",
                     "14",
                     "15",
                     "16",
@@ -246,17 +244,18 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "23",
                     "24",
                     "25",
+                    "26",
                 ]
             elif use_case_id == "4":
-                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
+                question_ids = ["27", "28", "29", "30", "31", "32", "33", "34", "35"]
             elif use_case_id == "5":
-                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+                question_ids = ["36", "37", "38", "39", "40", "41", "42"]
             elif use_case_id == "6":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "42",
+                    "3",
+                    "4",
                     "43",
                     "44",
                     "45",
@@ -269,27 +268,27 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "52",
                     "53",
                     "54",
+                    "55",
                 ]
             elif use_case_id == "7":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "55",
+                    "4",
                     "56",
                     "57",
                     "58",
                     "59",
                     "60",
+                    "61",
                 ]
             elif use_case_id == "8":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "61",
+                    "4",
                     "62",
                     "63",
                     "64",
@@ -300,14 +299,14 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "69",
                     "70",
                     "71",
+                    "72",
                 ]
             elif use_case_id == "9":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "72",
+                    "4",
                     "73",
                     "74",
                     "75",
@@ -315,14 +314,14 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "77",
                     "78",
                     "79",
+                    "80",
                 ]
             elif use_case_id == "10":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "80",
+                    "4",
                     "81",
                     "82",
                     "83",
@@ -331,6 +330,7 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
                     "86",
                     "87",
                     "88",
+                    "89",
                 ]
             else:
                 question_ids = ["0", "1", "2"]
@@ -375,14 +375,8 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
 
 async def get_summary_data(qa_pairs):
     prompt = f"""
-    Summarize the key points of an innovation based on the following details. 
-    Following details are on user's responses from the database for the predefined set 
-    of questions relevant to their innovation.
-    - Summarize the product or technology that has been developed, emphasizing its purpose and target industry.
-    - Describe in detail the technical aspects and the unique features of the innovation. Highlight how these features contribute to novelty within its field.
-    - Explain the innovation's business model, focusing on primary and potential revenue streams.
-    - Outline the company’s strategy for patent filing, including geographic focus and any prior art or existing patents that have been identified.
-    - Discuss how the innovation meets the criteria for novelty and non-obviousness, which are crucial for IP validity
+    Summarize the key points from the following user's responses to pre-defined questions. 
+    Ensure the summary is concise and under 80 words.
 
     User provided answers for set of pre-defined questions: 
     {qa_pairs}
