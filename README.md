@@ -49,7 +49,8 @@ source venv/bin/activate
 With your virtual environment activated, install the required dependencies from your requirements.txt file:
 
 ```
-pip freeze > requirements.txt
+pip install -r requirements.txt
+
 
 ```
 

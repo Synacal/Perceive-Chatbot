@@ -17,7 +17,7 @@ import json
 from app.models.ip_license_process import PatentResult, PatentList, PatentData
 
 
-async def search_documents(keywords: List[str]) -> List[PatentResult]:
+async def search_patents_ids(keywords: List[str]) -> List[int]:
     try:
         conn = get_percieve_db_connection()
         query_keywords = " | ".join(keywords)
@@ -40,24 +40,9 @@ async def search_documents(keywords: List[str]) -> List[PatentResult]:
                 print("No patents found.")
                 return []
 
-            patents = []
-            for row in results:
-                try:
-                    id_, title, abstract, content = row[:4]
-                    patents.append(
-                        PatentResult(
-                            id=id_,
-                            title=title,
-                            abstract=abstract,  # Use COALESCE to handle NULL or empty abstract values
-                            content=content,
-                        )
-                    )
-                except Exception as e:
-                    print(f"Error processing row: {row}")
-                    print(f"Error details: {e}")
-                    continue
+            patent_ids = [row[0] for row in results]  # Extracting only the ID
 
-            return patents
+            return patent_ids
     except Exception as e:
         print(f"Error executing search query: {e}")
         raise HTTPException(status_code=500, detail="Error executing search query")
@@ -153,12 +138,10 @@ async def get_answers(requirement_gathering_id, user_case_id):
 
             question_ids = []
             # Determine question_ids based on user_case_id
-            if user_case_id == "1":
+            if user_case_id == "1" or user_case_id == "2":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "5",
                     "6",
                     "7",
                     "8",
@@ -166,10 +149,10 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "10",
                     "11",
                     "12",
-                ]
-            elif user_case_id == "2":
-                question_ids = [
                     "13",
+                ]
+            elif user_case_id == "3":
+                question_ids = [
                     "14",
                     "15",
                     "16",
@@ -182,17 +165,18 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "23",
                     "24",
                     "25",
+                    "26",
                 ]
-            elif user_case_id == "3":
-                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
             elif user_case_id == "4":
-                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+                question_ids = ["27", "28", "29", "30", "31", "32", "33", "34", "35"]
             elif user_case_id == "5":
+                question_ids = ["36", "37", "38", "39", "40", "41", "42"]
+            elif user_case_id == "6":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "42",
+                    "3",
+                    "4",
                     "43",
                     "44",
                     "45",
@@ -205,6 +189,69 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "52",
                     "53",
                     "54",
+                    "55",
+                ]
+            elif user_case_id == "7":
+                question_ids = [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "56",
+                    "57",
+                    "58",
+                    "59",
+                    "60",
+                    "61",
+                ]
+            elif user_case_id == "8":
+                question_ids = [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "62",
+                    "63",
+                    "64",
+                    "65",
+                    "66",
+                    "67",
+                    "68",
+                    "69",
+                    "70",
+                    "71",
+                    "72",
+                ]
+            elif user_case_id == "9":
+                question_ids = [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "73",
+                    "74",
+                    "75",
+                    "76",
+                    "77",
+                    "78",
+                    "79",
+                    "80",
+                ]
+            elif user_case_id == "10":
+                question_ids = [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "81",
+                    "82",
+                    "83",
+                    "84",
+                    "85",
+                    "86",
+                    "87",
+                    "88",
+                    "89",
                 ]
             else:
                 question_ids = ["0", "1", "2"]
@@ -274,9 +321,7 @@ async def get_summary(answers):
 
 
 async def get_keywords(answers):
-    system_prompt = (
-        f"Create 2 keywords, separated by a comma, from the following text: {answers}"
-    )
+    system_prompt = f"Extract exactly 2 general product-related keywords from the following text. Ensure these are broad terms like 'satellite' or 'motor' and not specific names, companies, or places. Separate them with a comma: {answers}"
     try:
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
@@ -325,11 +370,13 @@ async def get_patent_data(patents: List[str]) -> List[PatentData]:
         FROM
             target.assignment_history AS ah
         JOIN
-            target.patent_assignees AS pae ON ah.patent_id = pae.patent_id
+            target.patent_assignees AS pae ON ah.application_id = pae.application_id
         JOIN
-            target.patent_assignors AS pao ON ah.patent_id = pao.patent_id
+            target.patent_assignors AS pao ON ah.application_id = pao.application_id
+        JOIN 
+            target.application AS a ON ah.application_id = a.application_id
         WHERE
-            ah.patent_id = ANY(%s)
+            a.patent_id = ANY(%s)
         GROUP BY
             ah.reel_no,
             ah.frame_no,
@@ -371,3 +418,74 @@ async def get_patent_data(patents: List[str]) -> List[PatentData]:
     finally:
         if conn:
             conn.close()
+
+
+async def create_report(summary: str, patent_data: List[PatentData]):
+    system_prompt = f"""Develop an IP Licensing Strategy focusing on the following aspects:
+
+        How to Create an IP Licensing Strategy Leveraging Past History:
+
+        Analyze historical data to identify successful IP licensing strategies.
+        Highlight key factors that contributed to the success of past licenses.
+        Top Licenses:
+
+        Identify and analyze the top licenses in the orthodontics technology sector.
+        Provide insights into why these licenses were successful and how they were structured.
+        Top Assignees:
+
+        Identify the top assignees in the orthodontics technology sector.
+        Analyze their patent portfolios and licensing activities.
+        Top Assignors:
+
+        Identify the top assignors in the orthodontics technology sector.
+        Analyze the significance of their contributions and their impact on the market.
+        Patent Filings Over Time for Top 5 Assignees:
+
+        Track and analyze the patent filing trends over time for the top 5 assignees.
+        Provide visualizations of filing trends and identify any notable patterns or shifts.
+        Top Patent Filings:
+
+        Identify the top patent filings that have had significant impacts on the technology sector.
+        Provide detailed analyses of these filings and their implications for the market.
+        Output Requirements:
+
+        The report should be insightful, highly accurate, and data-centric, naming specific patents and entities.
+        Structure the findings in a logical format with clear headings and subheadings.
+        Include a section for each relevant entity and patent found, detailing their relevance, potential impact , and implications for market strategy.
+
+        Background Information:{summary}
+
+        Data: {patent_data}
+        Note: don't make something vague, make it all clear
+        """
+
+    message_text = [
+        {"role": "system", "content": system_prompt},
+        {
+            "role": "user",
+            "content": str(patent_data),
+        },
+    ]
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=message_text,
+            temperature=0.7,
+            max_tokens=800,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=None,
+        )
+
+        content = completion.choices[0].message.content
+
+        # Parse the response into a structured dictionary if it's in JSON format
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            return content
+    except Exception as e:
+        print(f"Error generating novelty assessment: {e}")
+        return None
