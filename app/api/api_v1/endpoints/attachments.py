@@ -8,6 +8,8 @@ from app.services.check_attachment import (
     get_prompts,
     check_user_attachment_temp,
     find_question_number,
+    get_content,
+    get_web_content,
 )
 from app.services.add_attachment_answer import (
     add_attachment_answers,
@@ -17,34 +19,41 @@ from app.services.add_attachment_answer import (
     get_report_id,
 )
 
+
+import requests
+from bs4 import BeautifulSoup
+
 router = APIRouter()
 
 
 @router.post("/attachment/")
 async def add_attachment(attachment: Attachment):
     try:
-        content = get_pdf_content(attachment.attachment)
+        # content = get_pdf_content(attachment.attachment)
+        attachment_content = await get_content(attachment.attachments)
+
+        web_content = await get_web_content(
+            attachment.web_urls, attachment.requirement_gathering_id
+        )
+
+        content = attachment_content + web_content
+
         uncompleted_questions = []
-        print("1")
-        for user_case_id in attachment.user_cases_ids:
-            questions = get_questions(user_case_id)
-            prompts = get_prompts(user_case_id)
 
-            print("2")
+        attachment_content_save = await add_attachment_answer_content(
+            content,
+            attachment.requirement_gathering_id,
+            attachment.user_id,
+        )
 
-            attachment_content = await add_attachment_answer_content(
-                content,
-                attachment.requirement_gathering_id,
-                attachment.user_id,
-            )
-
+        for use_case_id in attachment.user_cases_ids:
+            questions = get_questions(use_case_id)
+            prompts = get_prompts(use_case_id)
             report_id = await get_report_id(
-                attachment.requirement_gathering_id, user_case_id
+                attachment.requirement_gathering_id, use_case_id
             )
 
             for i in range(len(questions)):
-
-                print("3")
                 result = await check_user_attachment(
                     questions[i],
                     prompts[i],
@@ -53,7 +62,7 @@ async def add_attachment(attachment: Attachment):
                     attachment.user_id,
                     report_id,
                 )
-                print("4")
+
                 if result["status"] == "false":
                     question_number = find_question_number(questions[i])
                     uncompleted_questions.append(
@@ -61,10 +70,10 @@ async def add_attachment(attachment: Attachment):
                             "question_id": question_number,
                         }
                     )
-                    print("5")
+
                 else:
                     question_number = find_question_number(questions[i])
-                    print("5.1")
+
                     data = await add_attachment_answer_by_llm(
                         question_number,
                         report_id,
@@ -72,7 +81,7 @@ async def add_attachment(attachment: Attachment):
                         result["answer"],
                         attachment.requirement_gathering_id,
                     )
-                    print("6")
+
         return uncompleted_questions
 
     except HTTPException as e:

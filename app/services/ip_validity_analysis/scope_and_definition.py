@@ -55,8 +55,6 @@ async def compare_scope_and_definition(patent_abstracts: List[str], answer_list:
             stop=None,
         )
 
-        print("Novelty assessment completion: ")
-
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary

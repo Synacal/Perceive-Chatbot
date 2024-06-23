@@ -46,8 +46,6 @@ async def compare_written_description(patent_abstracts: List[str], answer_list: 
             stop=None,
         )
 
-        print("Novelty assessment completion: ")
-
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
