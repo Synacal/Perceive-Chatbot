@@ -63,7 +63,7 @@ async def add_attachment(attachment: Attachment):
                     report_id,
                 )
 
-                if result["status"] == "false":
+                if result["status"] == "false" or result["answer"] == "":
                     question_number = find_question_number(questions[i])
                     uncompleted_questions.append(
                         {
