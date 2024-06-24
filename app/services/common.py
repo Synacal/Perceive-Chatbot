@@ -183,7 +183,7 @@ async def get_content_summary(requirement_gathering_id):
 
         if result:
             system_Prompt = f"""
-            Summarize the content of the attached document. Ensure the summary is concise and under 80 words.
+            Summarize the content of the attached document. Ensure the summary is concise and under 150 words.
             """
             message_text = [
                 {"role": "system", "content": system_Prompt},
