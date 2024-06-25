@@ -48,6 +48,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import os
+import base64
+from io import BytesIO
 
 
 async def search_documents(keywords: List[str]) -> List[PatentResult]:
@@ -532,12 +534,12 @@ async def create_report_background(report_params: ReportParams):
         # report_str = str(report)
         report_str = dict_to_formatted_string(report)
 
-        create_word_document(
+        await create_word_document(
             report_str,
             report_params.requirement_gathering_id,
             report_params.user_case_id,
         )
-        create_pdf_document(
+        await create_pdf_document(
             report_str,
             report_params.requirement_gathering_id,
             report_params.user_case_id,
@@ -568,36 +570,13 @@ def dict_to_formatted_string(report: Dict) -> str:
     return report_str
 
 
-def create_word_document(
+async def create_pdf_document(
     content: str, requirement_gathering_id: str, user_case_id: str
 ):
-    doc = Document()
-    doc.add_heading("Patent Novelty Assessment", 0)
-    filename = f"patent_novelty_assessment"
-
-    paragraphs = content.split("\n")
-    for para in paragraphs:
-        if para.strip() != "":
-            p = doc.add_paragraph(para)
-            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            p.style.font.size = Pt(12)
-
-    doc.save(filename)
-
-
-def create_pdf_document(content: str, requirement_gathering_id: str, user_case_id: str):
-    filename = f"patent_novelty_assessment.pdf"
-    folder = f"D:/downloadd/test"
-
-    # Ensure the folder exists
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
-    # Construct the full file path
-    file_path = os.path.join(folder, filename)
+    buffer = BytesIO()
 
     # Create the PDF document
-    c = canvas.Canvas(file_path, pagesize=letter)
+    c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
 
     c.setFont("Helvetica", 12)
@@ -610,3 +589,76 @@ def create_pdf_document(content: str, requirement_gathering_id: str, user_case_i
 
     c.drawText(text)
     c.save()
+
+    # Move to the beginning of the BytesIO buffer
+    buffer.seek(0)
+
+    # Convert the PDF to base64
+    pdf_bytes = buffer.read()
+    pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
+
+    file_type = "pdf"
+    file_name = "IP Validity Analysis Report"
+
+    # Insert the base64 PDF into the database
+    await insert_file_to_db(
+        pdf_base64, requirement_gathering_id, user_case_id, file_type, file_name
+    )
+
+
+async def create_word_document(
+    content: str, requirement_gathering_id: str, user_case_id: str
+):
+    buffer = BytesIO()
+
+    doc = Document()
+    doc.add_heading("Patent Novelty Assessment", 0)
+
+    paragraphs = content.split("\n")
+    for para in paragraphs:
+        if para.strip() != "":
+            p = doc.add_paragraph(para)
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p.style.font.size = Pt(12)
+
+    doc.save(buffer)
+
+    # Move to the beginning of the BytesIO buffer
+    buffer.seek(0)
+
+    # Convert the Word document to base64
+    word_bytes = buffer.read()
+    word_base64 = base64.b64encode(word_bytes).decode("utf-8")
+
+    file_type = "docx"
+    file_name = "IP Validity Analysis Report"
+
+    # Insert the base64 Word document into the database
+    await insert_file_to_db(
+        word_base64, requirement_gathering_id, user_case_id, file_type, file_name
+    )
+
+
+async def insert_file_to_db(
+    pdf_base64: str,
+    requirement_gathering_id: str,
+    user_case_id: str,
+    file_type: str,
+    file_name: str,
+):
+    query = """
+    INSERT INTO report_file (requirement_gathering_id, use_case_id, file, file_type,file_name)
+    VALUES (%s, %s, %s, %s,%s)
+    """
+    values = (requirement_gathering_id, user_case_id, pdf_base64, file_type, file_name)
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
