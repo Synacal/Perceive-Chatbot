@@ -42,6 +42,13 @@ from app.services.add_attachment_answer import get_report_id
 from app.core.database import get_db_connection
 import json
 
+from docx import Document
+from docx.shared import Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import os
+
 
 async def search_documents(keywords: List[str]) -> List[PatentResult]:
     try:
@@ -522,7 +529,20 @@ async def create_report_background(report_params: ReportParams):
             report[patentability_criteria[i]] = assessment
 
         # Convert report dictionary to JSON string
-        report_str = str(report)
+        # report_str = str(report)
+        report_str = dict_to_formatted_string(report)
+
+        create_word_document(
+            report_str,
+            report_params.requirement_gathering_id,
+            report_params.user_case_id,
+        )
+        create_pdf_document(
+            report_str,
+            report_params.requirement_gathering_id,
+            report_params.user_case_id,
+        )
+
         await add_report(
             report_str,
             report_params.requirement_gathering_id,
@@ -533,3 +553,60 @@ async def create_report_background(report_params: ReportParams):
     except Exception as e:
         print(f"Error in background task: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def dict_to_formatted_string(report: Dict) -> str:
+    report_str = ""
+    for key, value in report.items():
+        report_str += f"{key}:\n"
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                report_str += f"  {sub_key}: {sub_value}\n"
+        else:
+            report_str += f"  {value}\n"
+        report_str += "\n"
+    return report_str
+
+
+def create_word_document(
+    content: str, requirement_gathering_id: str, user_case_id: str
+):
+    doc = Document()
+    doc.add_heading("Patent Novelty Assessment", 0)
+    filename = f"patent_novelty_assessment"
+
+    paragraphs = content.split("\n")
+    for para in paragraphs:
+        if para.strip() != "":
+            p = doc.add_paragraph(para)
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p.style.font.size = Pt(12)
+
+    doc.save(filename)
+
+
+def create_pdf_document(content: str, requirement_gathering_id: str, user_case_id: str):
+    filename = f"patent_novelty_assessment.pdf"
+    folder = f"D:/downloadd/test"
+
+    # Ensure the folder exists
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    # Construct the full file path
+    file_path = os.path.join(folder, filename)
+
+    # Create the PDF document
+    c = canvas.Canvas(file_path, pagesize=letter)
+    width, height = letter
+
+    c.setFont("Helvetica", 12)
+    text = c.beginText(40, height - 40)
+
+    paragraphs = content.split("\n")
+    for para in paragraphs:
+        text.textLines(para)
+        text.textLine("")
+
+    c.drawText(text)
+    c.save()
