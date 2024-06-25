@@ -17,6 +17,10 @@ import json
 
 from app.models.prior_art_search import PatentResult, PatentList, ReportParams
 
+import os
+import markdown2
+import pdfkit
+
 
 async def get_answers(requirement_gathering_id, user_case_id):
     conn = None
@@ -606,6 +610,40 @@ async def get_patent_by_id(patent_id: str):
     finally:
         conn.close()
 
+async def get_patent_details_by_id(patent_id: str):
+    query = """
+    SELECT id, date, title, abstract, published_country,kind,wipo_kind,claim_text
+    FROM target.patents
+    WHERE id = %s;
+    """
+    value = patent_id
+    try:
+        conn = get_percieve_db_connection()
+
+        with conn.cursor() as cur:
+            cur.execute(query, [value])
+            result = cur.fetchone()
+            if result:
+                kind = result[5] if result[5] is not None else (result[6] if result[6] is not None else "")
+                country = result[4] if result[4] is not None else ""
+                patent_details = {
+                    "id": result[0],
+                    "date": result[1],
+                    "title": result[2],
+                    "abstract": result[3],
+                    "published_country": country,
+                    "kind": kind,
+                    "claims": result[6]
+                }
+                return patent_details
+            else:
+                return None
+    except Exception as e:
+        print(f"Error fetching patent {patent_id}: {e}")
+        return None
+    finally:
+        conn.close()
+
 
 async def create_report_background(report_params: ReportParams):
     try:
@@ -622,69 +660,196 @@ async def create_report_background(report_params: ReportParams):
         response_data = response_data[:3]
         patent_ids = await search_patents(response_data, summary)
         analysis_results = []
+        all_patents_info = []
 
         for patent_id in patent_ids:
             print(patent_id)
-            patent = await get_patent_by_id(patent_id)
-            system_prompt = f"""
-                Analyze the provided patent information against the user's invention description to identify and 
-                describe both similarities and differences, focusing on technical features, innovative aspects, 
-                and potential patentability issues.
-                Inputs:
-
-                User's Invention Description: {summary}
-
-                Patent Information to Analyze: {patent}
-
-                Analysis Tasks:
-
-                    Task 1: Identify Similarities:
-                        Prompt: "Given the abstract and claims of Patent X (details provided above) alongside the 
-                        description of the user's invention, identify and describe the key similarities. Focus on 
-                        technical features, shared functionalities, and overlapping application domains. Explain 
-                        how these similarities could impact the patentability of the user’s invention."
-                    Task 2: Identify Differences:
-                        Prompt: "Based on the provided patent information (Patent X) and the user's invention 
-                        description, identify and articulate the significant differences, particularly regarding 
-                        novel features and inventive steps. Describe how these differences enhance the uniqueness 
-                        of the user's invention and contribute to its patentability. Outline any new functionalities, 
-                        technical solutions, or applications that differentiate the user's invention from the patent."
-
-                Output:
-
-                    Format for Response:
-                        Similarities:
-                            A detailed list and explanation of elements or concepts that are similar between the analyzed patent and the user's invention. Include any shared technological approaches or functionalities.
-                        Differences:
-                            A comprehensive outline of how the user's invention diverges from the analyzed patent. Highlight novel features, different technical solutions, or unique applications that are not covered by the patent.
-                        Conclude with a brief summary of the potential implications of these similarities and differences on the user’s ability to patent the invention.
+            #patent = await get_patent_by_id(patent_id)
+            patent = await get_patent_details_by_id(patent_id)
+            if patent:
+                patent_info = f"""
+                Patent ID: {patent['id']}
+                Date: {patent['date']}
+                Published Country: {patent['published_country']}
+                Title: {patent['title']}
+                Abstract: {patent['abstract']}
+                Kind: {patent['kind']}
+                Claims: {patent['claims']}
                 """
-            message_text = [
-                {"role": "system", "content": system_prompt},
-                # {"role": "user", "content": answer}
-            ]
-            completion = client.chat.completions.create(
-                model="gpt-35-turbo",
-                messages=message_text,
-                temperature=0.7,
-                max_tokens=800,
-                top_p=0.95,
-                frequency_penalty=0,
-                presence_penalty=0,
-                stop=None,
-            )
+                all_patents_info.append(patent_info)
+                relevancyReport = await getRelevantPatentDetails(summary,patent_info)
+                relevancyReport = relevancyReport + os.linesep
+                analysis_results.append(relevancyReport)
+                
+            
+        
+        # Concatenate all patent information into a single string
+        patents_info_str = "\n\n".join(all_patents_info)
+            # system_prompt = f"""
+            #     Analyze the provided patent information against the user's invention description to identify and 
+            #     describe both similarities and differences, focusing on technical features, innovative aspects, 
+            #     and potential patentability issues.
+            #     Inputs:
 
-            content = completion.choices[0].message.content
+            #     User's Invention Description: {summary}
 
-            analysis_results.append(content)
+            #     Patent Information to Analyze: {patent}
 
+            #     Analysis Tasks:
+
+            #         Task 1: Identify Similarities:
+            #             Prompt: "Given the abstract and claims of Patent X (details provided above) alongside the 
+            #             description of the user's invention, identify and describe the key similarities. Focus on 
+            #             technical features, shared functionalities, and overlapping application domains. Explain 
+            #             how these similarities could impact the patentability of the user’s invention."
+            #         Task 2: Identify Differences:
+            #             Prompt: "Based on the provided patent information (Patent X) and the user's invention 
+            #             description, identify and articulate the significant differences, particularly regarding 
+            #             novel features and inventive steps. Describe how these differences enhance the uniqueness 
+            #             of the user's invention and contribute to its patentability. Outline any new functionalities, 
+            #             technical solutions, or applications that differentiate the user's invention from the patent."
+
+            #     Output:
+
+            #         Format for Response:
+            #             Similarities:
+            #                 A detailed list and explanation of elements or concepts that are similar between the analyzed patent and the user's invention. Include any shared technological approaches or functionalities.
+            #             Differences:
+            #                 A comprehensive outline of how the user's invention diverges from the analyzed patent. Highlight novel features, different technical solutions, or unique applications that are not covered by the patent.
+            #             Conclude with a brief summary of the potential implications of these similarities and differences on the user’s ability to patent the invention.
+
+            #     Give response in markdown format 
+            #     """
+
+        # system_prompt = f"""
+        #     Conduct a Prior Art Search focusing on the following aspects:
+
+        #     Key Findings:
+
+        #     Provide a summary of significant prior art that could affect the technology’s patentability, including the number and relevance of found patents, and implications for the novelty of the technology.
+        #     Focus on patents that are not owned by "User's Invention".
+        #     Provide a clear analysis of how these third-party patents may impact "User's Invention"'s technology and market strategy.
+        #     Ensure the report reflects accurate background information and demonstrates the utility of the analysis.
+        #     Output Requirements:
+
+        #     The report should be insightful, highly accurate, and name specific patents.
+        #     Structure the findings in a logical format with clear headings and subheadings.
+        #     Include a section for each relevant patent found, detailing its relevance, potential impact on "User's Invention"'s technology, and implications for market strategy.
+        #     Background Information of "User's Invention":
+        #         {summary}
+            
+        #     Patent Information to Analyze: {patents_info_str}
+
+        #     Report should be in markdown format which can be converted to html and pdf
+
+        #     Below is the structure of the report
+        #         Prior Art Search Report: "User's Invention" - (This is Title)
+        #             Introduction (h2)
+        #             Key Findings (h2)
+        #             Relevant Patents (h2)
+        #             Analysis and Implications (h2)
+        #                 Novelty and Patentability (h3)
+        #                 Impact on "User's Invention" (h3)
+        #             Conclusion (h2)
+
+        #     Don't include text "User's Invention" in the report instead use the name of the invention.
+
+        #     Don't include abstracts of the Relevant Patents include belows as bullet points. Subtopics of Relevant Patents section should be in numbering format.
+        #         "Patent ID :" Patent ID (Numbering) 
+        #             Publication Date (bullet)
+        #             Summary (bullet)
+        #             Relevance   (bullet)
+        #             Potential Impact    (bullet)
+            
+        #     If Patent IDs of relevent patents includes only numbers change it to (Published Country + " " + Patent ID + " " + Kind) format.
+
+        #     Report should inc
+
+        #     Give response in markdown format make sure to follow the given structure and put Title and all headings are in markdown heading formats.
+        #     """
+        system_prompt = f"""
+            Conduct a Prior Art Search focusing on the following aspects:
+
+            ### Key Findings:
+            - Provide a summary of significant prior art that could affect the technology’s patentability.
+            - Include the number and relevance of found patents, and implications for the novelty of the technology.
+            - Focus on patents that are not owned by the invention.
+            - Provide a clear analysis of how these third-party patents may impact the invention's technology and market strategy.
+            - Ensure the report reflects accurate background information and demonstrates the utility of the analysis.
+
+            ### Output Requirements:
+            - The report should be insightful, highly accurate, and name specific patents.
+            - Structure the findings in a logical format with clear headings and subheadings.
+            - Include a section for each relevant patent found, detailing its relevance, potential impact on the invention's technology, and implications for market strategy.
+            - The report should be in markdown format which can be converted to HTML and PDF.
+
+            ### Background Information of the Invention:
+            {summary}
+
+            ### Patent Information to Analyze:
+            {patents_info_str}
+
+            ### Report Structure:
+            # Prior Art Search Report: "Invention Name"
+
+            ## Introduction
+
+            ## Key Findings
+
+            ## Relevant Patents
+
+            ### 1. Patent ID: Patent ID
+            - **Publication Date:** 
+            - **Summary:** 
+            - **Relevance:** 
+            - **Potential Impact:** 
+
+            ### 2. Patent ID: Patent ID
+            - **Publication Date:** 
+            - **Summary:** 
+            - **Relevance:** 
+            - **Potential Impact:** 
+
+            ## Analysis and Implications
+
+            ### Novelty and Patentability
+
+            ### Impact on "Invention Name"
+
+            ## Conclusion
+
+            ### Additional Instructions:
+            - If Patent IDs of relevant patents include only numbers, change the format to (Published Country + " " + Patent ID + " " + Kind).
+            - Ensure headings and subheadings are in markdown heading formats.
+            - Replace the placeholder "Invention Name" with the actual name of the invention throughout the report.
+            """
+        message_text = [
+            {"role": "system", "content": system_prompt},
+            # {"role": "user", "content": answer}
+        ]
+        completion = client.chat.completions.create(
+            model="gpt-35-turbo",
+            messages=message_text,
+            temperature=0.7,
+            max_tokens=2000,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=None,
+        )
+
+        content = completion.choices[0].message.content
+
+        #analysis_results.append(content)
+
+        exportPdf(analysis_results)
         response = {
             "summary": summary,
             "status": "in-progress",
-            "analysis_results": analysis_results,
+            "analysis_results": content,
         }
 
-        str_analysis_results = str(analysis_results)
+        str_analysis_results = str(content)
         query = """
         INSERT INTO reports (requirement_gathering_id, user_case_id, report)
         VALUES %s
@@ -709,3 +874,89 @@ async def create_report_background(report_params: ReportParams):
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+async def getRelevantPatentDetails(userPatentSummary,patentInfo):
+    prompt = f"""
+            Analyze the given patent details in relation to the provided "User Patent" summary. Extract the "User Patent" name from the summary and use it throughout the response instead of the placeholder "User Patent". Follow the structure below to ensure comprehensive analysis:
+
+            Do not include the User Patent Summary in the response.
+
+            ### User Patent Summary:
+            {userPatentSummary}
+
+            ### Given Patent Details to Analyze:
+            {patentInfo}
+
+            ### Output Structure:
+            ### [Patent ID Number]
+            - **Publication Date:** [Date]
+            - **Summary:** [summary of the given patent]
+            - **Relevance:** [relevance of the given patent to "User Patent"]
+            - **Potential Impact:** [potential impact on "User Patent" from the given patent]
+
+            Provide the response in markdown format.
+        """
+    message_text = [
+            {"role": "system", "content": prompt},
+            # {"role": "user", "content": answer}
+        ]
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo",
+        messages=message_text,
+        temperature=0.7,
+        max_tokens=2000,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None,
+    )
+    response = completion.choices[0].message.content
+    return response
+
+def exportPdf(text):
+
+    if isinstance(text, list):
+        text = "\n".join(text)
+    elif not isinstance(text, str):
+        raise TypeError("The input text must be a string or a list of strings")
+
+    html_text = markdown2.markdown(text)
+
+    output_dir = "temp_report"
+    print(os.path)
+    output_pdf_path = os.path.join(output_dir, "report.pdf")
+    print(output_pdf_path)
+
+
+
+    # Create the directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    html_file_path = os.path.join(output_dir, "output.html")
+    with open(html_file_path, "w") as html_file:
+        html_file.write(html_text)
+    
+    path_to_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path based on your installation
+
+    config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+
+    pdfkit.from_string(html_text, output_pdf_path,configuration=config)
+    print(f"PDF file has been created successfully at {output_pdf_path}.")
+
+
+# markdown_text = """
+# # Sample Markdown
+
+# This is a sample markdown text.
+
+# ## Subheading
+
+# - List item 1
+# - List item 2
+
+# **Bold text**
+
+# [Link](https://example.com)
+# """
+# exportPdf(markdown_text)
