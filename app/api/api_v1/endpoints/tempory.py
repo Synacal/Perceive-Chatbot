@@ -7,11 +7,14 @@ from app.core.azure_client import client
 router = APIRouter()
 
 
-@router.post("/tempory/")
-async def tempory(user_prompt: str):
-    system_prompt = "Answer the following questions to the best of your ability. If you do not know the answer, please type 'I do not know'."
-
-    message_text = {"system_prompt": system_prompt, "user_prompt": user_prompt}
+@router.get("/tempory/")
+async def tempory():
+    system_prompt = "Answer the following questions to the best of your ability. If you do not know the answer, Answer should be more than 100 words. please type 'I do not know'."
+    user_prompt = "What is the difference between a provisional patent and a non-provisional patent?"
+    message_text = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
 
     try:
         completion = client.chat.completions.create(
@@ -26,6 +29,7 @@ async def tempory(user_prompt: str):
         )
 
         content = completion.choices[0].message.content
+
         return {"response": content}
     except Exception as e:
         return {"error": str(e)}
