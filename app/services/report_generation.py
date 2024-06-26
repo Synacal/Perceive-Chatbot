@@ -197,5 +197,27 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
         print("Report generated successfully.")
         return report
     except Exception as e:
-        print(f"Error in background task: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
+        query_file_status = """
+        INSERT INTO report_file_status (status,description,requirement_gathering_id, user_case_id)
+        VALUES (%s, %s, %s, %s)
+        """
+        query_file_status_params = (
+            "failed",
+            str(e),
+            requirement_gathering_id,
+            user_case_id,
+        )
+        conn = get_db_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute(query_file_status, query_file_status_params)
+            conn.commit()
+            cur.close()
+        except Exception as e:
+            print(f"Error in updating file status: {str(e)}")
+        finally:
+            conn.close()
+    finally:
+        conn.close()
+        print("Connection closed.")
