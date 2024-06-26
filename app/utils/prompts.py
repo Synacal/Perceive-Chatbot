@@ -288,16 +288,6 @@ prompts = [
     • Details on how M&A aligns with overall business objectives
     • Expected outcomes from strategic M&A initiatives
 
-    Parameters to Assess
-    • Action Verbs: Define, outline, explain, strategize.
-    • Parameters: Strategic objectives for M&A, alignment with overall business strategy, target sectors or technologies.
-    • Aspects: Detailed explanation of how M&A supports broader strategic goals.
-
-    Example Completed Answer:
-    • Answer: "Our strategic goals for M&A focus on acquiring companies that can provide advanced sensor technology and artificial intelligence capabilities, aiming to enhance our products' performance. We seek to expand our market presence in Europe and Asia by 25% and aim to reduce production costs by 15% through synergies over the next three years."
-    Example Incomplete Answer:
-    • Incomplete Response: "We aim to acquire companies to enhance our technology."
-    • Example Follow-up question: "What specific technologies or capabilities are you looking to acquire through M&A, and how do these acquisitions align with your strategic goals to expand market presence or reduce costs?"
     """,
     f"""
     Specify the criteria you use to evaluate potential M&A targets, detailing the importance of technological fit, financial health, and market potential. List the key performance indicators you consider essential for assessing these targets.
@@ -307,16 +297,6 @@ prompts = [
     • Importance of technological, financial, and market fit
     • Description of key performance indicators for potential targets
 
-    Parameters to Assess
-    • Action Verbs: Specify, list, detail, evaluate.
-    • Parameters: Selection criteria including technological fit, financial health, and market potential.
-    • Aspects: Criteria clarity, how well targets align with company strategy.
-
-    Example Completed Answer:
-    • Answer: "We prioritize targets with strong R&D capabilities in AI and robotics, robust customer bases in high-growth regions, and financial health indicators such as EBITDA margins above 20% and a debt-to-equity ratio below 0.5. Strategic fit, potential for innovation scalability, and market expansion possibilities are key considerations."
-    Example Incomplete Answer:
-    • Incomplete Response: "We look for innovative companies."
-    • Example Follow-up question: "Could you specify the criteria, such as R&D capabilities, market position, or financial health, that guide your selection of potential acquisition targets?"
     """,
     f"""
     Identify the regulatory environments impacting your M&A activities and assess the specific compliance requirements in your target markets. Explain your risk assessment strategy for managing regulatory challenges.
@@ -326,16 +306,6 @@ prompts = [
     • Specific compliance requirements in target markets
     • Risk assessment related to regulatory challenges
 
-    Parameters to Assess
-    • Action Verbs: Identify, assess, comply.
-    • Parameters: Regulatory environments, compliance requirements, risk management.
-    • Aspects: Comprehensive assessment of regulatory impacts and mitigation strategies.
-
-    Example Completed Answer:
-    • Answer: "Regulatory considerations are crucial, particularly compliance with the EU's General Data Protection Regulation (GDPR) for data handling and the U.S. Federal Trade Commission's guidelines on antitrust matters. We ensure all potential acquisitions comply with these standards to mitigate legal and financial risks."
-    Example Incomplete Answer:
-    • Incomplete Response: "We comply with necessary regulations."
-    • Example Follow-up question: "Can you detail the specific regulatory considerations, such as GDPR or FTC guidelines, that affect your M&A activities, particularly in new markets you are targeting?"
     """,
     f"""
     Analyze the list of financial metrics critical to assessing M&A targets, calculate the valuation methods used, and project the financial thresholds that guide your decision to engage in M&A.
@@ -345,35 +315,15 @@ prompts = [
     • Explanation of valuation methods employed
     • Financial thresholds considered for engaging in M&A
 
-    Parameters to Assess
-    • Action Verbs: Analyze, calculate, project.
-    • Parameters: Key financial metrics like EBITDA, ROI, revenue growth rates.
-    • Aspects: Accuracy in financial evaluations, relevance of metrics to M&A goals.
-
-    Example Completed Answer:
-    • Answer: "We evaluate targets based on their revenue growth rate, aiming for at least 10% annually, EBITDA margins, ideally 20% or higher, and a strong cash flow position to support ongoing operations and integration costs. Return on investment is projected to break even within three years post-acquisition."
-    Example Incomplete Answer:
-    • Incomplete Response: " We evaluate financial performance."
-    • Example Follow-up question: " What specific financial metrics, like revenue growth rate, EBITDA margins, or cash flow, are crucial in your assessment of potential M&A targets?"
     """,
     f"""
-    Plan the detailed integration of new acquisitions, outlining timelines and key objectives for technology and system integration. Describe strategies for cultural integration and employee retention to optimize operational efficiency.
+   Check the detailed integration of new acquisitions, outlining timelines and key objectives for technology and system integration.
 
     Completeness Checklist:
     • Detailed plan for integrating new acquisitions
     • Timeline and key objectives for technology and system integration
     • Strategies for cultural integration and employee retention
 
-    Parameters to Assess
-    • Action Verbs: Plan, integrate, align, optimize.
-    • Parameters: Integration plans for technology, operations, and culture.
-    • Aspects: Effectiveness of integration strategy, impact on operational efficiency.
-
-    Example Completed Answer:
-    • Answer: "Our integration strategy includes a 100-day plan focusing on technology alignment, operational efficiency, and cultural integration. We set specific milestones for technology integration within six months and aim to achieve operational cost synergies of up to 10% within the first year."
-    Example Incomplete Answer:
-    • Incomplete Response: "We have a 100-day integration plan."
-    • AI's Follow-up: "Could you elaborate on the steps and key objectives of your 100-day integration plan, including how you align technology and manage operational efficiencies?"
     """,
     f"""
     Measure the metrics used to evaluate the success of M&A transactions, assess the timeframes for evaluating post-M&A performance, and evaluate the long-term impacts on the company’s market position and financial health.
@@ -383,16 +333,6 @@ prompts = [
     • Timeframes for evaluating post-M&A performance
     • Long-term impacts on the company’s market position and financial health
 
-    Parameters to Assess
-    • Action Verbs: Measure, assess, evaluate.
-    • Parameters: Performance indicators post-M&A, such as revenue growth and cost synergy.
-    • Aspects: Alignment of success metrics with initial M&A objectives.
-
-    Example Completed Answer:
-    • Answer: "Success is measured by achieving or exceeding the set financial targets such as revenue growth and cost reduction, successful technology integration within the specified timeframe, and employee retention rates above 90% post-acquisition. Long-term success is evaluated by the acquired entity’s contribution to our market expansion and innovation capabilities."
-    Example Incomplete Answer:
-    • Incomplete Response: "We track financial and operational metrics."
-    • AI's Follow-up: "What specific financial and operational metrics do you use to measure the success of your M&A activities, and how do these metrics align with your long-term strategic objectives?"
     """,
     # Competitive landscape
     f"""
@@ -403,16 +343,6 @@ prompts = [
     o Analysis of key factors influencing market share and revenue growth
     o Future market share prediction models and underlying assumptions
 
-    Parameters to Assess
-    o Action Verbs: Analyze, compare, project.
-    o Parameters: Historical market share data, factors influencing growth, future market predictions.
-    o Aspects: Accuracy and depth of historical data analysis, clarity in growth factors, reliability of future projections.
-
-    Example Completed Answer:
-    • Answer: "Our market share has increased by 12% over the past five years, driven primarily by our expansion into the Asian market and the launch of our AI-driven product line, which captured a significant share of the tech-savvy consumer segment."
-    Example Incomplete Answer:
-    o Incomplete Response: "Our market share increased last year."
-    o AI's Follow-up: "Could you specify the exact percentage increase in market share your company experienced last year, and what were the main factors contributing to this growth?"
     """,
     f"""
     Evaluate brand positioning strategies among competitors, distinguish metrics used to measure customer loyalty and brand equity, and assess brand perception in the market through detailed analysis.
@@ -422,16 +352,6 @@ prompts = [
     o Metrics used to measure customer loyalty and brand equity
     o Analysis of brand perception in the market
 
-    Parameters to Assess
-    o Action Verbs: Evaluate, distinguish, assess.
-    o Parameters: Brand positioning strategies, customer loyalty metrics, brand equity comparison.
-    o Aspects: Detailed evaluation of positioning strategies, comparative analysis of brand equity, measurement effectiveness of loyalty metrics.
-
-    Example Completed Answer:
-    • Answer: "Our brand positioning focuses on user-centric design and sustainability, which differentiates us from competitors who prioritize cost reduction. This strategy has improved our brand perception scores by 20% as measured in independent consumer surveys."
-    Example Incomplete Answer:
-    o Incomplete Response: "We focus on sustainability in our branding."
-    o AI's Follow-up: "Can you elaborate on how sustainability is integrated into your brand positioning strategy and how this differentiates you from your competitors?"
     """,
     f"""
     Investigate financial performance trends such as revenue, profit margins, and expenditures, compare investments in innovation and customer acquisition, and summarize the financial risk profiles of major competitors.
@@ -441,16 +361,6 @@ prompts = [
     o Comparative analysis of investments in innovation and customer acquisition
     o Financial risk profiles for each major competitor
 
-    Parameters to Assess
-    o Action Verbs: Investigate, compare, summarize.
-    o Parameters: Revenue trends, profit margins, expenditure analysis, investment in innovation.
-    o Aspects: Comprehensive financial health overview, comparative financial performance, insight into investment strategies.
-
-    Example Completed Answer:
-    • Answer: " Over the last three years, our revenue has grown at an annual rate of 8%, outpacing the industry average of 5%. Our profit margins have also improved by 3% due to efficiencies gained through automation and supply chain optimizations."
-    Example Incomplete Answer:
-    o Incomplete Response: "We monitor our financials closely."
-    o AI's Follow-up: "Could you provide specific details on your company's revenue growth, profit margins, and how these financial metrics compare to those of your competitors over the last three years?"
     """,
     f"""
     Catalog recent significant innovations introduced by your company and competitors, assess the patents and intellectual property landscape, and compare the impact of these innovations on market dynamics.
@@ -460,16 +370,6 @@ prompts = [
     o Patents and intellectual property landscape analysis
     o Assessment of the impact of these innovations on market dynamics
 
-    Parameters to Assess
-    o Action Verbs: Catalog, assess, compare.
-    o Parameters: List of innovations, patent holdings, technology lifecycle stages.
-    o Aspects: Completeness of innovation listing, thorough assessment of technology impacts, comparative innovation strength.
-
-    Example Completed Answer:
-    • Answer: "Our flagship innovation last year was a blockchain-based supply chain transparency tool, which is a first in our industry. This has given us a competitive edge over others who are still relying on traditional supply chain management systems."
-    Example Incomplete Answer:
-    o Incomplete Response: "We introduced several innovations recently."
-    o AI's Follow-up: "Could you list the most significant innovations your company has recently introduced and explain their impact on the market compared to competitor innovations?"
     """,
     f"""
     Measure sales performance metrics and evaluate the effectiveness of distribution channels. Compare online and offline sales strategies and provide insights into unique sales tactics and their impact on the market.
@@ -479,16 +379,6 @@ prompts = [
     o Comparative analysis of online and offline sales strategies
     o Insights into unique sales tactics and their market impact
 
-    Parameters to Assess
-    o Action Verbs: Measure, evaluate, optimize.
-    o Parameters: Sales metrics, effectiveness of distribution channels, strategy comparisons.
-    o Aspects: Detailed measurement of sales performance, evaluation of channel effectiveness, strategic sales insights.
-
-    Example Completed Answer:
-    o Answer: "We assess sales channel effectiveness through conversion rates and customer feedback. A unique strategy we've implemented is the use of augmented reality in showrooms, which has increased our conversion rates by 15% compared to competitors who use standard display methods."
-    Example Incomplete Answer:
-    o Incomplete Response: "Our sales have improved with new strategies."
-    o AI's Follow-up: "What specific new sales strategies have you implemented, and how have these strategies improved sales performance metrics compared to previous years?"
     """,
     f"""
     Analyze the comparative effectiveness of marketing strategies and campaign outcomes. Measure metrics for campaign reach and consumer engagement, and conduct a detailed content analysis of marketing materials and communication strategies.
@@ -498,16 +388,7 @@ prompts = [
     o Metrics measuring campaign reach and consumer engagement
     o Content analysis for marketing materials and communication strategies
 
-    Parameters to Assess
-    o Action Verbs: Analyze, measure, compare.
-    o Parameters: Marketing strategy effectiveness, campaign reach metrics, consumer engagement levels.
-    o Aspects: Depth of strategy analysis, accuracy of reach and engagement metrics, comparative effectiveness.
-
-    Example Completed Answer:
-    o Answer: "Our recent campaigns have utilized user-generated content much more extensively than our competitors, leading to a 50% higher engagement rate on social media platforms."
-    Example Incomplete Answer:
-    o Incomplete Response: "Our marketing has been effective."
-    o AI's Follow-up: "Can you provide details on which aspects of your marketing campaigns have been particularly effective in engaging consumers, and how do these results compare to industry benchmarks?"
+    
     """,
     f"""
     Forecast future strategic decisions by competitors, plan scenario responses, and anticipate market positioning through a historical review of strategic moves and outcomes.
@@ -517,16 +398,7 @@ prompts = [
     o Forecasting of future strategic decisions by competitors
     o Scenario planning for strategic responses
 
-    Parameters to Assess
-    o Action Verbs: Forecast, plan, anticipate.
-    o Parameters: Strategic move analysis, future market positioning, scenario planning outcomes.
-    o Aspects: Strategic foresight in forecasting, clarity in future positioning, comprehensiveness of scenario planning.
-
-    Example Completed Answer:
-    o Answer: "We recently acquired a smaller competitor to consolidate our market position in the renewable energy sector, anticipating a shift in competitor focus towards green technologies. This move is expected to secure us an additional 10% market share in this growing sector over the next two years."
-    Example Incomplete Answer:
-    o Incomplete Response: "We plan to expand our product line."
-    o AI's Follow-up: "What specific products are you planning to introduce, and how do these align with anticipated competitor moves and market demands?"
+    
     """,
     f"""
     Assess supply chain robustness and agility across competitors, benchmark operational efficiencies and production costs, and optimize key performance indicators relevant to supply chain and operations.
@@ -536,16 +408,6 @@ prompts = [
     o Analysis of operational efficiencies and production costs
     o Benchmarking of key performance indicators (KPIs) relevant to supply chain and operations
 
-    Parameters to Assess
-    o Action Verbs: Assess, benchmark, optimize.
-    o Parameters: Supply chain robustness, operational costs, efficiency metrics.
-    o Aspects: Detailed assessment of supply chain agility, comparative benchmarking, operational optimization insights.
-
-    Example Completed Answer:
-    o Answer: "A strength of our supply chain is its agility, allowing us to adapt quickly to market changes. However, a weakness is our higher logistics costs compared to competitors who have optimized their routes and warehouse locations more effectively."
-    Example Incomplete Answer:
-    o Incomplete Response: "Our supply chain is very streamlined."
-    o AI's Follow-up: "Can you provide detailed insights into the strengths and any weaknesses of your supply chain, and how does this compare to the operational efficiencies of your main competitors?"
     """,
     f"""
     Survey customer experience metrics across competitors, compare the effectiveness of customer support strategies, and analyze the Net Promoter Score (NPS) and customer satisfaction index (CSI) for comprehensive insights.
@@ -555,16 +417,6 @@ prompts = [
     o Analysis of customer support strategies and their effectiveness
     o Net Promoter Score (NPS) and customer satisfaction index (CSI) comparison
 
-    Parameters to Assess
-    o Action Verbs: Survey, compare, improve.
-    o Parameters: Customer experience metrics, support strategy effectiveness, satisfaction indices.
-    o Aspects: Comprehensive survey data, effectiveness of support strategies, comparative analysis of satisfaction metrics.
-
-    Example Completed Answer:
-    o Answer: "We have implemented a 24/7 customer support center with multilingual capabilities, which has increased our customer satisfaction rate to 90%, approximately 10% higher than the industry average."
-    Example Incomplete Answer:
-    o Incomplete Response: "Customer feedback has been positive."
-    o AI's Follow-up: "What specific strategies have you employed to enhance customer satisfaction, and how do you measure the effectiveness of these strategies against competitor benchmarks?"
     """,
     f"""
     Review existing and potential strategic alliances, evaluate synergy effects from partnerships, and strategize on the impact of these alliances on competitive positioning.
@@ -574,16 +426,6 @@ prompts = [
     o Analysis of the synergy effects from partnerships
     o Evaluation of partnership strategies on competitive positioning
 
-    Parameters to Assess
-    o Action Verbs: Review, evaluate, strategize.
-    o Parameters: Alliance impacts, partnership strategies, synergy effects.
-    o Aspects: Thorough review of alliances, evaluation of partnership impacts, strategic alignment of synergies.
-
-    Example Completed Answer:
-    o Answer: "Our partnership with TechGlobal Inc. has allowed us to integrate cutting-edge AI into our products, enhancing our competitive positioning by delivering features that are currently unmatched by our direct competitors."
-    Example Incomplete Answer:
-    o Incomplete Response: "We have several key partnerships."
-    o AI's Follow-up: "Could you describe the most impactful strategic alliances you have formed recently, and how have these partnerships affected your competitive positioning?"
     """,
     f"""
     Identify comprehensive risk analysis from competitive actions, assess potential threats and their expected impact, and evaluate the company’s vulnerability to competitive moves through effective risk management strategies.
@@ -593,16 +435,6 @@ prompts = [
     o Identification of potential threats and their expected impact
     o Assessment of the company’s vulnerability to competitive moves
 
-    Parameters to Assess
-    o Action Verbs: Identify, assess, mitigate.
-    o Parameters: Competitive risks, threat identification, risk management strategies.
-    o Aspects: Completeness of risk identification, effectiveness of assessments, strategic mitigation plans.
-
-    Example Completed Answer:
-    o Answer: "A significant risk is the rapid innovation in AI technology by competitors. We manage this risk by investing 15% of our annual revenue in R&D and collaborating with leading technology universities to stay ahead in innovation."
-    Example Incomplete Answer:
-    o Incomplete Response: "We face some industry risks."
-    o AI's Follow-up: "What are the most significant competitive risks your company faces, and what specific strategies have you implemented to manage these risks?"
     """,
     # Regulatory pathways
     f"""
@@ -613,16 +445,6 @@ prompts = [
     o Market-specific regulatory challenges and differences
     o Adaptation strategies to meet specific market regulations
 
-    Parameters to Assess
-    o Action Verbs: Identify, describe, compare.
-    o Parameters: Regulatory environments in key markets (USA, EU, Asia), specific regulatory challenges, market adaptation strategies.
-    o Aspects: Clear identification and detailed description of regulatory challenges per market, comparative analysis of regulatory environments.
-
-    Example Completed Answer:
-    o Answer: "In the USA, the challenge lies in navigating the FDA’s premarket approval process, which is stringent for neuro-adaptive devices. The EU’s MDR presents similar hurdles but with an added focus on privacy under GDPR. Asia varies widely, with Japan having rigorous safety requirements, while countries like China are rapidly updating their regulatory frameworks to catch up with technological advances."
-    Example Incomplete Answer:
-    o Incomplete Response: "We face different regulations in each region."
-    o AI's Follow-up: "Could you specify the key regulatory challenges you face in major markets such as the USA, EU, and Asia, and how they differ from each other?"
     """,
     f"""
     Detail areas affected by regulations such as marketing and manufacturing, explain specific operational adjustments required for compliance, and illustrate the impact on business timelines and costs.
@@ -632,16 +454,6 @@ prompts = [
     o Specific operational adjustments required to comply
     o Analysis of impact on business timelines and costs
 
-    Parameters to Assess
-    o Action Verbs: Detail, explain, illustrate.
-    o Parameters: Areas affected by regulations (e.g., marketing, product design), specific operational adjustments, impact on timelines and costs.
-    o Aspects: Detailed explanation of operational impacts, demonstration of compliance strategies, assessment of cost implications.
-
-    Example Completed Answer:
-    o Answer: "We've had to invest significantly in clinical trials and certification processes, impacting our go-to-market timelines and costs. Regulatory compliance has also influenced our marketing strategies, requiring clear communication about device capabilities and limitations per regulatory standards."
-    Example Incomplete Answer:
-    o Incomplete Response: "Regulations have affected our marketing."
-    o AI's Follow-up: "Can you detail the specific operational adjustments you've had to make to comply with international regulations, especially in terms of marketing and product delivery?"
     """,
     f"""
     Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
@@ -651,16 +463,6 @@ prompts = [
     o Mitigation strategies and risk management plans
     o Examples of successfully implemented mitigation measures
 
-    Parameters to Assess
-    o Action Verbs: Identify, formulate, implement.
-    o Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-    o Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-
-    Example Completed Answer:
-    o Answer: "The major risks include potential non-compliance with emerging regulations and rapid changes in regulatory landscapes. Our mitigation strategy involves continuous monitoring of regulatory updates and maintaining agile compliance processes capable of adapting to new requirements quickly."
-    Example Incomplete Answer:
-    o Incomplete Response: "We monitor regulatory changes."
-    o AI's Follow-up: "What specific regulatory risks are you currently monitoring, and what mitigation strategies have you implemented to address these risks?"
     """,
     f"""
     Implement quality standards such as ISO, maintain robust quality management systems, and ensure effective monitoring practices to guarantee product safety and quality.
@@ -670,16 +472,6 @@ prompts = [
     o Quality management systems and monitoring practices
     o Examples of processes ensuring product safety and quality
 
-    Parameters to Assess
-    o Action Verbs: Implement, maintain, ensure.
-    o Parameters: Quality standards adhered to (e.g., ISO 13485), quality management systems, monitoring practices.
-    o Aspects: Implementation of quality systems, maintenance of compliance, assurance of product quality and safety.
-
-    Example Completed Answer:
-    o Answer: "NeuraWear adheres to ISO 13485 for medical devices, implementing comprehensive quality management systems that cover all stages from product design to post-market surveillance, ensuring continuous compliance and quality assurance."
-    Example Incomplete Answer:
-    o Incomplete Response: "We follow ISO standards."
-    o AI's Follow-up: "Which ISO standards are you compliant with, and how do these standards influence your quality management systems and product monitoring?"
     """,
     f"""
     Analyze emerging trends and future regulatory environments, predict anticipated regulatory changes and their implications, and prepare planned strategies for adapting to future regulations.
@@ -689,16 +481,6 @@ prompts = [
     o Anticipated regulatory changes and their implications
     o Planned strategies for adapting to future regulations
 
-    Parameters to Assess
-    o Action Verbs: Analyze, predict, prepare.
-    o Parameters: Emerging regulatory trends, anticipated changes, planned responses.
-    o Aspects: In-depth analysis of trends, accurate predictions of regulatory changes, preparation for future regulatory environments.
-
-    Example Completed Answer:
-    o Answer: "Emerging trends include stricter data protection regulations and increased scrutiny of AI in healthcare devices. We are preparing by enhancing our data security measures and ensuring our AI algorithms are transparent and explainable, aligning with potential regulatory changes."
-    Example Incomplete Answer:
-    o Incomplete Response: "We're looking at data security regulations."
-    o AI's Follow-up: "What emerging regulatory trends in data security are you preparing for, and how do you plan to adjust your products and processes to align with these trends?"
     """,
     f"""
     Outline current regulatory challenges impacting operations, address strategies developed to tackle these challenges, and explain proactive and reactive measures implemented to ensure compliance and mitigate impacts.
@@ -708,16 +490,6 @@ prompts = [
     o Strategies developed to tackle these challenges
     o Proactive and reactive measures implemented
 
-    Parameters to Assess
-    o Action Verbs: Outline, address, strategize.
-    o Parameters: Current regulatory challenges, impact on company operations, strategies for overcoming challenges.
-    o Aspects: Clear outline of current challenges, strategies addressed in detail, proactive and reactive measures explained.
-
-    Example Completed Answer:
-    o Answer: "Current challenges include adapting to the new EU Medical Device Regulation (MDR) which requires more extensive clinical data and a reevaluation of our device classification. This has led to delays in our product launches in Europe and increased our operational costs."
-    Example Incomplete Answer:
-    o Incomplete Response: "The new EU regulations are challenging."
-    o AI's Follow-up: "What specific challenges are the new EU regulations presenting, and how are these impacting your product launch timelines and costs?"
     """,
     f"""
     Set specific future regulatory goals, outline steps planned to achieve these goals, and establish metrics for measuring progress and success in regulatory compliance.
@@ -727,16 +499,6 @@ prompts = [
     o Steps planned to achieve these goals
     o Metrics for measuring progress and success
 
-    Parameters to Assess
-    o Action Verbs: Set, pursue, achieve.
-    o Parameters: Future regulatory goals, steps to meet these goals, measurement of progress.
-    o Aspects: Specific targets set, detailed pursuit strategies, metrics for achievement evaluation.
-
-    Example Completed Answer:
-    o Answer: "Our future regulatory targets include achieving faster product approval times by enhancing our pre-submission processes and working more collaboratively with regulatory agencies. We're investing in regulatory affairs expertise and enhancing our compliance infrastructure to meet these goals."
-    Example Incomplete Answer:
-    o Incomplete Response: "We want to speed up approvals."
-    o AI's Follow-up: "What specific steps are you taking to achieve faster product approval times, and how are you enhancing your pre-submission processes?"
     """,
     f"""
     Engage regulatory bodies through active consultation in product development stages, collaborate with authorities on compliance issues, and describe influence exerted on regulatory frameworks and guidance.
@@ -746,16 +508,6 @@ prompts = [
     o Examples of collaboration with authorities for compliance
     o Influence exerted on regulatory frameworks and guidance
 
-    Parameters to Assess
-    o Action Verbs: Engage, collaborate, influence.
-    o Parameters: Methods of engagement with regulatory bodies, collaboration examples, influence on regulatory frameworks.
-    o Aspects: Effective engagement strategies, successful collaboration cases, influence on shaping regulations detailed.
-
-    Example Completed Answer:
-    o Answer: "We actively engage with regulatory bodies through consultation during product development stages and participate in industry groups that influence regulatory policies. Our approach includes regular submissions of research findings and safety data to regulators to aid in shaping guidelines that are informed by real-world data."
-    Example Incomplete Answer:
-    o Incomplete Response: "We regularly communicate with regulatory bodies."
-    o AI's Follow-up: "Could you describe how you engage with regulatory bodies during the product development process and the ways you contribute to shaping regulatory policies?"
     """,
     # Consumer intelligence
     f"""
@@ -767,16 +519,6 @@ prompts = [
     • Insights into how demographics correlate with product choice
     • Statistical data supporting demographic conclusions
 
-    Parameters to Assess
-    • Action Verbs: Identify, analyze, compare, summarize.
-    • Parameters: Age groups, income brackets, geographic locations, education levels.
-    • Aspects: Comprehensive breakdown of demographics, correlation with product preferences, visual data representation.
-
-    Example Completed Answer:
-    • Answer: "Our immediate goal is to penetrate the Southeast Asian market by 2025, targeting tech-savvy millennials in urban areas. We're leveraging local influencers and digital marketing to build brand awareness and have established partnerships with two regional health and wellness chains to facilitate rapid market entry."
-    Example Incomplete Answer:
-    • Incomplete Response: "We target health-conscious adults."
-    • AI's Follow-up: "Can you specify the age range, geographic focus, and any particular lifestyle traits that characterize your target demographic, and explain why these factors were chosen?"
     """,
     f"""
     Describe lifestyle characteristics that align with the company, correlate attitudes, values, and interests through a comprehensive analysis, provide examples of how psychographics influence product adoption, and visually represent psychographic segmentation.
@@ -787,16 +529,6 @@ prompts = [
     • Examples of how psychographics influence product adoption
     • Visual representation of psychographic segmentation
 
-    Parameters to Assess
-    • Action Verbs: Describe, correlate, assess, detail.
-    • Parameters: Attitudes, values, interests, lifestyle choices.
-    • Aspects: Deep insights into lifestyle alignment with product, detailed psychographic segmentation, visualization of lifestyle impact on product choice.
-
-    Example Completed Answer:
-    • Answer: "The growing interest in mental health and stress management has led us to develop a new range of wearables that monitor and provide feedback on psychological well-being. This includes features for mindfulness and stress tracking, developed in collaboration with mental health professionals."
-    Example Incomplete Answer:
-    • Incomplete Response: "Consumers are focusing more on health monitoring."
-    • AI's Follow-up: "Could you detail which specific health monitoring trends are influencing your product development, and how you plan to integrate these trends into your future offerings?"
     """,
     f"""
     Map the consumer purchase journey with an in-depth analysis, evaluate key factors influencing purchase decisions, provide a stage-by-stage breakdown of the decision-making process, and illustrate decision points with consumer actions through visualizations.
@@ -807,16 +539,6 @@ prompts = [
     • Stage-by-stage breakdown of the decision-making process
     • Visualizations linking decision points with consumer actions
 
-    Parameters to Assess
-    • Action Verbs: Map, evaluate, detail, illustrate.
-    • Parameters: Purchase triggers, decision-making stages, consumer pain points.
-    • Aspects: Detailed mapping of the purchase journey, key decision-making factors, visual journey maps.
-
-    Example Completed Answer:
-    • Answer: "We're launching a targeted campaign using AI-driven content personalization to engage consumers in underpenetrated markets. By analyzing user interaction data, we will deliver personalized ads and content directly through social media platforms, expected to boost engagement rates by 40%."
-    Example Incomplete Answer:
-    • Incomplete Response: "We use online ads and social media."
-    • AI's Follow-up: "Can you elaborate on the specific digital marketing strategies you employ, how you tailor these to underpenetrated markets, and what metrics you use to measure their effectiveness?"
     """,
     f"""
     Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
@@ -826,100 +548,44 @@ prompts = [
     o Mitigation strategies and risk management plans
     o Examples of successfully implemented mitigation measures
 
-    Parameters to Assess
-    o Action Verbs: Identify, formulate, implement.
-    o Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-    o Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-
-    Example Completed Answer:
-    • Answer: "We anticipate resistance due to data privacy concerns. To address this, we are rolling out a new privacy campaign highlighting our encryption and data handling policies, and introducing a user-controlled data privacy feature that allows customers to manage their data sharing preferences."
-    Example Incomplete Answer:
-    • Incomplete Response: "Adoption challenges include technology acceptance."
-    • AI's Follow-up: "What specific actions are you taking to overcome technology acceptance barriers, and how do you educate your consumers about the benefits of new technologies?"
     """,
     f"""
     Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-Completeness Checklist:
-o	Identification of key regulatory risks by market and industry
-o	Mitigation strategies and risk management plans
-o	Examples of successfully implemented mitigation measures
+    Completeness Checklist:
+    o	Identification of key regulatory risks by market and industry
+    o	Mitigation strategies and risk management plans
+    o	Examples of successfully implemented mitigation measures
 
-Parameters to Assess
-o	Action Verbs: Identify, formulate, implement.
-o	Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-o	Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-Example Completed Answer:
-•	Answer: "Success metrics for new market entries include achieving a 25% market share within the first year and maintaining a customer acquisition cost (CAC) below $50. We will also track the engagement and repeat purchase rates to measure the effectiveness of initial product launches."
-Example Incomplete Answer:
-•	Incomplete Response: "We look at sales figures and customer feedback."
-•	AI's Follow-up: "Could you provide more detail on the key performance indicators (KPIs) you monitor besides sales figures and customer feedback to evaluate the success of new market entries?"
-""",
+    """,
     f"""
-Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-Completeness Checklist:
-o	Identification of key regulatory risks by market and industry
-o	Mitigation strategies and risk management plans
-o	Examples of successfully implemented mitigation measures
+    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
+    Completeness Checklist:
+    o	Identification of key regulatory risks by market and industry
+    o	Mitigation strategies and risk management plans
+    o	Examples of successfully implemented mitigation measures
 
-Parameters to Assess
-o	Action Verbs: Identify, formulate, implement.
-o	Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-o	Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-Example Completed Answer:
-•	Answer: "To enhance loyalty, we are introducing an advanced rewards program that integrates with daily activities to offer real-time benefits, such as discounts on health products and services. This program is supported by a new customer service initiative providing 24/7 support and personalized health insights."
-Example Incomplete Answer:
-•	Incomplete Response: "We plan to introduce loyalty programs."
-•	AI's Follow-up: "What specific features will your loyalty programs include, and how do you intend to differentiate these programs from competitors’ offerings to enhance customer retention?"
-""",
+    """,
     f"""
-Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-Completeness Checklist:
-o	Identification of key regulatory risks by market and industry
-o	Mitigation strategies and risk management plans
-o	Examples of successfully implemented mitigation measures
+    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
+    Completeness Checklist:
+    o	Identification of key regulatory risks by market and industry
+    o	Mitigation strategies and risk management plans
+    o	Examples of successfully implemented mitigation measures
 
-Parameters to Assess
-o	Action Verbs: Identify, formulate, implement.
-o	Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-o	Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-Example Completed Answer:
-•	Answer: "We've implemented a real-time feedback loop within our app, allowing users to report issues and suggest improvements directly. This feedback is analyzed quarterly to prioritize product updates and feature rollouts, directly addressing the most common user requests and complaints."
-Example Incomplete Answer:
-•	Incomplete Response: "We collect feedback through our app."
-•	AI's Follow-up: "How do you analyze the feedback collected through your app, and could you share examples of how this feedback has directly influenced recent product or service improvements?"
-""",
+    """,
     f"""
-Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-Completeness Checklist:
-o	Identification of key regulatory risks by market and industry
-o	Mitigation strategies and risk management plans
-o	Examples of successfully implemented mitigation measures
+    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
+    Completeness Checklist:
+    o	Identification of key regulatory risks by market and industry
+    o	Mitigation strategies and risk management plans
+    o	Examples of successfully implemented mitigation measures
 
-Parameters to Assess
-o	Action Verbs: Identify, formulate, implement.
-o	Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-o	Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-Example Completed Answer:
-•	Answer: "We are in the early stages of integrating AI to enhance predictive health analytics and are exploring the use of biodegradable materials to develop more sustainable product lines. These initiatives are expected to set new industry standards in both technological innovation and environmental responsibility by 2024."
-Example Incomplete Answer:
-•	Incomplete Response: "We’re exploring AI and blockchain."
-•	AI's Follow-up: "Could you specify how you plan to apply AI and blockchain in your product offerings, and what benefits you anticipate these technologies will bring to your consumers?"
-""",
+    """,
     f"""
-Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-Completeness Checklist:
-o	Identification of key regulatory risks by market and industry
-o	Mitigation strategies and risk management plans
-o	Examples of successfully implemented mitigation measures
-
-Parameters to Assess
-o	Action Verbs: Identify, formulate, implement.
-o	Parameters: Key regulatory risks, mitigation strategies, examples of strategy implementation.
-o	Aspects: Comprehensive risk identification, clear formulation of mitigation strategies, effective implementation examples.
-Example Completed Answer:
-•	Answer: "We are adopting a penetration pricing strategy to quickly build a customer base in new markets, followed by a gradual price increase as we add more advanced features. A tiered pricing model will be introduced to cater to different economic segments, ensuring market competitiveness while maintaining healthy profit margins."
-Example Incomplete Answer:
-•	Incomplete Response: "We will adjust our prices based on competition."
-•	AI's Follow-up: "Can you discuss the factors that influence your pricing adjustments and how you ensure these changes support both market competitiveness and profitability?"
-""",
+    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
+    Completeness Checklist:
+    o	Identification of key regulatory risks by market and industry
+    o	Mitigation strategies and risk management plans
+    o	Examples of successfully implemented mitigation measures
+    """,
 ]

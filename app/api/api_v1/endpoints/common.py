@@ -12,6 +12,7 @@ from app.services.common import (
     get_summary_data,
     get_report_by_user_id,
     get_completion_precentage,
+    get_content_summary,
 )
 
 router = APIRouter()
@@ -64,6 +65,10 @@ async def delete_draft(user_id: str, requirement_gathering_id: int):
 @router.post("/summary")
 async def get_summary(summary_data: SummaryData):
     try:
+        content_summary = await get_content_summary(
+            summary_data.requirement_gathering_id
+        )
+        print(content_summary)
         response_data = []
         for use_case_id in summary_data.use_case_ids:
             if not isinstance(use_case_id, str):
@@ -73,15 +78,17 @@ async def get_summary(summary_data: SummaryData):
             answers = await get_answers_with_questions(
                 summary_data.requirement_gathering_id, use_case_id
             )
-            # if answers:
-            summary = await get_summary_data(answers)
-            # elif answers == []:
-            #    summary = ""
-            # else:
-            #    summary = "false"
-            response_data.append({"use_case_id": use_case_id, "summary": summary})
+            if answers == []:
+                summary = await get_summary_data(answers)
+                # elif answers == []:
+                #    summary = ""
+                # else:
+                #    summary = "false"
+                response_data.append({"use_case_id": use_case_id, "summary": summary})
+        response_data.append({"content_summary": content_summary})
         return response_data
     except HTTPException as e:
+        print(e)
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

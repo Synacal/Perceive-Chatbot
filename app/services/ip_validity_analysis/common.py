@@ -42,6 +42,15 @@ from app.services.add_attachment_answer import get_report_id
 from app.core.database import get_db_connection
 import json
 
+from docx import Document
+from docx.shared import Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import os
+import base64
+from io import BytesIO
+
 
 async def search_documents(keywords: List[str]) -> List[PatentResult]:
     try:
@@ -254,10 +263,8 @@ async def get_answers(requirement_gathering_id, user_case_id):
             # Determine question_ids based on user_case_id
             if user_case_id == "1" or user_case_id == "2":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "5",
                     "6",
                     "7",
                     "8",
@@ -265,10 +272,10 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "10",
                     "11",
                     "12",
+                    "13",
                 ]
             elif user_case_id == "3":
                 question_ids = [
-                    "13",
                     "14",
                     "15",
                     "16",
@@ -281,17 +288,18 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "23",
                     "24",
                     "25",
+                    "26",
                 ]
             elif user_case_id == "4":
-                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
+                question_ids = ["27", "28", "29", "30", "31", "32", "33", "34", "35"]
             elif user_case_id == "5":
-                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+                question_ids = ["36", "37", "38", "39", "40", "41", "42"]
             elif user_case_id == "6":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "42",
+                    "3",
+                    "4",
                     "43",
                     "44",
                     "45",
@@ -304,27 +312,27 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "52",
                     "53",
                     "54",
+                    "55",
                 ]
             elif user_case_id == "7":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "55",
+                    "4",
                     "56",
                     "57",
                     "58",
                     "59",
                     "60",
+                    "61",
                 ]
             elif user_case_id == "8":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "61",
+                    "4",
                     "62",
                     "63",
                     "64",
@@ -335,14 +343,14 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "69",
                     "70",
                     "71",
+                    "72",
                 ]
             elif user_case_id == "9":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "72",
+                    "4",
                     "73",
                     "74",
                     "75",
@@ -350,14 +358,14 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "77",
                     "78",
                     "79",
+                    "80",
                 ]
             elif user_case_id == "10":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "80",
+                    "4",
                     "81",
                     "82",
                     "83",
@@ -366,6 +374,7 @@ async def get_answers(requirement_gathering_id, user_case_id):
                     "86",
                     "87",
                     "88",
+                    "89",
                 ]
             else:
                 question_ids = ["0", "1", "2"]
@@ -522,7 +531,20 @@ async def create_report_background(report_params: ReportParams):
             report[patentability_criteria[i]] = assessment
 
         # Convert report dictionary to JSON string
-        report_str = str(report)
+        # report_str = str(report)
+        report_str = dict_to_formatted_string(report)
+
+        await create_word_document(
+            report_str,
+            report_params.requirement_gathering_id,
+            report_params.user_case_id,
+        )
+        await create_pdf_document(
+            report_str,
+            report_params.requirement_gathering_id,
+            report_params.user_case_id,
+        )
+
         await add_report(
             report_str,
             report_params.requirement_gathering_id,
@@ -531,5 +553,185 @@ async def create_report_background(report_params: ReportParams):
         print("Report generated successfully.")
         return report
     except Exception as e:
-        print(f"Error in background task: {str(e)}")
+        query_status = """
+        UPDATE report_file_status
+        SET status = 'failed',description = %s
+        WHERE requirement_gathering_id = %s AND use_case_id = %s;
+        """
+        values_status = (
+            e,
+            report_params.requirement_gathering_id,
+            report_params.user_case_id,
+        )
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(query_status, values_status)
+            conn.commit()
+            cur.close()
+        except Exception as e:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
+
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def dict_to_formatted_string(report: Dict) -> str:
+    report_str = ""
+    for key, value in report.items():
+        report_str += f"{key}:\n"
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                report_str += f"  {sub_key}: {sub_value}\n"
+        else:
+            report_str += f"  {value}\n"
+        report_str += "\n"
+    return report_str
+
+
+async def create_pdf_document(
+    content: str, requirement_gathering_id: str, user_case_id: str
+):
+    buffer = BytesIO()
+
+    # Create the PDF document
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    c.setFont("Helvetica", 12)
+    text = c.beginText(40, height - 40)
+
+    paragraphs = content.split("\n")
+    for para in paragraphs:
+        text.textLines(para)
+        text.textLine("")
+
+    c.drawText(text)
+    c.save()
+
+    # Move to the beginning of the BytesIO buffer
+    buffer.seek(0)
+
+    # Convert the PDF to base64
+    pdf_bytes = buffer.read()
+    pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
+
+    file_type = "pdf"
+    file_name = "IP Validity Analysis Report"
+
+    # Insert the base64 PDF into the database
+    await insert_file_to_db(
+        pdf_base64, requirement_gathering_id, user_case_id, file_type, file_name
+    )
+
+
+async def create_word_document(
+    content: str, requirement_gathering_id: str, user_case_id: str
+):
+    buffer = BytesIO()
+
+    doc = Document()
+    doc.add_heading("Patent Novelty Assessment", 0)
+
+    paragraphs = content.split("\n")
+    for para in paragraphs:
+        if para.strip() != "":
+            p = doc.add_paragraph(para)
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p.style.font.size = Pt(12)
+
+    doc.save(buffer)
+
+    # Move to the beginning of the BytesIO buffer
+    buffer.seek(0)
+
+    # Convert the Word document to base64
+    word_bytes = buffer.read()
+    word_base64 = base64.b64encode(word_bytes).decode("utf-8")
+
+    file_type = "docx"
+    file_name = "IP Validity Analysis Report"
+
+    # Insert the base64 Word document into the database
+    await insert_file_to_db(
+        word_base64, requirement_gathering_id, user_case_id, file_type, file_name
+    )
+
+
+async def insert_file_to_db(
+    pdf_base64: str,
+    requirement_gathering_id: str,
+    user_case_id: str,
+    file_type: str,
+    file_name: str,
+):
+    query_status = """
+     SELECT index FROM report_file_status WHERE requirement_gathering_id = %s AND use_case_id = %s;
+    """
+    values_status = (requirement_gathering_id, user_case_id)
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(query_status, values_status)
+        status_index = cur.fetchone()
+        cur.close()
+
+        if not status_index:
+            raise HTTPException(status_code=404, detail="Report file status not found.")
+
+        query = """
+        INSERT INTO report_file (requirement_gathering_id, use_case_id, file, file_type, file_name, report_file_status_id)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            requirement_gathering_id,
+            user_case_id,
+            pdf_base64,
+            file_type,
+            file_name,
+            status_index[0],
+        )
+
+        cur = conn.cursor()
+        cur.execute(query, values)
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"Database operation failed: {str(e)}"
+        )
+    finally:
+        conn.close()
+
+
+async def get_report_file(
+    requirement_gathering_id: int, user_case_id: str, file_type: str
+):
+    query = """
+    SELECT file, file_type,file_name
+    FROM report_file
+    WHERE requirement_gathering_id = %s AND use_case_id = %s AND file_type = %s;
+    """
+    values = (requirement_gathering_id, user_case_id, file_type)
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(query, values)
+        result = cur.fetchone()
+        if result:
+            file_base64 = base64.b64encode(result[0]).decode("utf-8")
+            report = {
+                "file": file_base64,
+                "file_type": result[1],
+                "file_name": result[2],
+            }
+            return report
+        else:
+            raise HTTPException(status_code=404, detail="Report not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error fetching report: {e}")
+    finally:
+        conn.close()

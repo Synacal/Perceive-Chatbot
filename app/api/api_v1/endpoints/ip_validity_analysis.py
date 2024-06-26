@@ -13,6 +13,7 @@ from app.services.ip_validity_analysis.common import (
     add_report,
     get_summary,
     create_report_background,
+    get_report_file,
 )
 
 router = APIRouter()
@@ -85,4 +86,16 @@ async def ip_validity_analysis(
         # Return summary and status as "in progress" immediately
         return {"summary": summary, "status": "in progress"}
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/ip_validity_analysis/")
+async def get_report(requirement_gathering_id: int, user_case_id: str, file_type: str):
+    try:
+        report = await get_report_file(
+            requirement_gathering_id, user_case_id, file_type
+        )
+        return report
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))

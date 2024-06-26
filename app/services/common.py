@@ -168,6 +168,52 @@ async def get_report_by_user_id(UserID: str):
             conn.close()
 
 
+async def get_content_summary(requirement_gathering_id):
+    query = """
+    SELECT content FROM attachment WHERE requirement_gathering_id = %s
+    """
+    values = (requirement_gathering_id,)
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, values)
+        result = cur.fetchone()
+
+        if result:
+            system_Prompt = f"""
+            Summarize the content of the attached document. Ensure the summary is concise and under 150 words.
+            """
+            message_text = [
+                {"role": "system", "content": system_Prompt},
+                {"role": "user", "content": result[0]},
+            ]
+
+            completion = client.chat.completions.create(
+                model="gpt-35-turbo",
+                messages=message_text,
+                temperature=0.7,
+                max_tokens=800,
+                top_p=0.95,
+                frequency_penalty=0,
+                presence_penalty=0,
+                stop=None,
+            )
+
+            content = completion.choices[0].message.content
+            return content
+        else:
+            return ""
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
 async def get_report_id(requirement_gathering_id, category_id):
     query = """
     SELECT report_id FROM requirements_gathering WHERE requirement_gathering_id = %s AND user_case_id = %s
@@ -375,14 +421,8 @@ async def get_answers_with_questions(requirement_gathering_id, use_case_id):
 
 async def get_summary_data(qa_pairs):
     prompt = f"""
-    Summarize the key points of an innovation based on the following details. 
-    Following details are on user's responses from the database for the predefined set 
-    of questions relevant to their innovation.
-    - Summarize the product or technology that has been developed, emphasizing its purpose and target industry.
-    - Describe in detail the technical aspects and the unique features of the innovation. Highlight how these features contribute to novelty within its field.
-    - Explain the innovation's business model, focusing on primary and potential revenue streams.
-    - Outline the company’s strategy for patent filing, including geographic focus and any prior art or existing patents that have been identified.
-    - Discuss how the innovation meets the criteria for novelty and non-obviousness, which are crucial for IP validity
+    Summarize the key points from the following user's responses to pre-defined questions. 
+    Ensure the summary is concise and under 80 words.
 
     User provided answers for set of pre-defined questions: 
     {qa_pairs}

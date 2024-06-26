@@ -192,7 +192,6 @@ shortuuid==1.0.13
 
 scikit-learn==1.5.0
 
-
 python-pptx==0.6.21
 python-docx==0.8.11
 
@@ -200,3 +199,4 @@ python-docx==0.8.11
 requests==2.31.0
 beautifulsoup4==4.12.3
 
+reportlab==4.2.2
