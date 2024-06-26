@@ -662,3 +662,34 @@ async def insert_file_to_db(
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
+
+
+async def get_report_file(
+    requirement_gathering_id: int, user_case_id: str, file_type: str
+):
+    query = """
+    SELECT file, file_type,file_name
+    FROM report_file
+    WHERE requirement_gathering_id = %s AND use_case_id = %s AND file_type = %s;
+    """
+    values = (requirement_gathering_id, user_case_id, file_type)
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(query, values)
+        result = cur.fetchone()
+        if result:
+            file_base64 = base64.b64encode(result[0]).decode("utf-8")
+            report = {
+                "file": file_base64,
+                "file_type": result[1],
+                "file_name": result[2],
+            }
+            return report
+        else:
+            raise HTTPException(status_code=404, detail="Report not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error fetching report: {e}")
+    finally:
+        conn.close()
