@@ -16,6 +16,13 @@ import json
 
 from app.models.ip_license_process import PatentResult, PatentList, PatentData
 
+from app.services.ip_license_process.prompt1 import prompt1
+from app.services.ip_license_process.prompt2 import prompt2
+from app.services.ip_license_process.prompt3 import prompt3
+from app.services.ip_license_process.prompt4 import prompt4
+from app.services.ip_license_process.prompt5 import prompt5
+from app.services.ip_license_process.prompt6 import prompt6
+
 
 async def search_patents_ids(keywords: List[str]) -> List[int]:
     try:
@@ -108,7 +115,7 @@ async def search_patents(patents: List[PatentResult], description: str) -> Paten
     return top_10_patent_ids
 
 
-async def get_answers(requirement_gathering_id, user_case_id):
+async def get_answers_license(requirement_gathering_id, user_case_id):
     conn = None
     try:
         conn = get_db_connection()
@@ -292,7 +299,7 @@ async def get_answers(requirement_gathering_id, user_case_id):
             conn.close()
 
 
-async def get_summary(answers):
+async def get_summary_license(answers):
     system_prompt = f"Summarize the following text: {answers}"
     try:
         messages = [
@@ -320,7 +327,7 @@ async def get_summary(answers):
         )
 
 
-async def get_keywords(answers):
+async def get_keywords_license(answers):
     system_prompt = f"Extract exactly 2 general product-related keywords from the following text. Ensure these are broad terms like 'satellite' or 'motor' and not specific names, companies, or places. Separate them with a comma: {answers}"
     try:
         messages = [
@@ -420,8 +427,9 @@ async def get_patent_data(patents: List[str]) -> List[PatentData]:
             conn.close()
 
 
+"""
 async def create_report(summary: str, patent_data: List[PatentData]):
-    system_prompt = f"""Develop an IP Licensing Strategy focusing on the following aspects:
+    system_prompt = fDevelop an IP Licensing Strategy focusing on the following aspects:
 
         How to Create an IP Licensing Strategy Leveraging Past History:
 
@@ -457,7 +465,7 @@ async def create_report(summary: str, patent_data: List[PatentData]):
 
         Data: {patent_data}
         Note: don't make something vague, make it all clear
-        """
+        
 
     message_text = [
         {"role": "system", "content": system_prompt},
@@ -489,3 +497,27 @@ async def create_report(summary: str, patent_data: List[PatentData]):
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")
         return None
+"""
+
+
+async def create_report(
+    summary: str, patent_data: List[PatentData], license_criteria: str
+):
+    try:
+        if license_criteria == "prompt1":
+            license_report = await prompt1(summary, patent_data)
+        elif license_criteria == "prompt2":
+            license_report = await prompt2(summary, patent_data)
+        elif license_criteria == "prompt3":
+            license_report = await prompt3(summary, patent_data)
+        elif license_criteria == "prompt4":
+            license_report = await prompt4(summary, patent_data)
+        elif license_criteria == "prompt5":
+            license_report = await prompt5(summary, patent_data)
+        elif license_criteria == "prompt6":
+            license_report = await prompt6(summary, patent_data)
+        else:
+            pass
+        return license_report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

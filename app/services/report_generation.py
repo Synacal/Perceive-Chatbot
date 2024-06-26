@@ -15,6 +15,15 @@ from app.services.ip_validity_analysis.common import (
     get_answers,
 )
 
+from app.services.ip_license_process.common import (
+    get_answers_license,
+    get_summary_license,
+    get_keywords_license,
+    search_patents_ids,
+    get_patent_data,
+    create_report,
+)
+
 
 async def generate_reports(requirement_gathering_id: int):
     try:
@@ -123,8 +132,76 @@ async def generate_report_1(requirement_gathering_id, user_case_id):
 
 
 async def generate_report_2(requirement_gathering_id, user_case_id):
-    print(f"Generating report for user_case_id {user_case_id}")
-    pass
+    try:
+        answers = await get_answers_license(requirement_gathering_id, user_case_id)
+        summary = await get_summary_license(answers)
+        keywords = await get_keywords_license(answers)
+        patents_ids = await search_patents_ids(keywords)
+        patent_data = await get_patent_data(patents_ids)
+
+        license_criteria = [
+            "prompt1",
+            "prompt2",
+            "prompt3",
+            "prompt4",
+            "prompt5",
+            "prompt6",
+        ]
+
+        report = {}
+
+        for i in range(len(license_criteria)):
+            assessment = await create_report(
+                summary,
+                patent_data,
+                license_criteria[i],
+            )
+            report[license_criteria[i]] = assessment
+
+        # Convert report dictionary to JSON string
+        report_str = str(report)
+
+        await create_word_document(
+            report_str,
+            requirement_gathering_id,
+            user_case_id,
+        )
+
+        await create_pdf_document(
+            report_str,
+            requirement_gathering_id,
+            user_case_id,
+        )
+
+        await add_report(
+            report_str,
+            requirement_gathering_id,
+            user_case_id,
+        )
+        print("Report generated successfully.")
+        return report
+    except Exception as e:
+        print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
+        query_file_status = """
+        INSERT INTO report_file_status (status,description,requirement_gathering_id, user_case_id)
+        VALUES (%s, %s, %s, %s)
+        """
+        query_file_status_params = (
+            "failed",
+            str(e),
+            requirement_gathering_id,
+            user_case_id,
+        )
+        conn = get_db_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute(query_file_status, query_file_status_params)
+            conn.commit()
+            cur.close()
+        except Exception as e:
+            print(f"Error in updating file status: {str(e)}")
+        finally:
+            conn.close()
 
 
 async def generate_report_3(requirement_gathering_id, user_case_id):
