@@ -200,3 +200,8 @@ requests==2.31.0
 beautifulsoup4==4.12.3
 
 reportlab==4.2.2
+pdfkit==1.0.0
+markdown==3.6
+docx==0.2.4
+cobble==0.1.4 
+mammoth==1.8.0
