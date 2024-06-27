@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 
 router = APIRouter()
 
@@ -7,10 +7,14 @@ from app.services.report_generation import generate_reports
 from app.models.report_generation import ReportParams
 
 
-@router.get("/report_generation/")
-async def generate_report(report_params: ReportParams):
+@router.post("/report_generation/")
+async def generate_report_endpoint(
+    report_params: ReportParams, background_tasks: BackgroundTasks
+):
     try:
-        response_data = await generate_reports(report_params.requirement_gathering_id)
+        response_data = await generate_reports(
+            report_params.requirement_gathering_id, background_tasks
+        )
         return response_data
     except HTTPException as e:
         raise e

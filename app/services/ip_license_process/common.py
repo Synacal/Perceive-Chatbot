@@ -389,7 +389,8 @@ async def get_patent_data(patents: List[str]) -> List[PatentData]:
             ah.frame_no,
             ah.last_update_date,
             ah.recorded_date,
-            pae.name;
+            pae.name
+        LIMIT 20;
         """
         cur.execute(query, (patents,))
         results = cur.fetchall()

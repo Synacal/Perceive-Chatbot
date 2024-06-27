@@ -452,17 +452,19 @@ async def get_keywords(answers):
 async def add_report(report_str, requirement_gathering_id, user_case_id):
     query = """
     INSERT INTO reports (requirement_gathering_id, user_case_id, report)
-    VALUES %s
+    VALUES (%s, %s, %s)
     """
-    values = [(requirement_gathering_id, user_case_id, report_str)]
+    values = (requirement_gathering_id, user_case_id, report_str)
+
     conn = get_db_connection()
     try:
         cur = conn.cursor()
         cur.execute(query, values)
-        conn.commit()
+
+        conn.commit()  # Commit only after both operations succeed
         cur.close()
     except Exception as e:
-        conn.rollback()
+        conn.rollback()  # Rollback if any exception occurs
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
@@ -683,6 +685,12 @@ async def insert_file_to_db(
         query = """
         INSERT INTO report_file (requirement_gathering_id, use_case_id, file, file_type, file_name, report_file_status_id)
         VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id, file_type)
+        DO UPDATE SET
+            file = EXCLUDED.file,
+            file_type = EXCLUDED.file_type,
+            file_name = EXCLUDED.file_name,
+            report_file_status_id = EXCLUDED.report_file_status_id
         """
         values = (
             requirement_gathering_id,
@@ -693,8 +701,16 @@ async def insert_file_to_db(
             status_index[0],
         )
 
+        query_status = """
+        UPDATE report_file_status
+        SET status = 'completed'
+        WHERE requirement_gathering_id = %s AND use_case_id = %s;
+        """
+        values_status = (requirement_gathering_id, user_case_id)
+
         cur = conn.cursor()
         cur.execute(query, values)
+        cur.execute(query_status, values_status)
         conn.commit()
         cur.close()
     except Exception as e:

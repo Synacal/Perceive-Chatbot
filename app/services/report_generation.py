@@ -25,7 +25,10 @@ from app.services.ip_license_process.common import (
 )
 
 
-async def generate_reports(requirement_gathering_id: int):
+async def generate_reports(
+    requirement_gathering_id: int, background_tasks: BackgroundTasks
+):
+
     try:
         query_use_cases = """
         SELECT user_case_id FROM requirements_gathering WHERE requirement_gathering_id = %s
@@ -42,16 +45,21 @@ async def generate_reports(requirement_gathering_id: int):
                 status_code=400, detail="Invalid requirement_gathering_id"
             )
 
-        background_tasks = BackgroundTasks()
-        for use_case in use_cases:
+        print("1.1")
+        for i, use_case in enumerate(use_cases):
+            print(f"Iteration {i}")
             background_tasks.add_task(
                 generate_report, requirement_gathering_id, use_case[0]
             )
 
+        print("1.2")
         answers = await get_answers_by_req_id(requirement_gathering_id)
         summary = await get_summary(answers)
         return {"summary": summary, "status": "in progress"}
     except Exception as e:
+        print(
+            f"Error in background task for requirement_gathering_id {requirement_gathering_id}: {str(e)}"
+        )
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -96,7 +104,7 @@ async def get_answers_by_req_id(requirement_gathering_id):
             """
             values = (requirement_gathering_id,)
         else:
-            raise HTTPException(status_code=400, detail="Invalid type_id")
+            raise HTTPException(status_code=400, detail="Invalid typeeeeee_id")
         cur.execute(query, values)
         result = cur.fetchall()
 
@@ -114,15 +122,22 @@ async def get_answers_by_req_id(requirement_gathering_id):
 
 async def generate_report(requirement_gathering_id, user_case_id):
     try:
-        if user_case_id == "1":
+        if user_case_id == "2":
+            print("2.1")
             await generate_report_1(requirement_gathering_id, user_case_id)
-        elif user_case_id == "2":
+            print("2.2")
+        elif user_case_id == "1":
+            print("2.3")
             await generate_report_2(requirement_gathering_id, user_case_id)
+            print("2.4")
         elif user_case_id == "3":
+            print("2.5")
             await generate_report_3(requirement_gathering_id, user_case_id)
+            print("2.6")
         else:
             pass
     except Exception as e:
+        print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -133,6 +148,24 @@ async def generate_report_1(requirement_gathering_id, user_case_id):
 
 async def generate_report_2(requirement_gathering_id, user_case_id):
     try:
+        query_file_status = """
+        INSERT INTO report_file_status (status, requirement_gathering_id, use_case_id)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id)
+        DO UPDATE SET
+            status = EXCLUDED.status
+        """
+        values_file_status = (
+            "in progress",
+            requirement_gathering_id,
+            user_case_id,
+        )
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query_file_status, values_file_status)
+        conn.commit()
+        cur.close()
+
         answers = await get_answers_license(requirement_gathering_id, user_case_id)
         summary = await get_summary_license(answers)
         keywords = await get_keywords_license(answers)
@@ -183,7 +216,7 @@ async def generate_report_2(requirement_gathering_id, user_case_id):
     except Exception as e:
         print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
         query_file_status = """
-        INSERT INTO report_file_status (status,description,requirement_gathering_id, user_case_id)
+        INSERT INTO report_file_status (status,description,requirement_gathering_id, use_case_id)
         VALUES (%s, %s, %s, %s)
         """
         query_file_status_params = (
@@ -207,17 +240,20 @@ async def generate_report_2(requirement_gathering_id, user_case_id):
 async def generate_report_3(requirement_gathering_id, user_case_id):
     try:
         query_file_status = """
-         INSERT INTO report_file_status (status,requirement_gathering_id, user_case_id)
-            VALUES (%s, %s, %s)
-            """
-        query_file_status_params = (
+        INSERT INTO report_file_status (status, requirement_gathering_id, use_case_id)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id)
+        DO UPDATE SET
+            status = EXCLUDED.status
+        """
+        values_file_status = (
             "in progress",
             requirement_gathering_id,
             user_case_id,
         )
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute(query_file_status, query_file_status_params)
+        cur.execute(query_file_status, values_file_status)
         conn.commit()
         cur.close()
 
@@ -253,7 +289,7 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
 
         # Convert report dictionary to JSON string
         # report_str = str(report)
-        report_str = dict_to_formatted_string(report)
+        report_str = str(report)
 
         await create_word_document(
             report_str,
@@ -276,7 +312,7 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
     except Exception as e:
         print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
         query_file_status = """
-        INSERT INTO report_file_status (status,description,requirement_gathering_id, user_case_id)
+        INSERT INTO report_file_status (status,description,requirement_gathering_id, use_case_id)
         VALUES (%s, %s, %s, %s)
         """
         query_file_status_params = (
