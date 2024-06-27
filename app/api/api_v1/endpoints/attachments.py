@@ -100,7 +100,6 @@ async def add_attachment_answer(
     user_case_id: str,
 ):
     try:
-        print("1")
         response_data = await check_user_attachment_answer(
             answer, QuestionID, userID, requirement_gathering_id, user_case_id
         )

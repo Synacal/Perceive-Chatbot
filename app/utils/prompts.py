@@ -266,19 +266,58 @@ prompts = [
     "Verify the response identifies the sales and distribution channels the company uses or plans to use, explaining the choice and how these channels align with the company’s overall sales and marketing strategy.",
     "Ensure the answer provides an analysis of the competitive landscape, including direct and indirect competitors. It should evaluate how the company's offering compares in terms of features, pricing, and quality, and discuss strategies for differentiation and market positioning.",
     # Market analysis
-    "Check if the response describes how a company assesses the impact of global market drivers and restraints on its product development and marketing strategies using economic indicators, consumer trends, and regulatory changes to adapt strategies, forecast demand, adjust pricing strategies, guide product development, and ensure compliance for market entry and sustained operations.",
-    "Evaluate if the response describes a recent strategic decision made by a company in response to the projected market growth in wearable technology, explains the rationale behind the decision focusing on investing in AI and machine learning capabilities, driven by consumer demand for personalized health insights, and aims to provide superior functionality and customization to set products apart in the market.",
-    "Confirm if the response defines a company's primary target market within the wearable technology industry as health-conscious consumers aged 25 to 45, tech-savvy individuals with disposable income, explains data-driven methods used to segment the customer base such as cluster analysis techniques on demographic, behavioral, and psychographic factors, and outlines how these methods lead to targeted marketing strategies and product offerings.",
-    "Verify if the response lists key factors influencing purchasing decisions for customers like functionality and accuracy of health tracking, aesthetic design, perceived value of AI features, and customer testimonials, and explains how consumer feedback has shaped the development of new features in products like enhanced sleep tracking, stress management tools, and integration with third-party health applications.",
-    "Check if the response describes the competitive advantages of a company's latest wearable device compared to its main competitors such as real-time mood assessment using EEG signals, adaptive learning algorithms, and unique health monitoring and customization features, and explains the role of intellectual property in the product differentiation strategy focusing on protecting unique neuro-adaptive technologies and maintaining a competitive edge through patents.",
-    "Assess if the response explains a company's pricing strategy for its flagship product, using a value-based pricing strategy set at $299, justifies the pricing reflecting advanced technology and health benefits compared to competitors, discusses sales revenue and customer base expansion targets for the next five years, customer acquisition and engagement targets, and long-term customer retention targets with specific metrics for success measurement.",
-    "Evaluate if the response includes a detailed description of a company's business model, revenue streams, and cost structure focusing on the revenue model, product pricing, subscription models, future monetization plans, customer lifecycle value, strategies for scaling the business model, primary and secondary revenue streams, revenue diversification plans, cost optimization strategies, gross and net profit margins discussion, and plans for achieving and maintaining profitability.",
-    "Confirm if the response outlines a company's sales and distribution channels including primary and secondary channels, strategies for optimizing each channel, partnerships and collaborations for distribution, balancing direct sales with retail or partner sales, adaptation to different market or regional channels, competitive landscape identification of direct and indirect competitors, comparative analysis of product features and pricing, strategy for competitive differentiation, plans to address competition and market challenges, and methods for tracking and responding to competitive moves.",
-    "Check if the response provides a comprehensive explanation of a company's competitive advantage, including clear identification of competitors, specific features that outperform the competition, data analysis and interpretation capabilities, unique selling propositions (USPs), and any proprietary technology or intellectual property that contributes to its competitive edge.",
-    "Verify the completeness of the response regarding a company's pricing analysis and revenue streams, ensuring it includes details on the primary and secondary revenue streams-based pricing strategy for the flagship product, justification of the pricing model, comparison with competitor pricing, reflection of the value proposition in the pricing, any tiered pricing or discount strategies, and future revenue growth projections.",
-    "Evaluate the response on a company's future sales and market expansion targets, focusing on the sales revenue and customer base expansion targets for the next five years, especially in emerging markets. Confirm if the response provides specific growth rates, targets for revenue and customer base expansion, strategies for achieving these targets, and considerations for emerging markets in Asia and South America.",
-    "Check if the response outlines a company's customer acquisition and engagement targets for the upcoming year, including the number of new users targeted, demographic focus, key metrics used to measure success such as cost per acquisition (CPA), conversion rates, and initial user engagement levels.",
-    "Confirm the response regarding a company's long-term customer retention targets and effectiveness measurement, ensuring it includes targets for annual customer retention rate over the next five years, methods for tracking retention metrics such as churn rate, customer satisfaction scores, and renewal rates, and strategies for maintaining high customer retention levels.",
+    f"""Ensure the response includes the following aspects related to how a company measures its success in aligning with market dynamics and industry trends:
+
+            Description of the problem the product solves: Does the response explain the core issue the product addresses in the market?
+            Explanation of how the product addresses the problem: Is there a clear explanation of how the product meets market needs or challenges?
+            Examples of user scenarios or pain points: Are specific examples provided that illustrate why customers would seek out the product?
+            Differentiation from traditional solutions: Does the response highlight how the product distinguishes itself from existing market solutions or competitors?
+            Evidence of the product's effectiveness: Is there evidence or metrics provided that demonstrate how the product evaluates its market impact and effectiveness?
+
+        Use these points to verify if the response comprehensively addresses how the company assesses its alignment with market dynamics and industry trends.""",
+    # 44
+    f"""Check if the response includes the following aspects related to how a company assesses the impact of global market drivers and restraints:
+
+            Economic Indicators: Does the response describe how the company monitors global economic trends like inflation rates and consumer spending patterns to forecast demand and adjust pricing strategies?
+            Consumer Trends: Is there an explanation of how ongoing market research helps the company track changes in consumer preferences and technology adoption rates, guiding product development and feature prioritization?
+            Regulatory Changes: Does the response detail how the company keeps abreast of new regulations in key markets and adapts compliance strategies to ensure seamless market entry and sustained operations?
+
+        Use these points to verify if the response comprehensively covers how the company adapts its strategies based on global market drivers and restraints.""",
+    # 45
+    f"""Check if the response includes the following aspects related to a recent strategic decision:
+            1. Description of the strategic decision: Does the response describe the specific decision made?
+            2. Rationale behind the decision: Is there an explanation of why this decision was made, including relevant data and projections?
+            3. Expected outcomes: Does the response mention the anticipated benefits or goals of the decision?""",
+    f"""Check if the response includes the following aspects related to the primary target market:
+            1. Target demographic: Does the response clearly define the age range, lifestyle, and income level of the target market?
+            2. Reasons for targeting this market: Is there an explanation of why this demographic is significant?""",
+    f"""Check if the response includes the following aspects related to customer segmentation methods:
+            1. Data-driven methods: Does the response describe the techniques used, such as cluster analysis?
+            2. Types of data used: Is there a mention of the specific data factors considered, like demographic, behavioral, and psychographic?""",
+    f"""Check if the response includes the following aspects related to factors influencing customers' purchasing decisions:
+            1. Key factors: Does the response identify the main factors that influence purchasing decisions?
+            2. Supporting evidence: Are there examples or evidence supporting these factors, such as customer testimonials or expert reviews?""",
+    f"""Check if the response includes the following aspects related to the impact of consumer feedback on product development:
+            1. Specific features developed: Does the response list the new features developed based on feedback?
+            2. Connection to consumer needs: Is there an explanation of how these features address evolving consumer needs?""",
+    f"""Check if the response includes the following aspects related to competitive advantages:
+            1. Unique features: Does the response describe the distinctive features of the latest product?
+            2. Comparison to competitors: Is there a comparison showing how these features set the product apart from competitors?""",
+    f"""Check if the response includes the following aspects related to the role of intellectual property:
+            1. Importance of IP: Does the response explain the significance of intellectual property in the company's strategy?
+            2. Specific patents or technologies: Are specific patents or proprietary technologies mentioned?""",
+    f"""Check if the response includes the following aspects related to the pricing strategy:
+            1. Primary and secondary revenue streams: Does the response identify the primary and secondary revenue streams?
+            2. Rationale for pricing: Is there an explanation of why the current pricing strategy was chosen?""",
+    f"""Check if the response includes the following aspects related to sales revenue and customer base expansion targets:
+            1. Revenue targets: Does the response state the sales revenue targets for the next five years?
+            2. Customer base expansion: Are there specific targets for customer base growth, especially in emerging markets?""",
+    f"""Check if the response includes the following aspects related to customer acquisition targets:
+            1. Acquisition targets: Does the response mention the specific number of new users the company aims to acquire?
+            2. Key metrics: Are the key metrics for measuring success identified?""",
+    f"""Check if the response includes the following aspects related to customer retention targets:
+            1. Retention targets: Does the response state the long-term customer retention rate goals?
+            2. Measurement of effectiveness: Are the methods for measuring retention effectiveness described?""",
     # M&A strategy report
     f"""
     Define your strategic goals for M&A activities, outlining how these goals align with your overall business objectives. Explain the specific technologies or capabilities you aim to acquire and the expected outcomes from these strategic M&A initiatives.
@@ -335,257 +374,95 @@ prompts = [
 
     """,
     # Competitive landscape
-    f"""
-    Analyze historical market share changes over the past five years, compare key factors influencing market share and revenue growth, and project future market share using prediction models and underlying assumptions.
-
-    Completeness Checklist:
-    o Historical data on market share changes over the past five years
-    o Analysis of key factors influencing market share and revenue growth
-    o Future market share prediction models and underlying assumptions
-
-    """,
-    f"""
-    Evaluate brand positioning strategies among competitors, distinguish metrics used to measure customer loyalty and brand equity, and assess brand perception in the market through detailed analysis.
-
-    Completeness Checklist:
-    o Detailed comparison of brand positioning strategies among competitors
-    o Metrics used to measure customer loyalty and brand equity
-    o Analysis of brand perception in the market
-
-    """,
-    f"""
-    Investigate financial performance trends such as revenue, profit margins, and expenditures, compare investments in innovation and customer acquisition, and summarize the financial risk profiles of major competitors.
-
-    Completeness Checklist:
-    o Financial performance trends including revenue, profit margins, and expenditures
-    o Comparative analysis of investments in innovation and customer acquisition
-    o Financial risk profiles for each major competitor
-
-    """,
-    f"""
-    Catalog recent significant innovations introduced by your company and competitors, assess the patents and intellectual property landscape, and compare the impact of these innovations on market dynamics.
-
-    Completeness Checklist:
-    o List of recent significant innovations introduced by the company and competitors
-    o Patents and intellectual property landscape analysis
-    o Assessment of the impact of these innovations on market dynamics
-
-    """,
-    f"""
-    Measure sales performance metrics and evaluate the effectiveness of distribution channels. Compare online and offline sales strategies and provide insights into unique sales tactics and their impact on the market.
-
-    Completeness Checklist:
-    o Evaluation of sales performance metrics and effectiveness of distribution channels
-    o Comparative analysis of online and offline sales strategies
-    o Insights into unique sales tactics and their market impact
-
-    """,
-    f"""
-    Analyze the comparative effectiveness of marketing strategies and campaign outcomes. Measure metrics for campaign reach and consumer engagement, and conduct a detailed content analysis of marketing materials and communication strategies.
-
-    Completeness Checklist:
-    o Comparative analysis of marketing strategies and campaign effectiveness
-    o Metrics measuring campaign reach and consumer engagement
-    o Content analysis for marketing materials and communication strategies
-
-    
-    """,
-    f"""
-    Forecast future strategic decisions by competitors, plan scenario responses, and anticipate market positioning through a historical review of strategic moves and outcomes.
-
-    Completeness Checklist:
-    o Historical review of strategic moves and their outcomes
-    o Forecasting of future strategic decisions by competitors
-    o Scenario planning for strategic responses
-
-    
-    """,
-    f"""
-    Assess supply chain robustness and agility across competitors, benchmark operational efficiencies and production costs, and optimize key performance indicators relevant to supply chain and operations.
-
-    Completeness Checklist:
-    o Comparison of supply chain robustness and agility across competitors
-    o Analysis of operational efficiencies and production costs
-    o Benchmarking of key performance indicators (KPIs) relevant to supply chain and operations
-
-    """,
-    f"""
-    Survey customer experience metrics across competitors, compare the effectiveness of customer support strategies, and analyze the Net Promoter Score (NPS) and customer satisfaction index (CSI) for comprehensive insights.
-
-    Completeness Checklist:
-    o Detailed comparison of customer experience metrics across competitors
-    o Analysis of customer support strategies and their effectiveness
-    o Net Promoter Score (NPS) and customer satisfaction index (CSI) comparison
-
-    """,
-    f"""
-    Review existing and potential strategic alliances, evaluate synergy effects from partnerships, and strategize on the impact of these alliances on competitive positioning.
-
-    Completeness Checklist:
-    o Review of existing and potential strategic alliances
-    o Analysis of the synergy effects from partnerships
-    o Evaluation of partnership strategies on competitive positioning
-
-    """,
-    f"""
-    Identify comprehensive risk analysis from competitive actions, assess potential threats and their expected impact, and evaluate the company’s vulnerability to competitive moves through effective risk management strategies.
-
-    Completeness Checklist:
-    o Comprehensive risk analysis from competitive actions
-    o Identification of potential threats and their expected impact
-    o Assessment of the company’s vulnerability to competitive moves
-
-    """,
+    f"""Check if the response includes the following aspects related to changes in market share:
+            1. Market share change: Does the response mention the percentage change in market share over the past five years?
+            2. Key factors: Are the main factors contributing to this change, such as market expansion and product launches, identified?""",
+    f"""Check if the response includes the following aspects related to brand positioning strategies:
+            1. Brand positioning focus: Does the response describe the company's brand positioning strategies?
+            2. Differentiation: Is there a comparison showing how these strategies differ from those of main competitors?
+            3. Impact: Are the effects of these strategies on brand perception or other metrics mentioned?""",
+    f"""Check if the response includes the following aspects related to financial performance trends:
+            1. Revenue growth: Does the response provide details on the company's revenue growth rate over the last few years?
+            2. Profit margins: Are there details on profit margin trends?
+            3. Comparison to competitors: Is the company's performance compared to industry averages or main competitors?""",
+    f"""Check if the response includes the following aspects related to recent innovations:
+            1. Significant innovations: Does the response describe the most significant recent innovations developed by the company?
+            2. Comparison to competitors: Is there a comparison of these innovations to those of competitors?""",
+    f"""Check if the response includes the following aspects related to sales channel effectiveness:
+            1. Assessment methods: Does the response explain how the company assesses the effectiveness of its sales channels?
+            2. Unique strategies: Are unique strategies mentioned that differentiate the company from competitors?
+            3. Impact: Is there evidence or metrics showing the impact of these strategies?""",
+    f"""Check if the response includes the following aspects related to marketing campaign engagement:
+            1. Unique aspects: Does the response describe the unique aspects of recent marketing campaigns?
+            2. Engagement comparison: Is there a comparison of consumer engagement with that of competitors?""",
+    f"""Check if the response includes the following aspects related to strategic moves for competitiveness:
+            1. Recent strategic moves: Does the response detail recent strategic moves made by the company?
+            2. Anticipated outcomes: Is there an explanation of how these moves are expected to position the company against future competitor actions?""",
+    f"""Check if the response includes the following aspects related to supply chain strengths and weaknesses:
+            1. Strengths: Does the response describe the strengths of the company's supply chain?
+            2. Weaknesses: Are the weaknesses of the supply chain also mentioned?
+            3. Comparison to competitors: Is there a comparison of these strengths and weaknesses to those of key competitors?""",
+    f"""Check if the response includes the following aspects related to customer satisfaction strategies:
+            1. Specific strategies: Does the response detail the specific strategies employed to enhance customer satisfaction?
+            2. Comparison to competitors: Is there a comparison showing how these strategies differ from those of competitors?
+            3. Impact: Are there metrics or evidence showing the impact of these strategies on customer satisfaction?""",
+    f"""Check if the response includes the following aspects related to strategic alliances:
+            1. Significant alliances: Does the response describe the most impactful strategic alliances formed by the company?
+            2. Competitive positioning: Is there an explanation of how these alliances have affected the company's competitive positioning?""",
+    f"""Check if the response includes the following aspects related to risks from competitive actions:
+            1. Significant risks: Does the response identify the most significant risks the company faces from competitive actions?
+            2. Risk management: Is there an explanation of how the company is managing these risks?""",
     # Regulatory pathways
-    f"""
-    Identify and describe regulatory environments across key markets (USA, EU, Asia), including specific regulatory challenges and adaptation strategies to meet market regulations.
-
-    Completeness Checklist:
-    o Identification and comparison of regulatory environments across key markets
-    o Market-specific regulatory challenges and differences
-    o Adaptation strategies to meet specific market regulations
-
-    """,
-    f"""
-    Detail areas affected by regulations such as marketing and manufacturing, explain specific operational adjustments required for compliance, and illustrate the impact on business timelines and costs.
-
-    Completeness Checklist:
-    o Areas affected by regulations (e.g., marketing, manufacturing)
-    o Specific operational adjustments required to comply
-    o Analysis of impact on business timelines and costs
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-
-    Completeness Checklist:
-    o Identification of key regulatory risks by market and industry
-    o Mitigation strategies and risk management plans
-    o Examples of successfully implemented mitigation measures
-
-    """,
-    f"""
-    Implement quality standards such as ISO, maintain robust quality management systems, and ensure effective monitoring practices to guarantee product safety and quality.
-
-    Completeness Checklist:
-    o Quality standards adhered to (e.g., ISO 13485)
-    o Quality management systems and monitoring practices
-    o Examples of processes ensuring product safety and quality
-
-    """,
-    f"""
-    Analyze emerging trends and future regulatory environments, predict anticipated regulatory changes and their implications, and prepare planned strategies for adapting to future regulations.
-
-    Completeness Checklist:
-    o Analysis of emerging trends and future regulatory environments
-    o Anticipated regulatory changes and their implications
-    o Planned strategies for adapting to future regulations
-
-    """,
-    f"""
-    Outline current regulatory challenges impacting operations, address strategies developed to tackle these challenges, and explain proactive and reactive measures implemented to ensure compliance and mitigate impacts.
-
-    Completeness Checklist:
-    o Outline of current regulatory challenges impacting operations
-    o Strategies developed to tackle these challenges
-    o Proactive and reactive measures implemented
-
-    """,
-    f"""
-    Set specific future regulatory goals, outline steps planned to achieve these goals, and establish metrics for measuring progress and success in regulatory compliance.
-
-    Completeness Checklist:
-    o Setting of specific future regulatory goals
-    o Steps planned to achieve these goals
-    o Metrics for measuring progress and success
-
-    """,
-    f"""
-    Engage regulatory bodies through active consultation in product development stages, collaborate with authorities on compliance issues, and describe influence exerted on regulatory frameworks and guidance.
-
-    Completeness Checklist:
-    o Methods for engaging with regulatory bodies
-    o Examples of collaboration with authorities for compliance
-    o Influence exerted on regulatory frameworks and guidance
-
-    """,
+    f"""Check if the response includes the following aspects related to regulatory challenges and pathways in key markets:
+            1. Regulatory challenges: Does the response identify the specific regulatory challenges in key markets such as the USA, EU, and Asia?
+            2. Regulatory pathways: Is there a description of how the company navigates these regulatory challenges?""",
+    f"""Check if the response includes the following aspects related to operational adjustments for regulatory compliance:
+            1. Operational adjustments: Does the response describe the adjustments made to comply with international regulations?
+            2. Impact: Is there an explanation of how these adjustments have impacted go-to-market timelines, costs, and marketing strategies?""",
+    f"""Check if the response includes the following aspects related to regulatory risks and mitigation strategies:
+            1. Major risks: Does the response identify the major regulatory risks the company faces?
+            2. Mitigation strategies: Is there an explanation of the strategies implemented to mitigate these risks?""",
+    f"""Check if the response includes the following aspects related to quality management systems:
+            1. Quality management systems: Does the response describe the quality management systems implemented to satisfy regulatory requirements?
+            2. Compliance: Is there a mention of specific standards such as ISO 13485 and how they ensure continuous compliance and quality assurance?""",
+    f"""Check if the response includes the following aspects related to emerging regulatory trends:
+            1. Emerging trends: Does the response identify emerging regulatory trends that could impact the market?
+            2. Response plan: Is there a description of how the company plans to respond to these trends?""",
+    f"""Check if the response includes the following aspects related to current regulatory challenges:
+            1. Current challenges: Does the response describe the current regulatory challenges the company is facing?
+            2. Operational impact: Is there an explanation of how these challenges are affecting the company's operations?""",
+    f"""Check if the response includes the following aspects related to future regulatory targets:
+            1. Future targets: Does the response state the company's future targets in terms of regulatory achievements?
+            2. Steps to meet goals: Is there a description of the steps the company is taking to meet these goals?""",
+    f"""Check if the response includes the following aspects related to engagement with regulatory bodies:
+            1. Engagement: Does the response describe how the company engages with regulatory bodies to ensure compliance?
+            2. Influence: Is there a mention of how the company influences regulatory frameworks through participation in industry groups or consultations?""",
     # Consumer intelligence
-    f"""
-    Identify and analyze core demographic segments targeted, conduct a detailed comparative analysis of demographic preferences, provide insights into how demographics correlate with product choice, and present statistical data supporting demographic conclusions.
-
-    Completeness Checklist:
-    • Full breakdown of core demographic segments targeted
-    • Detailed comparative analysis of demographic preferences
-    • Insights into how demographics correlate with product choice
-    • Statistical data supporting demographic conclusions
-
-    """,
-    f"""
-    Describe lifestyle characteristics that align with the company, correlate attitudes, values, and interests through a comprehensive analysis, provide examples of how psychographics influence product adoption, and visually represent psychographic segmentation.
-
-    Completeness Checklist:
-    • Detailed description of lifestyle characteristics aligning with the company
-    • Comprehensive analysis of attitudes, values, and interests
-    • Examples of how psychographics influence product adoption
-    • Visual representation of psychographic segmentation
-
-    """,
-    f"""
-    Map the consumer purchase journey with an in-depth analysis, evaluate key factors influencing purchase decisions, provide a stage-by-stage breakdown of the decision-making process, and illustrate decision points with consumer actions through visualizations.
-
-    Completeness Checklist:
-    • In-depth analysis of the consumer purchase journey
-    • Key factors influencing purchase decisions
-    • Stage-by-stage breakdown of the decision-making process
-    • Visualizations linking decision points with consumer actions
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-
-    Completeness Checklist:
-    o Identification of key regulatory risks by market and industry
-    o Mitigation strategies and risk management plans
-    o Examples of successfully implemented mitigation measures
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-    Completeness Checklist:
-    o	Identification of key regulatory risks by market and industry
-    o	Mitigation strategies and risk management plans
-    o	Examples of successfully implemented mitigation measures
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-    Completeness Checklist:
-    o	Identification of key regulatory risks by market and industry
-    o	Mitigation strategies and risk management plans
-    o	Examples of successfully implemented mitigation measures
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-    Completeness Checklist:
-    o	Identification of key regulatory risks by market and industry
-    o	Mitigation strategies and risk management plans
-    o	Examples of successfully implemented mitigation measures
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-    Completeness Checklist:
-    o	Identification of key regulatory risks by market and industry
-    o	Mitigation strategies and risk management plans
-    o	Examples of successfully implemented mitigation measures
-
-    """,
-    f"""
-    Identify key regulatory risks by market and industry, formulate mitigation strategies, and provide examples of successfully implemented risk management plans.
-    Completeness Checklist:
-    o	Identification of key regulatory risks by market and industry
-    o	Mitigation strategies and risk management plans
-    o	Examples of successfully implemented mitigation measures
-    """,
+    f"""Check if the response includes the following aspects related to strategic goals for market expansion:
+            1. Geographic and demographic targets: Does the response describe the specific geographic and demographic markets the company aims to enter?
+            2. Strategies for market entry: Is there a description of the strategies the company plans to use to penetrate these new markets?""",
+    f"""Check if the response includes the following aspects related to consumer trends shaping product development:
+            1. Identified trends: Does the response identify specific consumer trends and behaviors?
+            2. Product development: Is there a description of how these trends are influencing the company's product development plans?""",
+    f"""Check if the response includes the following aspects related to leveraging digital marketing:
+            1. Digital marketing strategies: Does the response describe the digital marketing strategies the company plans to use?
+            2. Expected outcomes: Is there an explanation of how these strategies are expected to increase consumer engagement?""",
+    f"""Check if the response includes the following aspects related to challenges in adopting new technologies:
+            1. Anticipated challenges: Does the response identify specific challenges the company expects to face?
+            2. Mitigation strategies: Is there a description of how the company plans to address these challenges?""",
+    f"""Check if the response includes the following aspects related to measuring the success of market entries and product launches:
+            1. Success metrics: Does the response describe the metrics the company will use to measure success?
+            2. Targets: Are there specific targets mentioned for market share, customer acquisition cost, engagement, and repeat purchase rates?""",
+    f"""Check if the response includes the following aspects related to enhancing customer loyalty and retention:
+            1. Loyalty strategies: Does the response describe the strategies the company plans to use to enhance customer loyalty?
+            2. Retention initiatives: Is there a description of any new initiatives or programs aimed at increasing customer retention?""",
+    f"""Check if the response includes the following aspects related to using consumer feedback:
+            1. Feedback mechanisms: Does the response describe how the company collects consumer feedback?
+            2. Implementation: Is there an explanation of how this feedback is used to inform product iterations and service improvements?""",
+    f"""Check if the response includes the following aspects related to integrating emerging technologies:
+            1. Emerging technologies: Does the response describe the new technologies the company plans to integrate?
+            2. Expected impact: Is there an explanation of how these technologies will help the company stay ahead in the market?""",
+    f"""Check if the response includes the following aspects related to adapting pricing strategy:
+            1. Pricing strategies: Does the response describe the pricing strategies the company plans to use in new markets?
+            2. Balancing growth, competitiveness, and profitability: Is there an explanation of how these strategies will balance growth, competitiveness, and profitability?""",
 ]
