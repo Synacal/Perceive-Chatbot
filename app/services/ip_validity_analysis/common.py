@@ -424,7 +424,7 @@ async def get_keywords(answers):
         ]
 
         completion = client.chat.completions.create(
-            model="gpt-35-turbo",
+            model="gpt-4o",
             messages=messages,
             temperature=0.7,
             max_tokens=800,
@@ -433,7 +433,6 @@ async def get_keywords(answers):
             presence_penalty=0,
             stop=None,
         )
-
         content = completion.choices[0].message.content
         print(content)
 
@@ -623,7 +622,12 @@ async def create_pdf_document(
 
     # Insert the base64 PDF into the database
     await insert_file_to_db(
-        pdf_base64, requirement_gathering_id, user_case_id, file_type, file_name
+        pdf_base64,
+        requirement_gathering_id,
+        user_case_id,
+        file_type,
+        file_name,
+        content,
     )
 
 
@@ -656,7 +660,12 @@ async def create_word_document(
 
     # Insert the base64 Word document into the database
     await insert_file_to_db(
-        word_base64, requirement_gathering_id, user_case_id, file_type, file_name
+        word_base64,
+        requirement_gathering_id,
+        user_case_id,
+        file_type,
+        file_name,
+        content,
     )
 
 
@@ -666,6 +675,7 @@ async def insert_file_to_db(
     user_case_id: str,
     file_type: str,
     file_name: str,
+    content: str,
 ):
     query_status = """
      SELECT index FROM report_file_status WHERE requirement_gathering_id = %s AND use_case_id = %s;
@@ -703,10 +713,11 @@ async def insert_file_to_db(
 
         query_status = """
         UPDATE report_file_status
-        SET status = 'completed'
+        SET status = 'completed',
+        description = %s
         WHERE requirement_gathering_id = %s AND use_case_id = %s;
         """
-        values_status = (requirement_gathering_id, user_case_id)
+        values_status = (content, requirement_gathering_id, user_case_id)
 
         cur = conn.cursor()
         cur.execute(query, values)

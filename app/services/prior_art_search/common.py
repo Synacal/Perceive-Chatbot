@@ -18,7 +18,6 @@ import json
 from app.models.prior_art_search import PatentResult, PatentList, ReportParams
 
 import os
-import markdown2
 import pdfkit
 
 
@@ -238,10 +237,8 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
             # Determine question_ids based on user_case_id
             if user_case_id == "1" or user_case_id == "2":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "5",
                     "6",
                     "7",
                     "8",
@@ -249,10 +246,10 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                     "10",
                     "11",
                     "12",
+                    "13",
                 ]
             elif user_case_id == "3":
                 question_ids = [
-                    "13",
                     "14",
                     "15",
                     "16",
@@ -265,17 +262,18 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                     "23",
                     "24",
                     "25",
+                    "26",
                 ]
             elif user_case_id == "4":
-                question_ids = ["26", "27", "28", "29", "30", "31", "32", "33", "34"]
+                question_ids = ["27", "28", "29", "30", "31", "32", "33", "34", "35"]
             elif user_case_id == "5":
-                question_ids = ["35", "36", "37", "38", "39", "40", "41"]
+                question_ids = ["36", "37", "38", "39", "40", "41", "42"]
             elif user_case_id == "6":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
-                    "42",
+                    "3",
+                    "4",
                     "43",
                     "44",
                     "45",
@@ -288,27 +286,27 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                     "52",
                     "53",
                     "54",
+                    "55",
                 ]
             elif user_case_id == "7":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "55",
+                    "4",
                     "56",
                     "57",
                     "58",
                     "59",
                     "60",
+                    "61",
                 ]
             elif user_case_id == "8":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "61",
+                    "4",
                     "62",
                     "63",
                     "64",
@@ -319,14 +317,14 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                     "69",
                     "70",
                     "71",
+                    "72",
                 ]
             elif user_case_id == "9":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "72",
+                    "4",
                     "73",
                     "74",
                     "75",
@@ -334,14 +332,14 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                     "77",
                     "78",
                     "79",
+                    "80",
                 ]
             elif user_case_id == "10":
                 question_ids = [
-                    "0",
                     "1",
                     "2",
                     "3",
-                    "80",
+                    "4",
                     "81",
                     "82",
                     "83",
@@ -350,6 +348,7 @@ async def get_answers_with_questions(requirement_gathering_id, user_case_id):
                     "86",
                     "87",
                     "88",
+                    "89",
                 ]
             else:
                 question_ids = ["0", "1", "2"]
@@ -550,7 +549,9 @@ def vectorize_texts(texts: List[str]):
     return embeddings
 
 
-async def search_patents(patents: List[PatentResult], description: str) -> PatentList:
+async def search_patents_prior(
+    patents: List[PatentResult], description: str
+) -> PatentList:
     patent_texts = [f"{patent.abstract} " for patent in patents]
 
     # Ensure that you await the results of the asynchronous tasks
@@ -610,6 +611,7 @@ async def get_patent_by_id(patent_id: str):
     finally:
         conn.close()
 
+
 async def get_patent_details_by_id(patent_id: str):
     query = """
     SELECT id, date, title, abstract, published_country,kind,wipo_kind,claim_text
@@ -624,7 +626,11 @@ async def get_patent_details_by_id(patent_id: str):
             cur.execute(query, [value])
             result = cur.fetchone()
             if result:
-                kind = result[5] if result[5] is not None else (result[6] if result[6] is not None else "")
+                kind = (
+                    result[5]
+                    if result[5] is not None
+                    else (result[6] if result[6] is not None else "")
+                )
                 country = result[4] if result[4] is not None else ""
                 patent_details = {
                     "id": result[0],
@@ -633,7 +639,7 @@ async def get_patent_details_by_id(patent_id: str):
                     "abstract": result[3],
                     "published_country": country,
                     "kind": kind,
-                    "claims": result[6]
+                    "claims": result[6],
                 }
                 return patent_details
             else:
@@ -658,13 +664,13 @@ async def create_report_background(report_params: ReportParams):
         response_data = await search_documents(keywords)
 
         response_data = response_data[:3]
-        patent_ids = await search_patents(response_data, summary)
-        analysed_patent_reports = ['## Relevant Patents\n\n']
+        patent_ids = await search_patents_prior(response_data, summary)
+        analysed_patent_reports = ["## Relevant Patents\n\n"]
         all_patents_info = []
 
         for patent_id in patent_ids:
             print(patent_id)
-            #patent = await get_patent_by_id(patent_id)
+            # patent = await get_patent_by_id(patent_id)
             patent = await get_patent_details_by_id(patent_id)
             if patent:
                 patent_info = f"""
@@ -677,17 +683,22 @@ async def create_report_background(report_params: ReportParams):
                 Claims: {patent['claims']}
                 """
                 all_patents_info.append(patent_info)
-                relevancyReport = await getRelevantPatentDetails(summary,patent_info)
+                relevancyReport = await getRelevantPatentDetails(summary, patent_info)
                 relevancyReport = relevancyReport + os.linesep
                 analysed_patent_reports.append(relevancyReport)
-                
-            
+
         analysed_patent_reports_str = "\n\n".join(analysed_patent_reports)
         # Concatenate all patent information into a single string
         patents_info_str = "\n\n".join(all_patents_info)
-        report_intro = await getIntro_KeyFindings(summary,patents_info_str)
-        report_conclusion = await getAnalysis_Conclusion(summary,patents_info_str)
-        complete_report = report_intro + "\n\n" + analysed_patent_reports_str + "\n\n" + report_conclusion
+        report_intro = await getIntro_KeyFindings(summary, patents_info_str)
+        report_conclusion = await getAnalysis_Conclusion(summary, patents_info_str)
+        complete_report = (
+            report_intro
+            + "\n\n"
+            + analysed_patent_reports_str
+            + "\n\n"
+            + report_conclusion
+        )
 
         exportPdf(complete_report)
         response = {
@@ -722,7 +733,8 @@ async def create_report_background(report_params: ReportParams):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-async def getIntro_KeyFindings(userPatentSummary,patentInfo):
+
+async def getIntro_KeyFindings(userPatentSummary, patentInfo):
     system_prompt_intro_key_findings = f"""
             Conduct a Prior Art Search focusing on the following aspects:
 
@@ -752,9 +764,9 @@ async def getIntro_KeyFindings(userPatentSummary,patentInfo):
             Give response in markdown format, make sure to follow the given structure and put Title and all headings in markdown heading formats.
             """
     message_text = [
-            {"role": "system", "content": system_prompt_intro_key_findings},
-            # {"role": "user", "content": answer}
-        ]
+        {"role": "system", "content": system_prompt_intro_key_findings},
+        # {"role": "user", "content": answer}
+    ]
     completion = client.chat.completions.create(
         model="gpt-35-turbo",
         messages=message_text,
@@ -767,8 +779,9 @@ async def getIntro_KeyFindings(userPatentSummary,patentInfo):
     )
     response = completion.choices[0].message.content
     return response
-    
-async def getRelevantPatentDetails(userPatentSummary,patentInfo):
+
+
+async def getRelevantPatentDetails(userPatentSummary, patentInfo):
     prompt = f"""
             Analyze the given patent details in relation to the provided "User Patent" summary. Extract the "User Patent" name from the summary and use it throughout the response instead of the placeholder "User Patent". Follow the structure below to ensure comprehensive analysis:
 
@@ -793,9 +806,9 @@ async def getRelevantPatentDetails(userPatentSummary,patentInfo):
             Provide the response in markdown format.
         """
     message_text = [
-            {"role": "system", "content": prompt},
-            # {"role": "user", "content": answer}
-        ]
+        {"role": "system", "content": prompt},
+        # {"role": "user", "content": answer}
+    ]
     completion = client.chat.completions.create(
         model="gpt-35-turbo",
         messages=message_text,
@@ -809,7 +822,8 @@ async def getRelevantPatentDetails(userPatentSummary,patentInfo):
     response = completion.choices[0].message.content
     return response
 
-async def getAnalysis_Conclusion(userPatentSummary,patentInfo):
+
+async def getAnalysis_Conclusion(userPatentSummary, patentInfo):
     system_prompt_analysis_conclusion = f"""
                 Conduct a detailed analysis focusing on the following aspects:
 
@@ -847,11 +861,10 @@ async def getAnalysis_Conclusion(userPatentSummary,patentInfo):
                 Give response in markdown format, make sure to follow the given structure and put all headings in markdown heading formats.
                 """
 
-
     message_text = [
-            {"role": "system", "content": system_prompt_analysis_conclusion},
-            # {"role": "user", "content": answer}
-        ]
+        {"role": "system", "content": system_prompt_analysis_conclusion},
+        # {"role": "user", "content": answer}
+    ]
     completion = client.chat.completions.create(
         model="gpt-35-turbo",
         messages=message_text,
@@ -864,6 +877,9 @@ async def getAnalysis_Conclusion(userPatentSummary,patentInfo):
     )
     response = completion.choices[0].message.content
     return response
+
+
+"""
 
 def exportPdf(text):
 
@@ -879,24 +895,22 @@ def exportPdf(text):
     output_pdf_path = os.path.join(output_dir, "report.pdf")
     print(output_pdf_path)
 
-
-
     # Create the directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
+
     html_file_path = os.path.join(output_dir, "output.html")
     with open(html_file_path, "w") as html_file:
         html_file.write(html_text)
-    
-    path_to_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path based on your installation
+
+    path_to_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"  # Update this path based on your installation
 
     config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
 
-    pdfkit.from_string(html_text, output_pdf_path,configuration=config)
+    pdfkit.from_string(html_text, output_pdf_path, configuration=config)
     print(f"PDF file has been created successfully at {output_pdf_path}.")
 
-
+"""
 # markdown_text = """
 # # Sample Markdown
 

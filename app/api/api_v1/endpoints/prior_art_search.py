@@ -18,7 +18,7 @@ from app.services.prior_art_search.common import (
     generate_prior_art_summary,
     get_keywords,
     search_documents,
-    search_patents,
+    search_patents_prior,
     get_patent_by_id,
     create_report_background,
 )

@@ -45,14 +45,11 @@ async def generate_reports(
                 status_code=400, detail="Invalid requirement_gathering_id"
             )
 
-        print("1.1")
         for i, use_case in enumerate(use_cases):
-            print(f"Iteration {i}")
             background_tasks.add_task(
                 generate_report, requirement_gathering_id, use_case[0]
             )
 
-        print("1.2")
         answers = await get_answers_by_req_id(requirement_gathering_id)
         summary = await get_summary(answers)
         return {"summary": summary, "status": "in progress"}
@@ -122,11 +119,11 @@ async def get_answers_by_req_id(requirement_gathering_id):
 
 async def generate_report(requirement_gathering_id, user_case_id):
     try:
-        if user_case_id == "2":
+        if user_case_id == "1":
             print("2.1")
             await generate_report_1(requirement_gathering_id, user_case_id)
             print("2.2")
-        elif user_case_id == "1":
+        elif user_case_id == "2":
             print("2.3")
             await generate_report_2(requirement_gathering_id, user_case_id)
             print("2.4")
@@ -141,9 +138,144 @@ async def generate_report(requirement_gathering_id, user_case_id):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+from app.services.prior_art_search.common import (
+    get_answers_with_questions,
+    generate_prior_art_summary,
+    search_patents_prior,
+    get_patent_by_id,
+    getRelevantPatentDetails,
+    getIntro_KeyFindings,
+    getAnalysis_Conclusion,
+    get_patent_details_by_id,
+)
+import os
+
+
 async def generate_report_1(requirement_gathering_id, user_case_id):
-    print(f"Generating report for user_case_id {user_case_id}")
-    pass
+    try:
+        query_file_status = """
+        INSERT INTO report_file_status (status, requirement_gathering_id, use_case_id)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id)
+        DO UPDATE SET
+            status = EXCLUDED.status
+        """
+        values_file_status = (
+            "in progress",
+            requirement_gathering_id,
+            user_case_id,
+        )
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query_file_status, values_file_status)
+        conn.commit()
+        cur.close()
+
+        answers = await get_answers_with_questions(
+            requirement_gathering_id, user_case_id
+        )
+
+        summary = generate_prior_art_summary(answers)
+
+        keywords = await get_keywords(answers)
+
+        response_data = await search_documents(keywords)
+
+        response_data = response_data[:3]
+        patent_ids = await search_patents_prior(response_data, summary)
+        analysed_patent_reports = ["## Relevant Patents\n\n"]
+        all_patents_info = []
+
+        for patent_id in patent_ids:
+            print(patent_id)
+            # patent = await get_patent_by_id(patent_id)
+            patent = await get_patent_details_by_id(patent_id)
+            if patent:
+                patent_info = f"""
+                Patent ID: {patent['id']}
+                Date: {patent['date']}
+                Published Country: {patent['published_country']}
+                Title: {patent['title']}
+                Abstract: {patent['abstract']}
+                Kind: {patent['kind']}
+                Claims: {patent['claims']}
+                """
+                all_patents_info.append(patent_info)
+                relevancyReport = await getRelevantPatentDetails(summary, patent_info)
+                relevancyReport = relevancyReport + os.linesep
+                analysed_patent_reports.append(relevancyReport)
+
+        analysed_patent_reports_str = "\n\n".join(analysed_patent_reports)
+        # Concatenate all patent information into a single string
+        patents_info_str = "\n\n".join(all_patents_info)
+        report_intro = await getIntro_KeyFindings(summary, patents_info_str)
+        report_conclusion = await getAnalysis_Conclusion(summary, patents_info_str)
+        complete_report = (
+            report_intro
+            + "\n\n"
+            + analysed_patent_reports_str
+            + "\n\n"
+            + report_conclusion
+        )
+
+        # exportPdf(complete_report)
+        response = {
+            "summary": summary,
+            "status": "in-progress",
+            "analysis_results": complete_report,
+        }
+
+        str_analysis_results = str(complete_report)
+
+        await create_word_document(
+            str_analysis_results,
+            requirement_gathering_id,
+            user_case_id,
+        )
+
+        await create_pdf_document(
+            str_analysis_results,
+            requirement_gathering_id,
+            user_case_id,
+        )
+
+        await add_report(
+            str_analysis_results,
+            requirement_gathering_id,
+            user_case_id,
+        )
+
+        print("report generation completed.")
+        return response
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
+        query_file_status = """
+        INSERT INTO report_file_status (status, description, requirement_gathering_id, use_case_id)
+        VALUES (%s, %s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id)
+        DO UPDATE SET
+            status = EXCLUDED.status,
+            description = EXCLUDED.description;
+        """
+
+        query_file_status_params = (
+            "failed",
+            str(e),
+            requirement_gathering_id,
+            user_case_id,
+        )
+        conn = get_db_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute(query_file_status, query_file_status_params)
+            conn.commit()
+            cur.close()
+        except Exception as e:
+            print(f"Error in updating file status: {str(e)}")
+        finally:
+            conn.close()
 
 
 async def generate_report_2(requirement_gathering_id, user_case_id):
@@ -216,9 +348,14 @@ async def generate_report_2(requirement_gathering_id, user_case_id):
     except Exception as e:
         print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
         query_file_status = """
-        INSERT INTO report_file_status (status,description,requirement_gathering_id, use_case_id)
+        INSERT INTO report_file_status (status, description, requirement_gathering_id, use_case_id)
         VALUES (%s, %s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id)
+        DO UPDATE SET
+            status = EXCLUDED.status,
+            description = EXCLUDED.description;
         """
+
         query_file_status_params = (
             "failed",
             str(e),
@@ -251,18 +388,26 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
             requirement_gathering_id,
             user_case_id,
         )
+        print("a")
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(query_file_status, values_file_status)
         conn.commit()
         cur.close()
 
+        print("b")
         answers = await get_answers(requirement_gathering_id, user_case_id)
+        print("c")
         summary = await get_summary(answers)
+        print("d")
         keywords = await get_keywords(answers)
+        print("e")
         response_data = await search_documents(keywords)
+        print("f")
         response_data = response_data[:3]
+        print("g")
         response_data2 = await search_patents(response_data, summary)
+        print("h")
 
         patentability_criteria = [
             "Novelty (35 U.S.C. § 102)",
@@ -280,6 +425,7 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
         report = {}
 
         for i in range(len(patentability_criteria)):
+            print("i")
             assessment = await create_assessment(
                 response_data2,
                 answers,
@@ -290,18 +436,20 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
         # Convert report dictionary to JSON string
         # report_str = str(report)
         report_str = str(report)
+        print("j")
 
         await create_word_document(
             report_str,
             requirement_gathering_id,
             user_case_id,
         )
+        print("k")
         await create_pdf_document(
             report_str,
             requirement_gathering_id,
             user_case_id,
         )
-
+        print("l")
         await add_report(
             report_str,
             requirement_gathering_id,
@@ -312,9 +460,14 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
     except Exception as e:
         print(f"Error in background task for user_case_id {user_case_id}: {str(e)}")
         query_file_status = """
-        INSERT INTO report_file_status (status,description,requirement_gathering_id, use_case_id)
+        INSERT INTO report_file_status (status, description, requirement_gathering_id, use_case_id)
         VALUES (%s, %s, %s, %s)
+        ON CONFLICT (requirement_gathering_id, use_case_id)
+        DO UPDATE SET
+            status = EXCLUDED.status,
+            description = EXCLUDED.description;
         """
+
         query_file_status_params = (
             "failed",
             str(e),
