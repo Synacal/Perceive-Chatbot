@@ -10,6 +10,8 @@ import os
 import random
 from bs4 import BeautifulSoup
 from docx import Document
+import matplotlib.pyplot as plt
+import re
 
 
 
@@ -65,6 +67,14 @@ This is an introductory paragraph for Subtopic 2. Similar to the previous sectio
 Additional details for Subtopic 2. Use **bold** text for highlighting and *italic** text for emphasis.
 
 """
+
+system_prompt_for_graph="""When a user asks to create a graph, provide the data strictly in the format 'x values and y values' without additional information. For example:
+
+For the last five years of Apple product sales draw a bar chart: '2018: 868586, 2019: 6576845, 2020: 457843758, 2021: 8687475786, 2022: 876854'.
+For electric vehicle sales over the last 5 years draw a graph: '2017: 198350, 2018: 361307, 2019: 531407, 2020: 752684, 2021: 1051749'.
+For the population growth in major cities over the last decade draw a column chart: '2013: 1200000, 2014: 1350000, 2015: 1500000, 2016: 1650000, 2017: 1800000'.
+For the quarterly revenue of a company in the current fiscal year: 'Q1: 5000000, Q2: 5500000, Q3: 6000000, Q4: 6500000'.
+Please ensure that only these specific formats are provided without any additional explanations or details.dont generate any other words. only data set"""
 def generate_unique_number():
     while True:
         random_integer = random.randint(10000000, 20000000)
@@ -124,6 +134,42 @@ def create_doc(content, save_path):
         add_elements_from_html(tag)
     doc.save(save_path)
 
+def convert_to_dic(content):
+    split_data = content.split(',')
+    data_dic = {}
+    for word in split_data:
+        try:
+            X, Y = word.split(':')
+            X = X.strip()
+            Y = Y.strip()
+
+            if 'million' in Y:
+                Y = int(re.sub(r'[^0-9]', '', Y)) * 1_000_000
+            elif 'billion' in Y:
+                Y = int(re.sub(r'[^0-9]', '', Y)) * 1_000_000_000
+            else:
+                Y = int(re.sub(r'[^0-9]', '', Y))
+
+            data_dic[int(X)] = Y
+
+        except ValueError as e:
+            print(f"Error parsing '{word}': {e}")
+            raise ValueError(f"Error parsing '{word}': {e}")
+    return data_dic
+
+def generate_image(data_dic):
+    plt.figure(figsize=(8, 5))  
+    plt.bar(data_dic.keys(), data_dic.values(), color='skyblue')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Chart')
+    plt.grid(True)
+    plt.xticks(list(data_dic.keys())) 
+    plt.tight_layout()
+
+    #Save the plot as PNG image
+    plt.savefig('bar_chart.png', dpi=300) 
+    plt.close()
 
 
 router = APIRouter()
@@ -132,9 +178,9 @@ router = APIRouter()
 @router.get("/tempory/")
 async def tempory():
     
-    user_prompt = "What are the different between class and objects. "
+    user_prompt = "draw a bar chart for android users amount for last 5 years "
     message_text = [
-        {"role": "system", "content": system_prompt},
+        {"role": "system", "content": system_prompt_for_graph},
         {"role": "user", "content": user_prompt},
     ]
 
@@ -159,8 +205,14 @@ async def tempory():
         save_pdf_path = os.path.join(save_folder, f'file{unique_integer}.pdf')
         save_doc_path = os.path.join(save_folder, f'file{unique_integer}.docx')
        
-        create_pdf(content,save_pdf_path)
-        create_doc(content,save_doc_path)
+        # create_pdf(content,save_pdf_path)
+        # create_doc(content,save_doc_path)
+        try:
+            data_dic = convert_to_dic(content)
+            generate_image(data_dic)
+            print("Image generated successfully.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
         
         
 
