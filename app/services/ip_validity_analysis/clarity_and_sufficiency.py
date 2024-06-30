@@ -60,7 +60,7 @@ async def compare_clarity_and_sufficiency(
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
-        return {content}
+        return content
 
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")

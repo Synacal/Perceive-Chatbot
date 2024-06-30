@@ -533,7 +533,7 @@ async def create_report_background(report_params: ReportParams):
 
         # Convert report dictionary to JSON string
         # report_str = str(report)
-        report_str = dict_to_formatted_string(report)
+        report_str = str(report)
 
         await create_word_document(
             report_str,
@@ -577,17 +577,13 @@ async def create_report_background(report_params: ReportParams):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def dict_to_formatted_string(report: Dict) -> str:
-    report_str = ""
-    for key, value in report.items():
-        report_str += f"{key}:\n"
-        if isinstance(value, dict):
-            for sub_key, sub_value in value.items():
-                report_str += f"  {sub_key}: {sub_value}\n"
-        else:
-            report_str += f"  {value}\n"
-        report_str += "\n"
-    return report_str
+import markdown
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib import utils
+from io import BytesIO
 
 
 async def create_pdf_document(
@@ -595,20 +591,20 @@ async def create_pdf_document(
 ):
     buffer = BytesIO()
 
+    # Convert Markdown to HTML
+    html_content = markdown.markdown(content)
+
     # Create the PDF document
-    c = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
 
-    c.setFont("Helvetica", 12)
-    text = c.beginText(40, height - 40)
-
-    paragraphs = content.split("\n")
+    # Parse HTML content into reportlab platypus flowables
+    flowables = []
+    paragraphs = html_content.split("\n")
     for para in paragraphs:
-        text.textLines(para)
-        text.textLine("")
+        flowables.append(Paragraph(para, styles["Normal"]))
 
-    c.drawText(text)
-    c.save()
+    doc.build(flowables)
 
     # Move to the beginning of the BytesIO buffer
     buffer.seek(0)
@@ -636,31 +632,32 @@ async def create_word_document(
 ):
     buffer = BytesIO()
 
+    # Convert Markdown to HTML
+    html_content = markdown.markdown(content)
+
+    # Create a new Word document
     doc = Document()
-    doc.add_heading("Patent Novelty Assessment", 0)
+    doc.add_heading("IP Validity Analysis Report", level=1)
 
-    paragraphs = content.split("\n")
+    # Add paragraphs from Markdown content
+    paragraphs = html_content.split("\n")
     for para in paragraphs:
-        if para.strip() != "":
-            p = doc.add_paragraph(para)
-            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            p.style.font.size = Pt(12)
+        doc.add_paragraph(para)
 
+    # Save document to BytesIO buffer
     doc.save(buffer)
-
-    # Move to the beginning of the BytesIO buffer
     buffer.seek(0)
 
     # Convert the Word document to base64
-    word_bytes = buffer.read()
-    word_base64 = base64.b64encode(word_bytes).decode("utf-8")
+    doc_bytes = buffer.read()
+    doc_base64 = base64.b64encode(doc_bytes).decode("utf-8")
 
     file_type = "docx"
     file_name = "IP Validity Analysis Report"
 
     # Insert the base64 Word document into the database
     await insert_file_to_db(
-        word_base64,
+        doc_base64,
         requirement_gathering_id,
         user_case_id,
         file_type,

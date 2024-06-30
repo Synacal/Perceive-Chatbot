@@ -60,7 +60,7 @@ async def compare_industrial_application(patent_abstracts: List[str], answer_lis
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
-        return {content}
+        return content
 
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")

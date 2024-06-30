@@ -49,7 +49,7 @@ async def compare_written_description(patent_abstracts: List[str], answer_list: 
         content = completion.choices[0].message.content
 
         # Parse the response into a structured dictionary
-        return {content}
+        return content
 
     except Exception as e:
         print(f"Error generating novelty assessment: {e}")

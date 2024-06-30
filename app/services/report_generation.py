@@ -11,7 +11,6 @@ from app.services.ip_validity_analysis.common import (
     get_summary,
     create_word_document,
     create_pdf_document,
-    dict_to_formatted_string,
     get_answers,
 )
 
@@ -313,7 +312,7 @@ async def generate_report_2(requirement_gathering_id, user_case_id):
             "prompt6",
         ]
 
-        report = {}
+        report = ""
 
         for i in range(len(license_criteria)):
             assessment = await create_report(
@@ -321,7 +320,8 @@ async def generate_report_2(requirement_gathering_id, user_case_id):
                 patent_data,
                 license_criteria[i],
             )
-            report[license_criteria[i]] = assessment
+            assessment_str = str(assessment)  # Assuming assessment is a set of strings
+            report = report + "/n/n" + assessment_str
 
         # Convert report dictionary to JSON string
         report_str = str(report)
@@ -422,7 +422,7 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
             "Economic Significance",
         ]
 
-        report = {}
+        report = ""
 
         for i in range(len(patentability_criteria)):
             print("i")
@@ -431,7 +431,8 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
                 answers,
                 patentability_criteria[i],
             )
-            report[patentability_criteria[i]] = assessment
+            assessment_str = str(assessment)  # Assuming assessment is a set of strings
+            report = report + "/n/n" + assessment_str
 
         # Convert report dictionary to JSON string
         # report_str = str(report)
