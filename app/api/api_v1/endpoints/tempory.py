@@ -1,3 +1,4 @@
+from urllib import request
 from fastapi import APIRouter, HTTPException
 from app.services.check_user_answers import check_user_answers
 from psycopg2.extras import execute_values
@@ -12,6 +13,13 @@ from bs4 import BeautifulSoup
 from docx import Document
 import matplotlib.pyplot as plt
 import re
+from dotenv import load_dotenv
+
+from xhtml2pdf import pisa
+
+load_dotenv()
+
+
 
 
 
@@ -75,6 +83,76 @@ For electric vehicle sales over the last 5 years draw a graph: '2017: 198350, 20
 For the population growth in major cities over the last decade draw a column chart: '2013: 1200000, 2014: 1350000, 2015: 1500000, 2016: 1650000, 2017: 1800000 @Population growth in major cities over the last decade @Year @Population'.
 For the quarterly revenue of a company in the current fiscal year: 'Q1: 5000000, Q2: 5500000, Q3: 6000000, Q4: 6500000 @Quarterly revenue of a company in the current fiscal year @Year @Quarterly revenue'.
 Please ensure that only these specific formats are provided without any additional explanations or details.dont generate any other words. only data set"""
+system_prompt_mod="""Generate a detailed document using the following structure and formatting requirements:
+
+1. **Title**: The main title of the document should be formatted as a level 1 heading and use the font "'Times New Roman', serif".
+2. **Subtopics**: Each main section should be formatted as a level 2 heading and use the font "Arial', sans-serif". Sub-sections under each main section should be formatted as level 3 headings and use the font "Georgia, serif".
+3. **Bold Text**: Emphasize important keywords or phrases by making them bold.
+4. **Italic Text**: Use italics for additional emphasis, quotes, or specific terms that need to stand out.
+5. **Lists**: Use both ordered and unordered lists where appropriate to organize information.
+6. **Links**: Include hyperlinks to relevant resources.
+7. **Images**: Add images to illustrate key points or examples.
+8. **Code Blocks**: Use code blocks for any programming-related examples or explanations.
+9. **Tables**: Create tables to present structured data.
+10. **Blockquotes**: Use blockquotes for notable quotes or important points.
+11. **Horizontal Rules**: Use horizontal rules to separate sections or topics.
+12. **Task Lists**: Include task lists if the content involves steps or checklists.
+
+If you do not know the answer to a question or cannot provide detailed information, clearly state 'I do not know.' Ensure that the document is detailed and exceeds 1000 words.
+
+Here is an example structure to follow:
+
+```markdown
+# Main Title
+<style>
+h1 { font-family: 'Times New Roman', serif; }
+h2 { font-family: 'Arial', sans-serif; }
+h3 { font-family: 'Georgia', serif; }
+</style>
+
+
+## Subtopic 1
+
+        > This is an introductory paragraph for Subtopic 1. It contains an **important keyword** and some *italicized text*.
+
+        >> - **Bold List Item 1**
+        >> - *Italicized List Item 2*
+
+### Sub-subtopic 1.1
+
+        > This section goes into more detail under Subtopic 1. It also includes some **bold** and *italic* text for emphasis.
+
+        ```python
+        # Sample Code Block
+        def example_function():
+            print("Hello, World!")
+        ```
+
+        > [Link to Resource](https://www.example.com)
+
+        > ![Alt Text](image-url.jpg)
+
+        > This is a blockquote highlighting a significant point.
+
+## Subtopic 2
+
+        > This is an introductory paragraph for Subtopic 2. Similar to the previous sections, it can have **bold** keywords and *italicized* phrases.
+
+### Sub-subtopic 2.1
+
+        > Additional details for Subtopic 2. Use **bold** text for highlighting and *italic* text for emphasis.
+
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | Row 1    | Data 1   |
+        | Row 2    | Data 2   |
+
+---
+
+- [ ] Task 1
+- [x] Task 2
+
+"""
 def generate_unique_number():
     while True:
         random_integer = random.randint(10000000, 20000000)
@@ -207,6 +285,12 @@ def generate_image_line_chart(data_dic, title, x_axis_title, y_axis_title):
     plt.savefig('line_chart.png', dpi=300) 
     plt.close()
 
+def convert_html_to_pdf(html_string, pdf_path):
+    with open(pdf_path, "wb") as pdf_file:
+        pisa_status = pisa.CreatePDF(html_string, dest=pdf_file)
+        
+    return not pisa_status.err
+
 
 router = APIRouter()
 
@@ -214,9 +298,9 @@ router = APIRouter()
 @router.get("/tempory/")
 async def tempory():
     
-    user_prompt = "Provide the data for the annual rainfall in New York City over the past ten years."
+    user_prompt = "What is the difference between merge sort and quick sort?"
     message_text = [
-        {"role": "system", "content": system_prompt_for_graph},
+        {"role": "system", "content": system_prompt_mod},
         {"role": "user", "content": user_prompt},
     ]
 
@@ -236,37 +320,46 @@ async def tempory():
         
         unique_integer =generate_unique_number()
         
-        # save_folder = r'E:\intern\Synacal\New folder\Perceive-Chatbot\app\api\api_v1\endpoints\save_files'
-        # os.makedirs(save_folder, exist_ok=True)
-        # save_pdf_path = os.path.join(save_folder, f'file{unique_integer}.pdf')
-        # save_doc_path = os.path.join(save_folder, f'file{unique_integer}.docx')
+        save_folder = r'E:\intern\Synacal\New folder\Perceive-Chatbot\app\api\api_v1\endpoints\save_files'
+        os.makedirs(save_folder, exist_ok=True)
+        save_pdf_path = os.path.join(save_folder, f'file{unique_integer}.pdf')
+
+
+
+        markdown_content = markdown.markdown(content)
+        html_content = f"<html><body>{markdown_content}</body></html>"
+        if convert_html_to_pdf(html_content, save_pdf_path):
+            print(f"PDF generated and saved at {save_pdf_path}")
+        else:
+            print("PDF generation failed")
+
+        save_doc_path = os.path.join(save_folder, f'file{unique_integer}.docx')
        
         # create_pdf(content,save_pdf_path)
-        # create_doc(content,save_doc_path)
-
+        create_doc(content,save_doc_path)
         #bar chart
-        try:
-            data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
-            generate_image_bar_chart(data_dic,title,x_axis_title,y_axis_title)
-            print("Image generated successfully.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        # try:
+        #     data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
+        #     generate_image_bar_chart(data_dic,title,x_axis_title,y_axis_title)
+        #     print("Image generated successfully.")
+        # except Exception as e:
+        #     print(f"An error occurred: {e}")
 
-        #pie chart
-        try:
-            data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
-            generate_image_pie_chart(data_dic,title)
-            print("Image generated successfully.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        # #pie chart
+        # try:
+        #     data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
+        #     generate_image_pie_chart(data_dic,title)
+        #     print("Image generated successfully.")
+        # except Exception as e:
+        #     print(f"An error occurred: {e}")
 
-        #line chart
-        try:
-            data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
-            generate_image_line_chart(data_dic,title,x_axis_title,y_axis_title)
-            print("Image generated successfully.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        # #line chart
+        # try:
+        #     data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
+        #     generate_image_line_chart(data_dic,title,x_axis_title,y_axis_title)
+        #     print("Image generated successfully.")
+        # except Exception as e:
+        #     print(f"An error occurred: {e}")
 
 
         

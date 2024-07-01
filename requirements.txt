@@ -205,3 +205,6 @@ markdown==3.6
 docx==0.2.4
 cobble==0.1.4 
 mammoth==1.8.0
+
+
+pyppeteer=2.0.0
