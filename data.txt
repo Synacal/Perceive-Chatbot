@@ -1,0 +1,10 @@
+Draw a bar chart for the number of cars sold by Toyota over the last five years.
+Provide the data for the annual rainfall in New York City over the past five years.
+Show the average temperature in London for the last five years.
+Provide the data for the population growth in Tokyo over the last decade.
+Give the annual revenue of Apple Inc. for the last five years.
+Show the number of iPhones sold by Apple over the last five years.
+Provide the number of new startups registered in the United States over the past five years.
+Show the data for the total number of books published in the United Kingdom over the last five years.
+Provide the data for the annual electricity consumption in California over the last five years.
+Give the annual budget of Microsoft Corporation for the last five years.
