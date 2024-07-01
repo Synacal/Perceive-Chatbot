@@ -85,8 +85,8 @@ For the quarterly revenue of a company in the current fiscal year: 'Q1: 5000000,
 Please ensure that only these specific formats are provided without any additional explanations or details.dont generate any other words. only data set"""
 system_prompt_mod="""Generate a detailed document using the following structure and formatting requirements:
 
-1. **Title**: The main title of the document should be formatted as a level 1 heading and use the font "'Times New Roman', serif".
-2. **Subtopics**: Each main section should be formatted as a level 2 heading and use the font "Arial', sans-serif". Sub-sections under each main section should be formatted as level 3 headings and use the font "Georgia, serif".
+1. **Title**: The main title of the document should be formatted as a level 1 heading and use the font "Courier New, monospace".
+2. **Subtopics**: Each main section should be formatted as a level 2 heading and use the font "Comic Sans MS, cursive". Sub-sections under each main section should be formatted as level 3 headings and use the font "Georgia, serif".
 3. **Bold Text**: Emphasize important keywords or phrases by making them bold.
 4. **Italic Text**: Use italics for additional emphasis, quotes, or specific terms that need to stand out.
 5. **Lists**: Use both ordered and unordered lists where appropriate to organize information.
@@ -102,55 +102,55 @@ If you do not know the answer to a question or cannot provide detailed informati
 
 Here is an example structure to follow:
 
-```markdown
-# Main Title
+
 <style>
-h1 { font-family: 'Times New Roman', serif; }
-h2 { font-family: 'Arial', sans-serif; }
+h1 { font-family: 'Courier New', monospace; }
+h2 { font-family: 'Comic Sans MS', cursive; }
 h3 { font-family: 'Georgia', serif; }
 </style>
-
-
+# Main Title
 ## Subtopic 1
 
-        > This is an introductory paragraph for Subtopic 1. It contains an **important keyword** and some *italicized text*.
+    This is an introductory paragraph for Subtopic 1. It contains an **important keyword** and some *italicized text*.
 
-        >> - **Bold List Item 1**
-        >> - *Italicized List Item 2*
+        - **Bold List Item 1**
+        - *Italicized List Item 2*
 
 ### Sub-subtopic 1.1
 
-        > This section goes into more detail under Subtopic 1. It also includes some **bold** and *italic* text for emphasis.
+            This section goes into more detail under Subtopic 1. It also includes some **bold** and *italic* text for emphasis.
 
-        ```python
-        # Sample Code Block
-        def example_function():
-            print("Hello, World!")
-        ```
+            \`\`\`python
+            # Sample Code Block
+            def example_function():
+                print("Hello, World!")
+            \`\`\`
 
-        > [Link to Resource](https://www.example.com)
+            [Link to Resource](https://www.example.com)
 
-        > ![Alt Text](image-url.jpg)
+            ![Alt Text](image-url.jpg)
 
-        > This is a blockquote highlighting a significant point.
+            > This is a blockquote highlighting a significant point.
 
 ## Subtopic 2
 
-        > This is an introductory paragraph for Subtopic 2. Similar to the previous sections, it can have **bold** keywords and *italicized* phrases.
+    This is an introductory paragraph for Subtopic 2. Similar to the previous sections, it can have **bold** keywords and *italicized* phrases.
 
-### Sub-subtopic 2.1
+        ### Sub-subtopic 2.1
 
-        > Additional details for Subtopic 2. Use **bold** text for highlighting and *italic* text for emphasis.
+        Additional details for Subtopic 2. Use **bold** text for highlighting and *italic* text for emphasis.
 
         | Column 1 | Column 2 |
         |----------|----------|
         | Row 1    | Data 1   |
         | Row 2    | Data 2   |
 
----
+        ---
 
-- [ ] Task 1
-- [x] Task 2
+        - [ ] Task 1
+        - [x] Task 2
+
+
 
 """
 def generate_unique_number():
@@ -169,7 +169,6 @@ def create_pdf(content,save_path):
 
     pdfkit.from_file('temp.html', save_path, configuration=config,options=pdf_options)
     os.remove('temp.html')
-
 
 def create_doc(content, save_path):
     doc = Document()
@@ -290,6 +289,11 @@ def convert_html_to_pdf(html_string, pdf_path):
         pisa_status = pisa.CreatePDF(html_string, dest=pdf_file)
         
     return not pisa_status.err
+def convert_to_html(content):
+        markdown_content = markdown.markdown(content)
+        html_content = f"<html><body>{markdown_content}</body></html>"
+        return html_content
+
 
 
 router = APIRouter()
@@ -298,9 +302,9 @@ router = APIRouter()
 @router.get("/tempory/")
 async def tempory():
     
-    user_prompt = "What is the difference between merge sort and quick sort?"
+    user_prompt = "what is the difference between merge sort and quick sort?"
     message_text = [
-        {"role": "system", "content": system_prompt_mod},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
 
@@ -324,19 +328,23 @@ async def tempory():
         os.makedirs(save_folder, exist_ok=True)
         save_pdf_path = os.path.join(save_folder, f'file{unique_integer}.pdf')
 
-
-
-        markdown_content = markdown.markdown(content)
-        html_content = f"<html><body>{markdown_content}</body></html>"
+        #create pdf
+        html_content = convert_to_html(content)
         if convert_html_to_pdf(html_content, save_pdf_path):
             print(f"PDF generated and saved at {save_pdf_path}")
         else:
             print("PDF generation failed")
 
-        save_doc_path = os.path.join(save_folder, f'file{unique_integer}.docx')
+        # save_doc_path = os.path.join(save_folder, f'file{unique_integer}.docx')
        
         # create_pdf(content,save_pdf_path)
-        create_doc(content,save_doc_path)
+        # create_doc(content,save_doc_path)
+
+
+        #create pdf using wkhtmltopdf
+        file_name='test.pdf'
+        create_pdf(content,file_name)
+
         #bar chart
         # try:
         #     data_dic,title,x_axis_title,y_axis_title = convert_to_dic(content)
