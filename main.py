@@ -10,6 +10,7 @@ from app.api.api_v1.endpoints import (
     common,
     quickprompt,
     report_generation,
+    tempory,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,4 +32,7 @@ app.include_router(ip_validity_analysis.router)
 app.include_router(ip_license_process.router)
 app.include_router(common.router)
 app.include_router(quickprompt.router)
+
 app.include_router(report_generation.router)
+
+app.include_router(tempory.router)
