@@ -17,20 +17,19 @@ from dotenv import load_dotenv
 
 from xhtml2pdf import pisa
 
+
 load_dotenv()
-
-
 
 
 
 
 number_set = set()
 
-config=pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
-pdf_options = {
-    'page-size': 'A4',
-    'encoding': 'UTF-8',
-}
+# config=pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+# pdf_options = {
+#     'page-size': 'A4',
+#     'encoding': 'UTF-8',
+# }
 system_prompt= """
 Answer the following questions to the best of your ability. If you do not know the answer, Answer should be more than 1000 words. please type 'I do not know
 Please generate a detailed document using the following structure and formatting requirements:
@@ -160,15 +159,15 @@ def generate_unique_number():
             number_set.add(random_integer)
             return random_integer
 
-def create_pdf(content,save_path):
-    markdown_content = markdown.markdown(content)
-    html_content = f"<html><body>{markdown_content}</body></html>"
+# def create_pdf(content,save_path):
+#     markdown_content = markdown.markdown(content)
+#     html_content = f"<html><body>{markdown_content}</body></html>"
        
-    with open('temp.html', 'w', encoding='utf-8') as f:
-        f.write(html_content)    
+#     with open('temp.html', 'w', encoding='utf-8') as f:
+#         f.write(html_content)    
 
-    pdfkit.from_file('temp.html', save_path, configuration=config,options=pdf_options)
-    os.remove('temp.html')
+#     pdfkit.from_file('temp.html', save_path, configuration=config,options=pdf_options)
+#     os.remove('temp.html')
 
 def create_doc(content, save_path):
     doc = Document()
@@ -295,6 +294,13 @@ def convert_to_html(content):
         return html_content
 
 
+def convert_html_to_pdf(html_content, pdf_path):
+    try:
+        pdfkit.from_string(html_content, pdf_path)
+        print(f"PDF generated and saved at {pdf_path}")
+    except Exception as e:
+        print(f"PDF generation failed: {e}")
+
 
 router = APIRouter()
 
@@ -342,8 +348,8 @@ async def tempory():
 
 
         #create pdf using wkhtmltopdf
-        file_name='test.pdf'
-        create_pdf(content,file_name)
+        # file_name='test.pdf'
+        # create_pdf(content,file_name)
 
         #bar chart
         # try:
