@@ -20,6 +20,9 @@ from app.models.prior_art_search import PatentResult, PatentList, ReportParams
 import os
 import markdown2
 import pdfkit
+from datetime import datetime
+from email.message import EmailMessage
+import smtplib
 
 
 async def get_answers(requirement_gathering_id, user_case_id):
@@ -481,6 +484,7 @@ async def search_documents(keywords: List[str]) -> List[PatentResult]:
     try:
         conn = get_percieve_db_connection()
         query_keywords = " | ".join(keywords)
+        print(query_keywords)
         ts_query = sql.SQL("plainto_tsquery('english', %s)")
 
         query = sql.SQL(
@@ -585,7 +589,7 @@ async def search_patents(patents: List[PatentResult], description: str) -> Paten
     sorted_similarities = sorted(
         similarity_dict.items(), key=lambda item: item[1], reverse=True
     )
-    top_10_patent_ids = [patent_id for patent_id, _ in sorted_similarities[:5]]
+    top_10_patent_ids = [patent_id for patent_id, _ in sorted_similarities[:10]]
 
     return top_10_patent_ids
 
@@ -656,8 +660,9 @@ async def create_report_background(report_params: ReportParams):
         keywords = await get_keywords(answers)
 
         response_data = await search_documents(keywords)
+        print(len(response_data))
 
-        response_data = response_data[:3]
+        response_data = response_data[:20]
         patent_ids = await search_patents(response_data, summary)
         analysed_patent_reports = ['## Relevant Patents\n\n']
         all_patents_info = []
@@ -677,17 +682,36 @@ async def create_report_background(report_params: ReportParams):
                 Claims: {patent['claims']}
                 """
                 all_patents_info.append(patent_info)
-                relevancyReport = await getRelevantPatentDetails(summary,patent_info)
-                relevancyReport = relevancyReport + os.linesep
-                analysed_patent_reports.append(relevancyReport)
-                
-            
-        analysed_patent_reports_str = "\n\n".join(analysed_patent_reports)
+
         # Concatenate all patent information into a single string
         patents_info_str = "\n\n".join(all_patents_info)
+
+        relevant_patent_ids = await get_relevant_patent_ids(summary,patents_info_str)
+        print(relevant_patent_ids)
+
+        for patent_id in relevant_patent_ids:
+            patent = await get_patent_details_by_id(patent_id)
+            if patent:
+                patent_info = f"""
+                Patent ID: {patent['id']}
+                Date: {patent['date']}
+                Published Country: {patent['published_country']}
+                Title: {patent['title']}
+                Abstract: {patent['abstract']}
+                Kind: {patent['kind']}
+                Claims: {patent['claims']}
+                """
+            relevancyReport = await getRelevantPatentDetails(summary,patent_info)
+            relevancyReport = relevancyReport + os.linesep
+            analysed_patent_reports.append(relevancyReport)
+        
+        analysed_patent_reports_str = "\n\n".join(analysed_patent_reports)
+
         report_intro = await getIntro_KeyFindings(summary,patents_info_str)
         report_conclusion = await getAnalysis_Conclusion(summary,patents_info_str)
         complete_report = report_intro + "\n\n" + analysed_patent_reports_str + "\n\n" + report_conclusion
+
+        
 
         exportPdf(complete_report)
         response = {
@@ -842,12 +866,10 @@ async def getAnalysis_Conclusion(userPatentSummary,patentInfo):
 
                 Provide detailed content for the "Analysis and Implications" and "Conclusion" sections based on the above structure. Do not include the title or introduction in the response.
 
-                Make sure to replace "User Patent" with actual name of the output. you have to extract the name of the "User Patent" from the Background Information of the User Patent.
+                # Make sure to replace "User Patent" with actual name of the output. you have to extract the name of the "User Patent" from the Background Information of the User Patent.
 
                 Give response in markdown format, make sure to follow the given structure and put all headings in markdown heading formats.
                 """
-
-
     message_text = [
             {"role": "system", "content": system_prompt_analysis_conclusion},
             # {"role": "user", "content": answer}
@@ -864,6 +886,41 @@ async def getAnalysis_Conclusion(userPatentSummary,patentInfo):
     )
     response = completion.choices[0].message.content
     return response
+    
+async def get_relevant_patent_ids(userPatentSummary,patentsInfo):
+    prompt  = f"""
+                You are provided with a list of patents and a summary of a specific patent. Your task is to find the top 10 most relevant patents from the list that match the specific patent summary.
+                The specific patent summary is:
+                {userPatentSummary}
+
+                Here is the list of patents:
+                {patentsInfo}
+
+                Return only the top 10 Patent IDs of the most relevant patents in a comma-separated format don't send any other thing in the response.
+                """
+
+
+    message_text = [
+            {"role": "system", "content": prompt},
+            # {"role": "user", "content": answer}
+        ]
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo",
+        messages=message_text,
+        temperature=0.7,
+        max_tokens=2000,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None,
+    )
+    response = completion.choices[0].message.content
+    if response:
+            patent_ids = [keyword.strip() for keyword in response.split(",") if keyword]
+            return patent_ids
+    else:
+            return {"status": "No content received"}
+    
 
 def exportPdf(text):
 
@@ -875,8 +932,9 @@ def exportPdf(text):
     html_text = markdown2.markdown(text)
 
     output_dir = "temp_report"
-    print(os.path)
-    output_pdf_path = os.path.join(output_dir, "report.pdf")
+    now = datetime.now()
+    formatted_now = now.strftime("%Y%m%d_%H%M")
+    output_pdf_path = os.path.join(output_dir, f"report_{formatted_now}.pdf")
     print(output_pdf_path)
 
 
@@ -889,12 +947,38 @@ def exportPdf(text):
     with open(html_file_path, "w") as html_file:
         html_file.write(html_text)
     
+
     path_to_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path based on your installation
 
     config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
 
     pdfkit.from_string(html_text, output_pdf_path,configuration=config)
+    print(type(html_text))
     print(f"PDF file has been created successfully at {output_pdf_path}.")
+    send_email_with_attachment(output_pdf_path,html_text,output_pdf_path)
+
+def send_email_with_attachment(subject, body,attachment_path):
+    # Create the email message
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = 'fitme.paf@gmail.com'
+    msg['To'] = 'himaranga.mini90@gmail.com'
+
+    # Set the email body
+    
+    msg.add_alternative(body, subtype='html')
+
+    
+    # Attach the file
+    with open(attachment_path, 'rb') as f:
+        file_data = f.read()
+        file_name = os.path.basename(attachment_path)
+        msg.add_attachment(file_data, maintype='application', subtype='pdf', filename=file_name)
+
+    # Send the email
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.login('fitme.paf@gmail.com', 'mfbyrdsxsbcoyfbv')
+        server.send_message(msg)
 
 
 # markdown_text = """
