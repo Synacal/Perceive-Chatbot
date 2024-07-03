@@ -948,7 +948,7 @@ def exportPdf(text):
         html_file.write(html_text)
     
 
-    path_to_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path based on your installation
+    path_to_wkhtmltopdf = r'temp_report\wkhtmltopdf.exe'  # Update this path based on your installation
 
     config = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
 
