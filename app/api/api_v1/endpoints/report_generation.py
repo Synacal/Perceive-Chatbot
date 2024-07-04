@@ -80,3 +80,24 @@ async def download_file(
         )
     finally:
         conn.close()
+
+from app.services.ip_license_process.common import (
+    get_answers_license,
+    get_summary_license,
+    get_keywords_license,
+    search_patents_ids,
+    get_patent_data,
+    create_report,
+)
+
+@router.get("/temp-image")
+async def temp_image():
+    requirement_gathering_id = 1293
+    user_case_id = 2
+    answers = await get_answers_license(requirement_gathering_id, user_case_id)
+    summary = await get_summary_license(answers)
+    keywords = await get_keywords_license(answers)
+    patents_ids = await search_patents_ids(keywords)
+    patent_data = await get_patent_data(patents_ids)
+
+    system_prompt = f"""
