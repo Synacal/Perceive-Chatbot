@@ -328,7 +328,7 @@ async def get_summary_license(answers):
 
 
 async def get_keywords_license(answers):
-    system_prompt = f"Extract exactly 2 general product-related keywords from the following text. Ensure these are broad terms like 'satellite' or 'motor' and not specific names, companies, or places. Separate them with a comma: {answers}"
+    system_prompt = f"Extract exactly 2 general product-related keywords that indicate innovation potential for patents from the following text. Ensure these are broad terms like 'solar' or 'battery' and not specific names, companies, or places. Separate them with a comma: {answers}"
     try:
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},

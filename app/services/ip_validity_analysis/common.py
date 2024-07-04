@@ -416,7 +416,7 @@ async def get_answers(requirement_gathering_id, user_case_id):
 
 
 async def get_keywords(answers):
-    system_prompt = f"Extract exactly 2 general product-related keywords from the following text. Ensure these are broad terms like 'satellite' or 'motor' and not specific names, companies, or places. Separate them with a comma: {answers}"
+    system_prompt = f"Extract exactly 2 general product-related keywords that indicate innovation potential for patents from the following text. Ensure these are broad terms like 'solar' or 'battery' and not specific names, companies, or places. Separate them with a comma: {answers}"
     try:
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
@@ -585,14 +585,15 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib import utils
 from io import BytesIO
 
-
+"""
 async def create_pdf_document(
     content: str, requirement_gathering_id: str, user_case_id: str
 ):
     buffer = BytesIO()
 
     # Convert Markdown to HTML
-    html_content = markdown.markdown(content)
+    markdown_content = markdown.markdown(content)
+    html_content = f"<html><body>{markdown_content}</body></html>"
 
     # Create the PDF document
     doc = SimpleDocTemplate(buffer, pagesize=letter)
@@ -625,8 +626,124 @@ async def create_pdf_document(
         file_name,
         content,
     )
+    """
+
+from bs4 import BeautifulSoup
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    ListFlowable,
+    ListItem,
+)
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 
+async def create_pdf_document(
+    report_name: str, content: str, requirement_gathering_id: str, user_case_id: str
+):
+    buffer = BytesIO()
+
+    # Convert Markdown to HTML
+    html_content = markdown.markdown(content)
+
+    # Create the PDF document
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    styles.add(
+        ParagraphStyle(
+            name="CenteredHeading", alignment=TA_CENTER, fontSize=16, leading=20
+        )
+    )
+    flowables = []
+
+    # Add the title
+    flowables.append(
+        Paragraph("IP Validity Analysis Report", styles["CenteredHeading"])
+    )
+    flowables.append(Spacer(1, 12))
+
+    # Parse the HTML content using BeautifulSoup
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Add content to the PDF
+    for element in soup.children:
+        if element.name == "p":
+            flowables.append(Paragraph(element.text, styles["Normal"]))
+            flowables.append(Spacer(1, 12))
+        elif element.name in ["h1", "h2", "h3"]:
+            level = int(element.name[1])
+            style_name = f"Heading{level}"
+            if style_name in styles:
+                flowables.append(Paragraph(element.text, styles[style_name]))
+                flowables.append(Spacer(1, 12))
+        elif element.name == "ul":
+            list_items = [
+                ListItem(
+                    Paragraph(li.text, styles["Normal"]),
+                    bulletFontName="Helvetica",
+                    bulletFontSize=12,
+                )
+                for li in element.find_all("li")
+            ]
+            flowables.append(
+                ListFlowable(
+                    list_items,
+                    bulletType="bullet",
+                    start="disc",
+                    bulletFontName="Helvetica",
+                    bulletFontSize=12,
+                )
+            )
+            flowables.append(Spacer(1, 12))
+        elif element.name == "ol":
+            list_items = [
+                ListItem(
+                    Paragraph(li.text, styles["Normal"]),
+                    bulletFontName="Helvetica",
+                    bulletFontSize=12,
+                )
+                for li in element.find_all("li")
+            ]
+            flowables.append(
+                ListFlowable(
+                    list_items,
+                    bulletType="1",
+                    start="1",
+                    bulletFontName="Helvetica",
+                    bulletFontSize=12,
+                )
+            )
+            flowables.append(Spacer(1, 12))
+
+    # Build the PDF
+    doc.build(flowables)
+
+    # Move to the beginning of the BytesIO buffer
+    buffer.seek(0)
+
+    # Convert the PDF to base64
+    pdf_bytes = buffer.read()
+    pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
+
+    file_type = "pdf"
+    file_name = report_name
+
+    # Insert the base64 PDF document into the database
+    await insert_file_to_db(
+        pdf_base64,
+        requirement_gathering_id,
+        user_case_id,
+        file_type,
+        file_name,
+        content,
+    )
+
+
+"""
 async def create_word_document(
     content: str, requirement_gathering_id: str, user_case_id: str
 ):
@@ -654,6 +771,71 @@ async def create_word_document(
 
     file_type = "docx"
     file_name = "IP Validity Analysis Report"
+
+    # Insert the base64 Word document into the database
+    await insert_file_to_db(
+        doc_base64,
+        requirement_gathering_id,
+        user_case_id,
+        file_type,
+        file_name,
+        content,
+    )
+"""
+
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+
+async def create_word_document(
+    report_name: str, content: str, requirement_gathering_id: str, user_case_id: str
+):
+    buffer = BytesIO()
+
+    # Convert Markdown to HTML
+    html_content = markdown.markdown(content)
+
+    # Create a new Word document
+    doc = Document()
+    doc.add_heading("IP Validity Analysis Report", level=1).alignment = (
+        WD_ALIGN_PARAGRAPH.CENTER
+    )
+
+    # Parse the HTML content using BeautifulSoup
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Add content to the document
+    for element in soup.children:
+        if element.name == "p":
+            doc.add_paragraph(element.text)
+        elif element.name == "h1":
+            heading = doc.add_heading(level=1)
+            heading_run = heading.add_run(element.text)
+            heading_run.bold = True
+        elif element.name == "h2":
+            heading = doc.add_heading(level=2)
+            heading_run = heading.add_run(element.text)
+            heading_run.bold = True
+        elif element.name == "h3":
+            heading = doc.add_heading(level=3)
+            heading_run = heading.add_run(element.text)
+            heading_run.bold = True
+        elif element.name == "ul":
+            for li in element.find_all("li"):
+                doc.add_paragraph(li.text, style="List Bullet")
+        elif element.name == "ol":
+            for li in element.find_all("li"):
+                doc.add_paragraph(li.text, style="List Number")
+
+    # Save the document to a BytesIO buffer
+    doc.save(buffer)
+    buffer.seek(0)
+
+    # Convert the Word document to base64
+    doc_bytes = buffer.read()
+    doc_base64 = base64.b64encode(doc_bytes).decode("utf-8")
+
+    file_type = "docx"
+    file_name = report_name
 
     # Insert the base64 Word document into the database
     await insert_file_to_db(

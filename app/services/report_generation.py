@@ -226,13 +226,19 @@ async def generate_report_1(requirement_gathering_id, user_case_id):
 
         str_analysis_results = str(complete_report)
 
+        report_name = (
+            "prior_art" + str(requirement_gathering_id) + "_" + str(user_case_id)
+        )
+
         await create_word_document(
+            report_name,
             str_analysis_results,
             requirement_gathering_id,
             user_case_id,
         )
 
         await create_pdf_document(
+            report_name,
             str_analysis_results,
             requirement_gathering_id,
             user_case_id,
@@ -321,18 +327,24 @@ async def generate_report_2(requirement_gathering_id, user_case_id):
                 license_criteria[i],
             )
             assessment_str = str(assessment)  # Assuming assessment is a set of strings
-            report = report + "/n/n" + assessment_str
+            report = report + assessment_str
 
         # Convert report dictionary to JSON string
         report_str = str(report)
 
+        report_name = (
+            "IP_Licensing_" + str(requirement_gathering_id) + "_" + str(user_case_id)
+        )
+
         await create_word_document(
+            report_name,
             report_str,
             requirement_gathering_id,
             user_case_id,
         )
 
         await create_pdf_document(
+            report_name,
             report_str,
             requirement_gathering_id,
             user_case_id,
@@ -432,20 +444,29 @@ async def generate_report_3(requirement_gathering_id, user_case_id):
                 patentability_criteria[i],
             )
             assessment_str = str(assessment)  # Assuming assessment is a set of strings
-            report = report + "/n/n" + assessment_str
+            report = report + assessment_str
 
         # Convert report dictionary to JSON string
         # report_str = str(report)
         report_str = str(report)
         print("j")
 
+        report_name = (
+            "IP_Validity_Analysis_"
+            + str(requirement_gathering_id)
+            + "_"
+            + str(user_case_id)
+        )
+
         await create_word_document(
+            report_name,
             report_str,
             requirement_gathering_id,
             user_case_id,
         )
         print("k")
         await create_pdf_document(
+            report_name,
             report_str,
             requirement_gathering_id,
             user_case_id,
